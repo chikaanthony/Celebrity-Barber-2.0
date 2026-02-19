@@ -11,7 +11,7 @@ body {
     display: flex;
     justify-content: center;
     padding: 20px;
-    padding-bottom: 120px;
+    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
 }
 
 .leaderboard-container {
@@ -371,7 +371,7 @@ body {
     justify-content: space-around;
     background: linear-gradient(to top, rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0.95));
     border-top: 1px solid rgba(212, 175, 55, 0.2);
-    padding: 10px 5px 20px;
+    padding: 10px 5px calc(20px + env(safe-area-inset-bottom, 0px));
     backdrop-filter: blur(10px);
     z-index: 99;
 }
