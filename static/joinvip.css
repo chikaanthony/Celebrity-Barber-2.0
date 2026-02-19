@@ -12,7 +12,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
 }
 
 .vip-container {
