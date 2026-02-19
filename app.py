@@ -1808,15 +1808,67 @@ def get_user_details(user_id):
 def delete_user(user_id):
     if not session.get('is_admin'):
         return {'success': False, 'message': 'Access denied'}, 403
-    
-    if db:
+
+    target_user_id = str(user_id or '').strip()
+    if not target_user_id:
+        return {'success': False, 'message': 'User ID is required'}, 400
+
+    if target_user_id == 'admin' or target_user_id == session.get('user_id'):
+        return {'success': False, 'message': 'Cannot delete this account'}, 400
+
+    if not db:
+        return {'success': False, 'message': 'Database not available'}, 500
+
+    try:
+        user_email = None
+        user_doc_ref = db.collection('users').document(target_user_id)
+        user_doc = user_doc_ref.get()
+        if user_doc.exists:
+            user_data = user_doc.to_dict() or {}
+            user_email = (user_data.get('email') or '').strip() or None
+            user_doc_ref.delete()
+
+        # Also remove matching blocked-users doc if present.
         try:
-            db.collection('users').document(user_id).delete()
-            return {'success': True, 'message': 'User deleted'}
+            db.collection('blocked_users').document(target_user_id).delete()
+        except Exception:
+            pass
+
+        auth_deleted = False
+        auth_error = None
+
+        # Primary path: Firestore doc ID is usually Firebase Auth UID.
+        try:
+            auth.delete_user(target_user_id)
+            auth_deleted = True
         except Exception as e:
-            return {'success': False, 'message': str(e)}, 500
-    
-    return {'success': False, 'message': 'Error'}, 500
+            if e.__class__.__name__ != 'UserNotFoundError':
+                auth_error = str(e)
+
+        # Fallback: resolve by email if UID lookup did not delete.
+        if (not auth_deleted) and user_email:
+            try:
+                firebase_user = auth.get_user_by_email(user_email)
+                auth.delete_user(firebase_user.uid)
+                auth_deleted = True
+                auth_error = None
+            except Exception as e:
+                if e.__class__.__name__ != 'UserNotFoundError':
+                    auth_error = str(e)
+
+        if auth_error:
+            return {
+                'success': False,
+                'message': f'Firestore user deleted, but Auth delete failed: {auth_error}'
+            }, 500
+
+        return {
+            'success': True,
+            'message': 'User deleted successfully',
+            'auth_deleted': auth_deleted
+        }
+    except Exception as e:
+        return {'success': False, 'message': str(e)}, 500
 
 
 @app.route('/api/admin/analytics')
