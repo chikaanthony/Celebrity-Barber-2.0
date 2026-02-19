@@ -739,7 +739,7 @@
         }
 
         function openChat(userId) {
-            window.location.href = `/admin/messages?user=${userId}`;
+            window.location.href = `/admin/chat?user=${encodeURIComponent(userId)}`;
         }
 
         function showDeleteConfirm(userId) {

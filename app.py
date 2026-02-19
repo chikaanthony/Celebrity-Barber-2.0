@@ -2607,6 +2607,19 @@ def admin_chat():
     return render_template('admin-messages.html')
 
 
+@app.route('/admin/messages')
+@login_required
+def admin_messages_legacy():
+    if not session.get('is_admin'):
+        flash('Access denied', 'error')
+        return redirect(url_for('index'))
+
+    requested_user = request.args.get('user')
+    if requested_user:
+        return redirect(url_for('admin_chat', user=requested_user))
+    return redirect(url_for('admin_chat'))
+
+
 @app.route('/admin/broadcast')
 @login_required
 def admin_broadcast():

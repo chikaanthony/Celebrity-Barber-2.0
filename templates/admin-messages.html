@@ -882,6 +882,7 @@
         let usersData = {};
         let allUsersCache = [];
         let searchTimeout = null;
+        let preselectedUserHandled = false;
 
         async function loadChatList() {
             try {
@@ -895,6 +896,60 @@
                 }
             } catch (error) {
                 console.error('Error loading chat list:', error);
+            }
+        }
+
+        async function openUserFromQuery() {
+            if (preselectedUserHandled) return;
+
+            const params = new URLSearchParams(window.location.search);
+            const requestedUserId = params.get('user');
+            if (!requestedUserId) {
+                preselectedUserHandled = true;
+                return;
+            }
+
+            if (usersData[requestedUserId]) {
+                preselectedUserHandled = true;
+                await selectUser(requestedUserId);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/users');
+                const result = await response.json();
+                if (!result.success) {
+                    return;
+                }
+
+                const users = result.data || [];
+                const matched = users.find(u => (u.user_id || u.id) === requestedUserId);
+                if (!matched) {
+                    return;
+                }
+
+                const synthesizedUser = {
+                    user_id: requestedUserId,
+                    user_name: matched.full_name || matched.user_name || matched.email || 'User',
+                    user_email: matched.email || '',
+                    is_vip: !!(matched.is_vip || matched.isVIP),
+                    isVIP: !!(matched.is_vip || matched.isVIP),
+                    photo_url: matched.photo_url || '',
+                    last_message: 'Start a conversation...',
+                    last_time: '',
+                    unread: 0
+                };
+
+                usersData[requestedUserId] = synthesizedUser;
+                if (!allUsersCache.some(u => u.user_id === requestedUserId)) {
+                    allUsersCache = [synthesizedUser, ...allUsersCache];
+                }
+
+                renderChatList(allUsersCache);
+                preselectedUserHandled = true;
+                await selectUser(requestedUserId);
+            } catch (error) {
+                console.error('Error opening user from query:', error);
             }
         }
 
@@ -1257,7 +1312,13 @@
         });
 
         setInterval(loadChatList, 30000);
-        loadChatList();
+
+        async function initMessagingCenter() {
+            await loadChatList();
+            await openUserFromQuery();
+        }
+
+        initMessagingCenter();
 
         // Mobile menu toggle
         function toggleChatList() {
