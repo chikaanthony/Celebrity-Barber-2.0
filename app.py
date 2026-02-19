@@ -50,6 +50,10 @@ def login_required(f):
     return decorated_function
 
 
+def normalize_referral_code(code):
+    return str(code or '').strip().upper()
+
+
 # Routes
 @app.route('/')
 def index():
@@ -136,7 +140,7 @@ def register():
             email = request.form.get('email')
             pin = request.form.get('pin')  # Secure PIN as password
             phone = request.form.get('phone')
-            referral_code = request.form.get('referral_code', '')
+            referral_code = normalize_referral_code(request.form.get('referral_code', ''))
             
             print(f"Received: name={name}, email={email}, pin={pin}, phone={phone}")
             
@@ -167,23 +171,23 @@ def register():
                     'is_vip': False,
                     'total_spent': 0,
                     'referral_code': 'CELEB-' + user.uid[:4].upper(),
+                    'referral_count': 0,
                     'created_at': firestore.SERVER_TIMESTAMP
                 }
                 
-                # If user used a referral code, save it
+                # If user used a referral code, link and increment referrer count
                 if referral_code:
-                    user_data['used_referral_code'] = referral_code.upper()
-                    
-                    # Find the referrer and increment their referral count
                     try:
-                        # Find user with this referral code
-                        referrers = db.collection('users').where('referral_code', '==', referral_code.upper()).get()
-                        for referrer in referrers:
-                            current_count = referrer.to_dict().get('referral_count', 0)
-                            db.collection('users').document(referrer.id).update({
-                                'referral_count': current_count + 1
+                        referrers = db.collection('users').where('referral_code', '==', referral_code).limit(1).get()
+                        if referrers:
+                            referrer_id = referrers[0].id
+                            user_data['used_referral_code'] = referral_code
+                            db.collection('users').document(referrer_id).update({
+                                'referral_count': firestore.Increment(1)
                             })
-                            print(f"Incremented referral count for {referrer.id}")
+                            print(f"Incremented referral count for {referrer_id}")
+                        else:
+                            print(f"Referral code not found: {referral_code}")
                     except Exception as e:
                         print(f"Error updating referrer: {e}")
                 
@@ -1547,7 +1551,7 @@ def api_signup():
     password = data.get('password')
     full_name = data.get('full_name')
     phone = data.get('phone')
-    referral_code = data.get('referral_code', '')
+    referral_code = normalize_referral_code(data.get('referral_code', ''))
     
     try:
         # Create user in Firebase Auth
@@ -1564,13 +1568,28 @@ def api_signup():
                 'email': email,
                 'full_name': full_name,
                 'phone': phone,
-                'referral_code': referral_code,
+                'referral_code': 'CELEB-' + user.uid[:4].upper(),
                 'is_admin': False,
                 'is_vip': False,
                 'total_spent': 0,
                 'referral_count': 0,
                 'created_at': firestore.SERVER_TIMESTAMP
             }
+
+            if referral_code:
+                try:
+                    referrers = db.collection('users').where('referral_code', '==', referral_code).limit(1).get()
+                    if referrers:
+                        referrer_id = referrers[0].id
+                        user_data['used_referral_code'] = referral_code
+                        db.collection('users').document(referrer_id).update({
+                            'referral_count': firestore.Increment(1)
+                        })
+                    else:
+                        print(f"Referral code not found: {referral_code}")
+                except Exception as e:
+                    print(f"Error applying referral on api signup: {e}")
+
             db.collection('users').document(user.uid).set(user_data)
         
         # Create session
@@ -1942,25 +1961,31 @@ def get_all_referrals():
                 user_data = user_doc.to_dict()
                 
                 # Check if this user was referred (has used_referral_code)
-                used_code = user_data.get('used_referral_code', '')
+                used_code = normalize_referral_code(user_data.get('used_referral_code', ''))
                 if used_code:
                     # Find the referrer
                     referrers = db.collection('users').where('referral_code', '==', used_code).get()
                     referrer_name = 'Unknown'
                     referrer_code = used_code
                     referrer_photo = ''
-                    
+                    referral_count = 0
+
                     for referrer in referrers:
                         ref_data = referrer.to_dict()
                         referrer_name = ref_data.get('full_name', 'Unknown')
                         referrer_photo = ref_data.get('photo_url', '')
                         referral_count = ref_data.get('referral_count', 0)
                         break
-                    
-                    # Determine status - check referral_status field first, then total_spent
+
+                    # Determine status - check referral_status field first, then spending fallback
                     status = user_data.get('referral_status', '')
+                    total_spent = user_data.get('total_spent', 0)
+                    if isinstance(total_spent, str):
+                        try:
+                            total_spent = float(''.join(ch for ch in total_spent if ch.isdigit() or ch in ['.', '-']))
+                        except Exception:
+                            total_spent = 0
                     if not status:
-                        # Fall back to checking spending
                         if total_spent > 0:
                             status = 'successful'
                         else:
@@ -2061,7 +2086,7 @@ def grant_referral_reward():
                 return {'success': False, 'message': 'User not found'}, 404
             
             user_data = referred_user.to_dict()
-            used_code = user_data.get('used_referral_code', '')
+            used_code = normalize_referral_code(user_data.get('used_referral_code', ''))
             
             # Update the referred user (the one who made the purchase)
             db.collection('users').document(referral_id).update({
@@ -2111,15 +2136,18 @@ def get_user_referrals():
                 return {'success': False, 'message': 'User not found'}, 404
             
             user_data = user_doc.to_dict()
-            my_referral_code = user_data.get('referral_code', '')
+            my_referral_code = normalize_referral_code(user_data.get('referral_code', ''))
             
-            # Find users who used this code
+            # Find users who used this code (normalize stored values to handle old mixed-case data)
             referrals = []
             if my_referral_code:
-                referred_users = db.collection('users').where('used_referral_code', '==', my_referral_code).get()
-                
-                for ref_user in referred_users:
+                all_users = db.collection('users').get()
+
+                for ref_user in all_users:
                     ref_data = ref_user.to_dict()
+                    used_code = normalize_referral_code(ref_data.get('used_referral_code', ''))
+                    if used_code != my_referral_code:
+                        continue
                     
                     # Get status
                     status = ref_data.get('referral_status', 'pending')
