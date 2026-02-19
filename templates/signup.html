@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Celebrity Barber</title>
+
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Return Button -->
+    <a href="/" class="return-btn">
+        <span class="return-icon">←</span>
+        <span>Return</span>
+    </a>
+
+    <!-- Sign Up Form -->
+    <div class="login-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="flash-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <div class="login-box">
+            <div class="login-header">
+                <span class="login-icon">✂️</span>
+                <h2>CREATE ACCOUNT</h2>
+                <p class="login-subtitle">Join the Celebrity Barber community</p>
+            </div>
+            
+            <form class="login-form" action="/register" method="POST">
+                <div class="form-group">
+                    <label for="fullname">FULL NAME</label>
+                    <input type="text" id="fullname" name="full_name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">EMAIL</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">PHONE NUMBER</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">PASSWORD</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="pin" placeholder="Enter your PIN" required>
+                        <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">CONFIRM PASSWORD</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+                        <span class="toggle-password" onclick="togglePassword('confirm_password')">👁️</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="referral">REFERRAL CODE <span class="optional">(Optional)</span></label>
+                    <input type="text" id="referral" name="referral_code" placeholder="Enter referral code">
+                </div>
+                
+                <button type="submit" class="login-btn">CREATE ACCOUNT</button>
+            </form>
+            
+            <p class="signup-link">
+                Already have an account? <a href="/login">Login</a>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const toggle = input.nextElementSibling;
+        if (input.type === 'password') {
+            input.type = 'text';
+            toggle.textContent = '🔒';
+        } else {
+            input.type = 'password';
+            toggle.textContent = '👁️';
+        }
+    }
+</script>

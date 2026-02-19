@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Session - Celebrity Barber</title>
+
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/bookcut.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Close Button -->
+    <a href="/clientdashboard" class="close-btn">
+        <span>✕</span>
+    </a>
+
+    <!-- Booking Container -->
+    <div class="booking-container">
+        
+        <!-- Page Header -->
+        <div class="booking-header">
+            <h1>Book a <span class="gold-accent">Session</span></h1>
+        </div>
+
+        <!-- Service Selection -->
+        <div class="service-section">
+            <h2>Select Service</h2>
+            <div class="service-grid" id="serviceGrid">
+                <!-- Services loaded dynamically from API -->
+            </div>
+        </div>
+
+        <!-- Date Picker -->
+        <div class="date-section">
+            <h2>Preferred Date</h2>
+            <div class="date-input-wrapper">
+                <input type="date" id="booking-date" class="date-input" required>
+                <span class="calendar-icon">📅</span>
+            </div>
+        </div>
+
+        <!-- Special Requests -->
+        <div class="requests-section">
+            <h2>Special Requests</h2>
+            <div class="textarea-wrapper">
+                <textarea id="special-requests" placeholder="Any special requests..."></textarea>
+                <label for="receipt-upload" class="upload-btn">
+                    📷 Upload Receipt
+                </label>
+                <input type="file" id="receipt-upload" accept="image/*" hidden>
+            </div>
+        </div>
+
+        <!-- Book Now Button -->
+        <button class="book-now-btn" onclick="submitBooking()">
+            BOOK NOW
+        </button>
+
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <span class="success-icon">✓</span>
+            <h2>Booking Confirmed!</h2>
+            <p>Your appointment has been submitted successfully.</p>
+            <a href="/clientdashboard" class="return-btn">Return to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        let selectedService = null;
+        let selectedPrice = 0;
+
+        // Load services from API on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServices();
+        });
+
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services');
+                const result = await response.json();
+                
+                const container = document.getElementById('serviceGrid');
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    // Render services from database
+                    container.innerHTML = result.data.map(service => `
+                        <div class="service-card" onclick="selectService(this, '${service.name}', ${service.price})">
+                            <span class="service-name">${service.name}</span>
+                            <span class="service-price">₦${service.price.toLocaleString()}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    // No services in database yet
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1/-1; padding: 40px;">
+                            <div class="empty-icon">💇</div>
+                            <div>No services available</div>
+                            <p style="color: #666; margin-top: 10px;">Please check back later or contact the shop</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+
+        function selectService(card, serviceName, price) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            card.classList.add('selected');
+            
+            // Store selection
+            selectedService = serviceName;
+            selectedPrice = price;
+        }
+
+        function submitBooking() {
+            const date = document.getElementById('booking-date').value;
+            const requests = document.getElementById('special-requests').value;
+            const receiptFile = document.getElementById('receipt-upload').files[0];
+
+            // Validation
+            if (!selectedService) {
+                alert('Please select a service!');
+                return;
+            }
+
+            if (!date) {
+                alert('Please select a date!');
+                return;
+            }
+
+            // Convert receipt to base64
+            const convertToBase64 = (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                });
+            };
+            
+            const processBooking = async () => {
+                let receiptBase64 = '';
+                if (receiptFile) {
+                    try {
+                        receiptBase64 = await convertToBase64(receiptFile);
+                    } catch (e) {
+                        console.error('Error converting receipt:', e);
+                    }
+                }
+
+                // Send to Firebase
+                fetch('/api/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        service: selectedService,
+                        price: selectedPrice,
+                        date: date,
+                        requests: requests,
+                        receipt: receiptBase64
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        document.getElementById('successOverlay').classList.add('active');
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error submitting booking. Please try again.');
+                });
+            };
+            
+            processBooking();
+        }
+    </script>
+
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+</body>
+</html>

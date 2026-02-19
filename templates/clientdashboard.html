@@ -1,0 +1,524 @@
+be<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - Celebrity Barber</title>
+
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/clientdashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="client-nav">
+        <div class="nav-logo">
+            <span class="logo-icon">✂️</span>
+            <span class="logo-text">CELEBRITY BARBER</span>
+        </div>
+        
+        <div class="nav-right">
+            <button class="notification-btn" onclick="window.location.href='/notifications'">
+                <span class="notif-icon">🔔</span>
+                <span class="notif-badge" id="notifBadge">0</span>
+            </button>
+            <button class="menu-dots" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" onclick="toggleMobileMenu()">×</button>
+        <a href="/clientdashboard">My Account</a>
+        <a href="#">Settings</a>
+        <a href="#">Help</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile-section">
+        <div class="profile-container">
+            <div class="profile-pic" onclick="window.location.href='/profile'">
+                <span class="avatar" id="dashboardAvatar">👤</span>
+                <button class="change-pic">📷</button>
+            </div>
+            <h1>WELCOME BACK CELEB <span class="user-name">{{ user.full_name if user else 'User' }}</span></h1>
+            <div class="vip-indicator" id="vipIndicator">
+                <span class="vip-badge" id="vipBadge">👑 VIP</span>
+                <span class="vip-status" id="vipStatus">{{ 'Active' if user.is_vip else 'Regular' }}</span>
+            </div>
+            <p class="user-email">{{ user.email if user else 'user@example.com' }}</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        
+        <!-- Latest Updates -->
+        <div class="dashboard-card updates-card">
+            <h3>📢 LATEST UPDATES</h3>
+            <div class="updates-ticker">
+                <div class="ticker-track">
+                    <span>🎉 New VIP perks available! Get priority queueing and 2 free haircuts monthly.</span>
+                    <span>🔥 Refer a friend and earn free cuts!</span>
+                    <span>💈 Weekend special: 20% off all services!</span>
+                    <span>✨ New style available - Ask our barbers!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spending Streak - loads from database -->
+        <div class="dashboard-card spending-card">
+            <h3>💰 SPENDING STREAK BONUS</h3>
+            <div class="spending-content">
+                <div class="pie-chart-container">
+                    <svg class="pie-chart" viewBox="0 0 100 100">
+                        <circle class="pie-bg" cx="50" cy="50" r="40"/>
+                        <circle class="pie-fill" cx="50" cy="50" r="40" id="spendingPie" stroke-dasharray="0 251.2"/>
+                        <text x="50" y="45" class="pie-text" text-anchor="middle" id="spendingAmount">₦0</text>
+                        <text x="50" y="60" class="pie-subtext" text-anchor="middle">of ₦5,000</text>
+                    </svg>
+                </div>
+                <div class="spending-info">
+                    <p class="spending-goal">Reach ₦5,000 spending to unlock ₦500 bonus!</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="spendingProgress" style="width: 0%;"></div>
+                    </div>
+                    <p class="spending-hint" id="spendingHint">Start booking to earn bonuses</p>
+                </div>
+            </div>
+        </div>
+        
+    <!-- Referral Streak -->
+        <div class="dashboard-card" onclick="window.location.href='/referrals'" style="cursor: pointer; transition: all 0.3s; border: 1px solid #1a1a1a; background: #111; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+            <h3 style="font-family: 'Orbitron', sans-serif; color: #d4af37; font-size: 14px; margin-bottom: 15px;">🎁 REFERRAL STREAK</h3>
+            <div style="padding: 10px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div id="dash-m1" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                        <div id="dash-m1-circle" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid rgba(255,255,255,0.2); margin-bottom: 5px; transition: all 0.3s;">🎟️</div>
+                        <span id="dash-m1-label" style="color: #aaa; font-size: 10px; text-align: center;">30% OFF</span>
+                    </div>
+                    <div style="flex: 1; height: 2px; background: rgba(255,255,255,0.2); margin: 0 5px; margin-bottom: 20px;"></div>
+                    <div id="dash-m2" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                        <div id="dash-m2-circle" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid rgba(255,255,255,0.2); margin-bottom: 5px; transition: all 0.3s;">🎟️</div>
+                        <span id="dash-m2-label" style="color: #aaa; font-size: 10px; text-align: center;">60% OFF</span>
+                    </div>
+                    <div style="flex: 1; height: 2px; background: rgba(255,255,255,0.2); margin: 0 5px; margin-bottom: 20px;"></div>
+                    <div id="dash-m3" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                        <div id="dash-m3-circle" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid rgba(255,255,255,0.2); margin-bottom: 5px; transition: all 0.3s;">✂️</div>
+                        <span id="dash-m3-label" style="color: #aaa; font-size: 10px; text-align: center;">FREE CUT</span>
+                    </div>
+                </div>
+                <p id="referralStreakHint" style="text-align: center; color: #888; font-size: 13px;">Refer friends to unlock rewards!</p>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="dashboard-card history-card">
+            <h3>📋 MY HISTORY</h3>
+            <div class="history-list">
+                <div class="history-item" onclick="window.location.href='/bookings'">
+                    <div class="history-icon">📅</div>
+                    <div class="history-info">
+                        <h4>Booking History</h4>
+                        <p>View your past appointments</p>
+                    </div>
+                    <span class="history-arrow">›</span>
+                </div>
+                <div class="history-item" onclick="window.location.href='/referrals'">
+                    <div class="history-icon">🎁</div>
+                    <div class="history-info">
+                        <h4>Referral History</h4>
+                        <p>Track your referrals</p>
+                    </div>
+                    <span class="history-arrow">›</span>
+                </div>
+                <div class="history-item" onclick="window.location.href='/transactions'">
+                    <div class="history-icon">💳</div>
+                    <div class="history-info">
+                        <h4>Transaction History</h4>
+                        <p>View all transactions</p>
+                    </div>
+                    <span class="history-arrow">›</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Message Button -->
+    <div class="floating-message">
+        <button class="message-btn" onclick="window.location.href='/chat'">
+            <span>💬</span>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+
+    <!-- Popup Overlays -->
+    
+    <!-- Update Popup -->
+    <div class="popup-overlay" id="update-popup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup('update-popup')">← Return</button>
+            <h2>📢 Announcement</h2>
+            <div class="popup-body" id="update-popup-body">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load notification count on page load
+        async function loadNotificationCount() {
+            try {
+                const response = await fetch('/api/user/notifications');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    // Count unread notifications
+                    const unreadCount = result.data.filter(n => n.unread === true).length;
+                    const badge = document.getElementById('notifBadge');
+                    if (badge) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+        
+        // Send heartbeat to keep user online
+        async function sendHeartbeat() {
+            try {
+                await fetch('/api/user/heartbeat', { method: 'POST' });
+            } catch (e) {}
+        }
+        
+        // Expose function for notifications page to call
+        window.updateNotificationBadge = function(count) {
+            const badge = document.getElementById('notifBadge');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        };
+        
+        // Load user spending on page load
+        async function loadUserSpending() {
+            try {
+                const response = await fetch('/api/user/spending');
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateSpendingDisplay(result.total_spent);
+                }
+            } catch (error) {
+                console.error('Error loading spending:', error);
+            }
+        }
+        
+        // Load user profile to get VIP status and referral count
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user/profile');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const isVIP = result.data.isVIP === true;
+                    updateVIPStatus(isVIP);
+                    
+                    // Update referral streak
+                    const referralCount = result.data.referral_count || 0;
+                    updateReferralStreak(referralCount);
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+        
+        function updateReferralStreak(count) {
+            const m1Circle = document.getElementById('dash-m1-circle');
+            const m1Label = document.getElementById('dash-m1-label');
+            const m2Circle = document.getElementById('dash-m2-circle');
+            const m2Label = document.getElementById('dash-m2-label');
+            const m3Circle = document.getElementById('dash-m3-circle');
+            const m3Label = document.getElementById('dash-m3-label');
+            const hint = document.getElementById('referralStreakHint');
+            
+            // Reset all
+            if(m1Circle) { m1Circle.style.background = 'rgba(255,255,255,0.1)'; m1Circle.style.borderColor = 'rgba(255,255,255,0.2)'; }
+            if(m1Label) m1Label.style.color = '#aaa';
+            if(m2Circle) { m2Circle.style.background = 'rgba(255,255,255,0.1)'; m2Circle.style.borderColor = 'rgba(255,255,255,0.2)'; }
+            if(m2Label) m2Label.style.color = '#aaa';
+            if(m3Circle) { m3Circle.style.background = 'rgba(255,255,255,0.1)'; m3Circle.style.borderColor = 'rgba(255,255,255,0.2)'; }
+            if(m3Label) m3Label.style.color = '#aaa';
+            
+            if (count >= 1) {
+                if(m1Circle) { m1Circle.style.background = 'rgba(212, 175, 55, 0.3)'; m1Circle.style.borderColor = '#d4af37'; }
+                if(m1Label) m1Label.style.color = '#d4af37';
+            }
+            if (count >= 2) {
+                if(m2Circle) { m2Circle.style.background = 'rgba(212, 175, 55, 0.3)'; m2Circle.style.borderColor = '#d4af37'; }
+                if(m2Label) m2Label.style.color = '#d4af37';
+            }
+            if (count >= 3) {
+                if(m3Circle) { m3Circle.style.background = 'rgba(212, 175, 55, 0.3)'; m3Circle.style.borderColor = '#d4af37'; }
+                if(m3Label) m3Label.style.color = '#d4af37';
+            }
+            
+            if(hint) {
+                if (count >= 3) {
+                    hint.textContent = '🎉 You unlocked a FREE CUT! Great job!';
+                } else if (count >= 1) {
+                    hint.textContent = `${3 - count} more referral(s) to get a FREE CUT!`;
+                } else {
+                    hint.textContent = 'Refer friends to unlock rewards!';
+                }
+            }
+        }
+        
+        // Load broadcasts for Latest Updates
+        async function loadBroadcasts() {
+            try {
+                const response = await fetch('/api/broadcasts');
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    updateLatestUpdates(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading broadcasts:', error);
+            }
+        }
+        
+        function updateLatestUpdates(broadcasts) {
+            const ticker = document.querySelector('.ticker-track');
+            // Store broadcasts globally for popup access
+            window.broadcastsData = broadcasts;
+            
+            if (ticker && broadcasts.length > 0) {
+                ticker.innerHTML = '';
+                
+                // Create content twice for seamless infinite scroll
+                const createItems = () => {
+                    broadcasts.forEach((broadcast, index) => {
+                        const span = document.createElement('span');
+                        span.style.cursor = 'pointer';
+                        span.style.display = 'inline-flex';
+                        span.style.alignItems = 'center';
+                        span.style.marginRight = '30px';
+                        span.onclick = () => showBroadcastPopup(index);
+                        
+                        // Add image if available
+                        if (broadcast.image) {
+                            const img = document.createElement('img');
+                            img.src = broadcast.image;
+                            img.alt = 'Update';
+                            img.style.width = '40px';
+                            img.style.height = '40px';
+                            img.style.objectFit = 'cover';
+                            img.style.marginRight = '8px';
+                            img.style.borderRadius = '4px';
+                            span.appendChild(img);
+                        }
+                        
+                        const textNode = document.createTextNode('📢 ' + broadcast.title + ': ' + broadcast.content);
+                        span.appendChild(textNode);
+                        ticker.appendChild(span);
+                    });
+                };
+                
+                createItems(); // First set
+                createItems(); // Duplicate for seamless loop
+                
+                // Restart scrolling with new content
+                startTickerScroll();
+            }
+        }
+        
+        function showBroadcastPopup(index) {
+            const broadcast = window.broadcastsData[index];
+            if (!broadcast) return;
+            
+            const popupBody = document.getElementById('update-popup-body');
+            let html = '';
+            
+            // Add image if available
+            if (broadcast.image) {
+                html += `<img src="${broadcast.image}" alt="Update Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 15px;">`;
+            }
+            
+            html += `<h3>${broadcast.title}</h3>`;
+            html += `<p>${broadcast.content}</p>`;
+            
+            // Add date if available
+            if (broadcast.createdAt) {
+                const date = new Date(broadcast.createdAt * 1000);
+                html += `<p class="popup-date">Posted: ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>`;
+            }
+            
+            popupBody.innerHTML = html;
+            showPopup('update-popup');
+        }
+        
+        function updateVIPStatus(isVIP) {
+            const vipBadge = document.getElementById('vipBadge');
+            const vipStatus = document.getElementById('vipStatus');
+            
+            if (isVIP) {
+                if (vipBadge) vipBadge.textContent = '👑 VIP';
+                if (vipStatus) vipStatus.textContent = 'VIP';
+            } else {
+                if (vipBadge) vipBadge.textContent = 'Regular';
+                if (vipStatus) vipStatus.textContent = 'Regular';
+            }
+        }
+        
+        function updateSpendingDisplay(totalSpent) {
+            const goal = 5000;
+            const bonusAmount = 500;
+            
+            // Calculate current streak (modulo) and bonuses earned
+            const currentStreak = totalSpent % goal;
+            const bonusesEarned = Math.floor(totalSpent / goal);
+            
+            const percentage = Math.min((currentStreak / goal) * 100, 100);
+            const remaining = Math.max(goal - currentStreak, 0);
+            
+            // Update pie chart
+            const pie = document.getElementById('spendingPie');
+            if (pie) {
+                const dashValue = (percentage / 100) * 251.2;
+                pie.setAttribute('stroke-dasharray', dashValue + ' 251.2');
+            }
+            
+            // Update amount text
+            const amountText = document.getElementById('spendingAmount');
+            if (amountText) {
+                amountText.textContent = '₦' + currentStreak.toLocaleString();
+            }
+            
+            // Update progress bar
+            const progress = document.getElementById('spendingProgress');
+            if (progress) {
+                progress.style.width = percentage + '%';
+            }
+            
+            // Update hint
+            const hint = document.getElementById('spendingHint');
+            if (hint) {
+                if (bonusesEarned > 0) {
+                    hint.textContent = `🔥 ${bonusesEarned} bonus${bonusesEarned > 1 ? 'es' : ''} earned (₦${(bonusesEarned * bonusAmount).toLocaleString()})!`;
+                } else if (currentStreak >= goal) {
+                    hint.textContent = '🎉 Bonus unlocked!';
+                } else {
+                    hint.textContent = '₦' + remaining.toLocaleString() + ' more to unlock bonus';
+                }
+            }
+        }
+        
+        // Load spending on page load
+        loadUserSpending();
+        loadUserProfile();
+        loadNotificationCount();
+        sendHeartbeat();
+        
+        // Send heartbeat every minute to keep user online
+        setInterval(sendHeartbeat, 60000);
+        loadBroadcasts();
+        
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Popup Functions
+        function showPopup(popupId) {
+            document.getElementById(popupId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Auto-scrolling updates
+        let tickerInterval = null;
+        
+        function startTickerScroll() {
+            const tickerTrack = document.querySelector('.ticker-track');
+            if (!tickerTrack) return;
+            
+            // Clear any existing interval
+            if (tickerInterval) clearInterval(tickerInterval);
+            
+            let scrollPos = 0;
+            tickerInterval = setInterval(() => {
+                const trackWidth = tickerTrack.scrollWidth / 2; // Width of one set of items
+                scrollPos -= 1;
+                if (scrollPos < -trackWidth) {
+                    scrollPos = 0;
+                }
+                tickerTrack.style.transform = `translateX(${scrollPos}px)`;
+            }, 30);
+        }
+        
+        // Start scroll after content loads
+        startTickerScroll();
+
+        // Close popup when clicking outside
+        document.querySelectorAll('.popup-overlay').forEach(popup => {
+            popup.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+        
+        // Load profile photo from session storage
+        const savedPhoto = sessionStorage.getItem('profilePhoto');
+        if (savedPhoto) {
+            const avatarEl = document.getElementById('dashboardAvatar');
+            if (avatarEl) {
+                avatarEl.style.display = 'none';
+                const img = document.createElement('img');
+                img.src = savedPhoto;
+                img.style.cssText = 'width: 100%; height: 100%; object-fit: cover; border-radius: 50%;';
+                avatarEl.parentNode.appendChild(img);
+            }
+        }
+    </script>
+
+</body>
+</html>

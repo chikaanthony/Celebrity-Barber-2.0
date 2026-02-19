@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broadcast Manager - Celebrity Barber Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='broadcast.css') }}?v=2">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .broadcast-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .broadcast-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .broadcast-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .broadcast-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .composer-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .composer-section h2 {
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .photo-upload {
+            border: 2px dashed rgba(212, 175, 55, 0.5);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .photo-upload:hover {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+        
+        .photo-upload span {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .photo-upload p {
+            color: #aaa;
+            margin: 0;
+            font-size: 14px;
+        }
+        
+        .photo-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .post-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #d4af37 0%, #aa8a2e 100%);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        }
+        
+        .preview-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .preview-section h2 {
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .preview-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #2a2a4e 0%, #1a1a2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 50px;
+        }
+        
+        .preview-content {
+            padding: 20px;
+        }
+        
+        .preview-content h3 {
+            color: #d4af37;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            margin: 0 0 10px 0;
+        }
+        
+        .preview-content p {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .preview-date {
+            color: #666;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+        
+        .history-section {
+            margin-top: 30px;
+        }
+        
+        .history-section h2 {
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .history-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s;
+        }
+        
+        .history-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+        
+        .history-card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #2a2a4e 0%, #1a1a2e 100%);
+        }
+        
+        .history-card-content {
+            padding: 15px;
+        }
+        
+        .history-card h4 {
+            color: #d4af37;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            margin: 0 0 8px 0;
+        }
+        
+        .history-card p {
+            color: #999;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0 0 10px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .history-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .history-date {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+        }
+        
+        .repost-btn {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+        }
+        
+        .repost-btn:hover {
+            background: rgba(212, 175, 55, 0.4);
+        }
+        
+        .delete-btn {
+            background: rgba(255, 77, 77, 0.2);
+            color: #ff4d4d;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(255, 77, 77, 0.4);
+        }
+        
+        .empty-history {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        .empty-history span {
+            font-size: 50px;
+            display: block;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-nav">
+            <div class="nav-left">
+                <button class="back-btn" onclick="window.location.href='/admin'">←</button>
+                <h1 class="page-title">BROADCAST MANAGER</h1>
+            </div>
+        </nav>
+        
+        <div class="broadcast-container">
+            <div class="broadcast-main">
+                <!-- Composer Section -->
+                <div class="composer-section">
+                    <h2>📝 NEW UPDATE COMPOSER</h2>
+                    
+                    <form id="broadcastForm">
+                        <div class="form-group">
+                            <label for="title">TITLE INPUT</label>
+                            <input type="text" id="title" name="title" placeholder="e.g., Valentine Special" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="content">DESCRIPTION AREA</label>
+                            <textarea id="content" name="content" placeholder="Write your announcement message here..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>PHOTO UPDATE</label>
+                            <div class="photo-upload" onclick="document.getElementById('photo').click()">
+                                <span>📷</span>
+                                <p>Click to upload photo</p>
+                                <img id="photoPreview" class="photo-preview" alt="Preview">
+                            </div>
+                            <input type="file" id="photo" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
+                        </div>
+                        
+                        <button type="submit" class="post-btn">🚀 POST UPDATE</button>
+                    </form>
+                </div>
+                
+                <!-- Preview Section -->
+                <div class="preview-section">
+                    <h2>👁️ LIVE PREVIEW</h2>
+                    <div class="preview-card">
+                        <div class="preview-image" id="previewImage">📰</div>
+                        <div class="preview-content">
+                            <h3 id="previewTitle">Your Title Here</h3>
+                            <p id="previewContent">Your announcement message will appear here...</p>
+                            <div class="preview-date" id="previewDate"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History Section -->
+            <div class="history-section">
+                <h2>📋 BROADCAST HISTORY</h2>
+                <div class="history-grid" id="historyGrid">
+                    <div class="empty-history">
+                        <span>📭</span>
+                        <p>No broadcasts yet. Create your first update!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Preview functionality
+        document.getElementById('title').addEventListener('input', function() {
+            document.getElementById('previewTitle').textContent = this.value || 'Your Title Here';
+        });
+        
+        document.getElementById('content').addEventListener('input', function() {
+            document.getElementById('previewContent').textContent = this.value || 'Your announcement message will appear here...';
+        });
+        
+        function previewPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').src = e.target.result;
+                    document.getElementById('photoPreview').style.display = 'block';
+                    document.querySelector('.photo-upload span').style.display = 'none';
+                    document.querySelector('.photo-upload p').style.display = 'none';
+                    
+                    // Update preview
+                    document.getElementById('previewImage').innerHTML = '<img src="' + e.target.result + '" style="width: 100%; height: 100%; object-fit: cover;">';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Set preview date
+        const now = new Date();
+        document.getElementById('previewDate').textContent = now.toLocaleDateString('en-US', { 
+            year: 'numeric', month: 'long', day: 'numeric' 
+        });
+        
+        // Load broadcast history
+        async function loadBroadcastHistory() {
+            try {
+                const response = await fetch('/api/admin/broadcasts');
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    renderHistory(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading broadcasts:', error);
+            }
+        }
+        
+        function renderHistory(broadcasts) {
+            const grid = document.getElementById('historyGrid');
+            grid.innerHTML = '';
+            
+            broadcasts.forEach(broadcast => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                
+                const imageHtml = broadcast.image 
+                    ? `<img src="${broadcast.image}" class="history-card-image" alt="${broadcast.title}">`
+                    : `<div class="history-card-image">📰</div>`;
+                
+                const date = broadcast.createdAt ? new Date(broadcast.createdAt).toLocaleDateString() : 'Unknown date';
+                
+                card.innerHTML = `
+                    ${imageHtml}
+                    <div class="history-card-content">
+                        <h4>${broadcast.title}</h4>
+                        <p>${broadcast.content}</p>
+                        <div class="history-card-footer">
+                            <span class="history-date">${date}</span>
+                            <div class="history-actions">
+                                <button class="action-btn repost-btn" onclick="repostBroadcast('${broadcast.id}')">♻️ Repost</button>
+                                <button class="action-btn delete-btn" onclick="deleteBroadcast('${broadcast.id}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // Submit broadcast
+        document.getElementById('broadcastForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const photoInput = document.getElementById('photo');
+            
+            let imageData = '';
+            if (photoInput.files[0]) {
+                const reader = new FileReader();
+                imageData = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(photoInput.files[0]);
+                });
+            }
+            
+            try {
+                const response = await fetch('/api/admin/broadcast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title,
+                        content: content,
+                        image: imageData
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Broadcast posted successfully!');
+                    document.getElementById('broadcastForm').reset();
+                    document.getElementById('photoPreview').style.display = 'none';
+                    document.querySelector('.photo-upload span').style.display = 'block';
+                    document.querySelector('.photo-upload p').style.display = 'block';
+                    document.getElementById('previewImage').innerHTML = '📰';
+                    loadBroadcastHistory();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error posting broadcast');
+            }
+        });
+        
+        // Delete broadcast
+        async function deleteBroadcast(id) {
+            if (!confirm('Are you sure you want to delete this broadcast?')) return;
+            
+            try {
+                const response = await fetch('/api/admin/broadcast/' + id, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Broadcast deleted!');
+                    loadBroadcastHistory();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error deleting broadcast');
+            }
+        }
+        
+        // Repost broadcast
+        async function repostBroadcast(id) {
+            if (!confirm('Repost this broadcast to the top?')) return;
+            
+            try {
+                const response = await fetch('/api/admin/broadcast/repost', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Broadcast reposted!');
+                    loadBroadcastHistory();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error reposting broadcast');
+            }
+        }
+        
+        // Load history on page load
+        loadBroadcastHistory();
+    </script>
+</body>
+</html>

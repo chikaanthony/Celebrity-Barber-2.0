@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approvals - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='approvals.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="approvals-container">
+        <!-- Header -->
+        <nav class="approvals-nav">
+            <div class="nav-left">
+                <button class="back-btn" onclick="window.location.href='/admin'">←</button>
+                <h1 class="page-title">APPROVALS MANAGER</h1>
+            </div>
+            <div class="nav-right">
+                <span class="pending-count" id="pendingCount">3 Pending</span>
+            </div>
+        </nav>
+        
+        <!-- Approval Stack -->
+        <div class="approval-stack" id="approvalStack">
+            <!-- Data loaded from Firebase -->
+        </div>
+        
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <span class="empty-icon">✓</span>
+            <p>All approvals settled!</p>
+        </div>
+    </div>
+    
+    <!-- Quick-Look Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            
+            <div class="modal-header">
+                <span class="modal-tag" id="modalTag">VIP REQUEST</span>
+                <h2 class="modal-title" id="modalTitle">Chidi Okeke</h2>
+                <p class="modal-email" id="modalEmail">chidi@example.com</p>
+            </div>
+            
+            <!-- Receipt Preview -->
+            <div class="receipt-preview">
+                <img id="receiptPreview" class="receipt-image" src="" alt="Receipt" style="display: none;">
+                <div class="receipt-placeholder" id="receiptPlaceholder">
+                    <span class="receipt-icon">📄</span>
+                    <p>Payment Receipt</p>
+                    <small>Upload receipt to view</small>
+                </div>
+            </div>
+            
+            <div class="modal-amount">
+                <span class="amount-label">Amount</span>
+                <span class="amount-value" id="modalAmount">₦2,500</span>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="modal-actions">
+                <button class="btn-decline" onclick="showDeclineReason()">
+                    <span>❌</span> DECLINE
+                </button>
+                <button class="btn-approve" onclick="approveRequest()">
+                    <span>✅</span> CONFIRM
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Decline Reason Modal -->
+    <div class="modal-overlay" id="declineModal" onclick="closeDeclineModal(event)">
+        <div class="decline-content">
+            <h3>Decline Request</h3>
+            <p>Please provide a reason for declining:</p>
+            <textarea id="declineReason" placeholder="e.g., Invalid Receipt"></textarea>
+            <div class="decline-actions">
+                <button class="btn-cancel" onclick="closeDeclineModal()">Cancel</button>
+                <button class="btn-confirm-decline" onclick="confirmDecline()">Submit & Decline</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Toast -->
+    <div class="success-toast" id="successToast">
+        <span>✓</span> <span id="toastMessage">Success!</span>
+    </div>
+    
+    <script>
+        let currentRequest = null;
+        let pendingRequests = 3;
+        
+        function openModal(type, name, email, amount, requestId = null, receipt = null, userId = null) {
+            currentRequest = { type, name, email, amount, requestId, receipt, userId };
+            
+            document.getElementById('modalTag').textContent = type === 'vip' ? 'VIP REQUEST' : 'BOOKING REQUEST';
+            document.getElementById('modalTag').className = 'modal-tag ' + type;
+            document.getElementById('modalTitle').textContent = name;
+            document.getElementById('modalEmail').textContent = email;
+            document.getElementById('modalAmount').textContent = amount;
+            
+            // Show receipt info if available
+            const receiptPreview = document.getElementById('receiptPreview');
+            const receiptPlaceholder = document.getElementById('receiptPlaceholder');
+            if (receipt) {
+                receiptPreview.src = receipt;
+                receiptPreview.style.display = 'block';
+                receiptPlaceholder.style.display = 'none';
+            } else {
+                receiptPreview.style.display = 'none';
+                receiptPlaceholder.style.display = 'flex';
+            }
+            
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+        
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+        
+        async function approveRequest() {
+            if (!currentRequest || !currentRequest.requestId) {
+                showToast('Error: No request selected');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        requestId: currentRequest.requestId,
+                        requestType: currentRequest.type
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Reload all approvals to ensure accurate list
+                    loadPendingApprovals();
+                    
+                    showToast('Confirmed! Added to ledger and user spending updated');
+                    document.getElementById('modalOverlay').classList.remove('active');
+                } else {
+                    showToast('Error: ' + result.message);
+                }
+            } catch (error) {
+                showToast('Error confirming request');
+                console.error(error);
+            }
+        }
+        
+        function showDeclineReason() {
+            document.getElementById('declineModal').classList.add('active');
+        }
+        
+        function closeDeclineModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('declineModal').classList.remove('active');
+        }
+        
+        async function confirmDecline() {
+            const reason = document.getElementById('declineReason').value.trim();
+            if (!reason) {
+                alert('Please enter a reason');
+                return;
+            }
+            
+            if (!currentRequest || !currentRequest.requestId) {
+                showToast('Error: No request selected');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/decline', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        requestId: currentRequest.requestId,
+                        reason: reason
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Reload all approvals to ensure accurate list
+                    loadPendingApprovals();
+                    
+                    showToast('Request declined. User notified.');
+                    document.getElementById('declineModal').classList.remove('active');
+                    document.getElementById('modalOverlay').classList.remove('active');
+                    document.getElementById('declineReason').value = '';
+                } else {
+                    showToast('Error: ' + result.message);
+                }
+            } catch (error) {
+                showToast('Error declining request');
+                console.error(error);
+            }
+        }
+        
+        function updatePendingCount() {
+            document.getElementById('pendingCount').textContent = pendingRequests + ' Pending';
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('successToast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Load pending approvals from Firebase on page load
+        async function loadPendingApprovals() {
+            try {
+                const response = await fetch('/api/admin/pending-approvals');
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    pendingRequests = result.data.length;
+                    updatePendingCount();
+                    renderApprovals(result.data);
+                } else {
+                    // No pending approvals
+                    pendingRequests = 0;
+                    document.getElementById('approvalStack').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error loading approvals:', error);
+                // Show error state
+                pendingRequests = 0;
+                document.getElementById('approvalStack').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'flex';
+            }
+        }
+        
+        function renderApprovals(approvals) {
+            const stack = document.getElementById('approvalStack');
+            stack.innerHTML = '';
+            
+            approvals.forEach(approval => {
+                const type = approval.type || 'vip';
+                const name = approval.user_name || approval.name || 'User';
+                const email = approval.user_email || approval.email || '';
+                const amount = approval.amount || '₦0';
+                const receipt = approval.receipt || null;
+                const docId = approval.id;
+                const userId = approval.user_id;
+                
+                const row = document.createElement('div');
+                row.className = 'approval-row pending';
+                row.onclick = () => openModal(type, name, email, amount, docId, receipt, userId);
+                
+                row.innerHTML = `
+                    <div class="row-left">
+                        <span class="request-tag ${type}">${type.toUpperCase()}</span>
+                        <div class="user-info">
+                            <span class="user-name">${name}</span>
+                            <span class="user-email">${email}</span>
+                        </div>
+                    </div>
+                    <div class="row-right">
+                        <span class="request-amount">₦${amount.toLocaleString()}</span>
+                        <span class="row-arrow">›</span>
+                    </div>
+                `;
+                
+                stack.appendChild(row);
+            });
+        }
+        
+        // Load approvals on page load
+        document.addEventListener('DOMContentLoaded', loadPendingApprovals);
+    </script>
+</body>
+</html>

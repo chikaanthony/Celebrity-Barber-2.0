@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Close Button -->
+        <button class="close-btn" onclick="window.location.href='/clientdashboard'">✕</button>
+        
+        <!-- Chat Header -->
+        <h1 class="chat-header">CHAT WITH ADMIN</h1>
+        <hr class="header-separator">
+        
+        <!-- Direct Chat View -->
+        <div class="chat-view" id="chatView" style="display: flex;">
+            <div class="chat-view-header">
+                <span class="chat-view-name" id="chatViewName">Celebrity Barber Admin</span>
+                <span class="online-indicator" id="adminStatus" style="color: #666;">○ Offline</span>
+            </div>
+            
+            <div class="user-status-bar">
+                <span class="user-status-indicator" id="userStatus" style="color: #666;">○ Connecting...</span>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <!-- Welcome message -->
+                <div class="message them">
+                    <div class="message-bubble">
+                        <p>Hello! Welcome to Celebrity Barber. How can we help you today?</p>
+                        <span class="message-time">Now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="message-input-area">
+                <input 
+                    type="text" 
+                    class="message-input" 
+                    id="messageInput"
+                    placeholder="Type a message..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button type="button" class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    <span>✈️</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check admin online status
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/chat/admin-status');
+                const result = await response.json();
+                
+                const statusEl = document.getElementById('adminStatus');
+                if (statusEl) {
+                    if (result.is_online) {
+                        statusEl.textContent = '● Online';
+                        statusEl.style.color = '#4CAF50';
+                    } else {
+                        statusEl.textContent = '○ Offline';
+                        statusEl.style.color = '#666';
+                    }
+                }
+                
+                // Update user status (they are online since they're using the chat)
+                const userStatusEl = document.getElementById('userStatus');
+                if (userStatusEl) {
+                    userStatusEl.textContent = '● You are online';
+                    userStatusEl.style.color = '#4CAF50';
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                const statusEl = document.getElementById('adminStatus');
+                if (statusEl) {
+                    statusEl.textContent = '○ Offline';
+                    statusEl.style.color = '#666';
+                }
+            }
+        }
+        
+        // Send heartbeat to keep user active
+        async function sendHeartbeat() {
+            try {
+                await fetch('/api/user/heartbeat', { method: 'POST' });
+            } catch (e) {}
+        }
+        
+        // Load messages from API
+        async function loadMessages() {
+            try {
+                const response = await fetch('/api/chat/messages');
+                const result = await response.json();
+                
+                const container = document.getElementById('messagesContainer');
+                container.innerHTML = '';
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    result.data.forEach(msg => {
+                        const senderClass = msg.sender === 'user' ? 'me' : 'them';
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message ${senderClass}`;
+                        messageDiv.innerHTML = `
+                            <div class="message-bubble">
+                                <p>${msg.message}</p>
+                                <span class="message-time">${msg.time || 'recently'}</span>
+                            </div>
+                        `;
+                        container.appendChild(messageDiv);
+                    });
+                } else {
+                    // Show welcome message if no messages
+                    container.innerHTML = `
+                        <div class="message them">
+                            <div class="message-bubble">
+                                <p>Hello! Welcome to Celebrity Barber. How can we help you today?</p>
+                                <span class="message-time">Now</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Scroll to bottom
+                container.scrollTop = container.scrollHeight;
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                // Show welcome message on error
+                const container = document.getElementById('messagesContainer');
+                container.innerHTML = `
+                    <div class="message them">
+                        <div class="message-bubble">
+                            <p>Hello! Welcome to Celebrity Barber. How can we help you today?</p>
+                            <span class="message-time">Now</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) {
+                alert('Please enter a message');
+                return;
+            }
+            
+            // Send to API
+            try {
+                const response = await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                const result = await response.json();
+                console.log('Send response:', result);
+                
+                if (result.success) {
+                    // Clear input
+                    input.value = '';
+                    
+                    // Reload messages
+                    loadMessages();
+                } else {
+                    alert('Error: ' + (result.message || 'Failed to send message'));
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error sending message. Please try again.');
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Load messages on page load
+        loadMessages();
+        checkAdminStatus();
+        sendHeartbeat();
+        
+        // Refresh messages every 10 seconds
+        setInterval(loadMessages, 10000);
+        
+        // Check admin status every 30 seconds
+        setInterval(checkAdminStatus, 30000);
+        
+        // Send heartbeat every minute to keep user active
+        setInterval(sendHeartbeat, 60000);
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+</body>
+</html>

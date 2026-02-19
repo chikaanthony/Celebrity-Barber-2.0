@@ -1,0 +1,12 @@
+# Flask Framework
+Flask==3.0.0
+Flask-CORS==4.0.0
+
+# Firebase Admin SDK
+firebase-admin==6.3.0
+
+# Python-dotenv for environment variables
+python-dotenv==1.0.0
+
+# Requests for HTTP calls
+requests==2.31.0

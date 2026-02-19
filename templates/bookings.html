@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking History - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='clientdashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a12;
+            min-height: 100vh;
+        }
+        
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .page-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .back-btn {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #d4af37;
+            color: #0a0a12;
+        }
+        
+        .booking-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .booking-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+        
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .booking-date {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .booking-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .booking-status.completed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .booking-status.pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .booking-status.confirmed {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .booking-status.cancelled {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .booking-service {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        
+        .booking-price {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <h1>📅 My Bookings</h1>
+            <a href="/clientdashboard" class="back-btn">← Back to Dashboard</a>
+        </div>
+        
+        <div id="bookings-list">
+            <div class="empty-state">
+                <h2>Loading...</h2>
+                <p>Fetching your booking history</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load user's bookings
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/user/bookings');
+                const result = await response.json();
+                
+                const container = document.getElementById('bookings-list');
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    container.innerHTML = result.data.map(booking => {
+                        const date = new Date(booking.createdAt * 1000);
+                        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const statusClass = booking.status === 'completed' ? 'completed' : 
+                                          booking.status === 'confirmed' ? 'confirmed' : 
+                                          booking.status === 'cancelled' ? 'cancelled' : 'pending';
+                        const service = booking.requests || booking.service || 'Haircut Service';
+                        
+                        return `
+                            <div class="booking-card">
+                                <div class="booking-header">
+                                    <span class="booking-date">${dateStr}</span>
+                                    <span class="booking-status ${statusClass}">${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}</span>
+                                </div>
+                                <p class="booking-service">${service}</p>
+                                <p class="booking-price">₦${booking.price || 0}</p>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h2>📅 No Bookings Yet</h2>
+                            <p>You haven't made any bookings yet.</p>
+                            <a href="/bookcut" style="color: #d4af37; margin-top: 15px; display: inline-block;">Book your first appointment →</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                document.getElementById('bookings-list').innerHTML = `
+                    <div class="empty-state">
+                        <h2>⚠️ Error</h2>
+                        <p>Failed to load bookings. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        loadBookings();
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Hub - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='refer.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="refer-container">
+        <!-- Close Button -->
+        <button class="close-btn" onclick="window.location.href='/clientdashboard'">✕</button>
+        
+        <!-- Referral Header -->
+        <h1 class="referral-header">REFERRAL HUB</h1>
+        <hr class="header-separator">
+        
+        <!-- Referral Code Display -->
+        <div class="referral-code-section">
+            <label class="code-label">YOUR REFERRAL CODE:</label>
+            <div class="code-display" onclick="copyCode()">
+                <span class="code-value" id="referralCode">3EFCVAHG</span>
+                <span class="copy-icon">📋</span>
+            </div>
+            <span class="copy-hint">Click to copy</span>
+        </div>
+        
+        <!-- Progress Tracker -->
+        <div class="progress-section">
+            <h2 class="progress-title">PROGRESS TOWARD FREE CUT</h2>
+            <div class="milestones">
+                <div class="milestone" id="milestone1">
+                    <div class="milestone-circle active">
+                        <span class="milestone-icon">🎟️</span>
+                    </div>
+                    <span class="milestone-label">30% OFF</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone" id="milestone2">
+                    <div class="milestone-circle">
+                        <span class="milestone-icon">🎟️</span>
+                    </div>
+                    <span class="milestone-label">60% OFF</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone" id="milestone3">
+                    <div class="milestone-circle">
+                        <span class="milestone-icon">✂️</span>
+                    </div>
+                    <span class="milestone-label">FREE CUT</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Referral Input Section -->
+        <div class="refer-input-section">
+            <input 
+                type="text" 
+                class="refer-input" 
+                id="friendName"
+                placeholder="Friend's Full Name..."
+            >
+            <button class="refer-btn" onclick="submitReferral()">REFER</button>
+        </div>
+        
+        <!-- Referral History -->
+        <div class="referral-history">
+            <h3 class="history-title">REFERRAL HISTORY</h3>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">
+                    <span>No referrals yet. Start referring friends!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message" id="toastMessage">Referral sent successfully!</span>
+    </div>
+    
+    <script>
+        // Fetch user profile data
+        let referralCount = 0;
+        let userReferralCode = '';
+        
+        async function fetchUserData() {
+            try {
+                const response = await fetch('/api/user/profile');
+                const result = await response.json();
+                if (result.success) {
+                    const userData = result.data;
+                    referralCount = userData.referral_count || 0;
+                    userReferralCode = userData.referral_code || '';
+                    
+                    // Set referral code
+                    if (userReferralCode) {
+                        document.getElementById('referralCode').textContent = userReferralCode;
+                    }
+                    
+                    // Update progress milestones based on actual count
+                    updateProgressFromCount(referralCount);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        }
+        
+        // Update progress from fetched count
+        function updateProgressFromCount(count) {
+            if (count >= 1) {
+                document.getElementById('milestone1').querySelector('.milestone-circle').classList.add('active');
+            }
+            if (count >= 2) {
+                document.getElementById('milestone2').querySelector('.milestone-circle').classList.add('active');
+            }
+            if (count >= 3) {
+                document.getElementById('milestone3').querySelector('.milestone-circle').classList.add('active');
+            }
+        }
+        
+        // Copy code to clipboard
+        function copyCode() {
+            const code = document.getElementById('referralCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('Code copied to clipboard!');
+            });
+        }
+        
+        // Submit referral
+        function submitReferral() {
+            const friendName = document.getElementById('friendName').value.trim();
+            
+            if (!friendName) {
+                showToast('Please enter your friend\'s name!');
+                return;
+            }
+            
+            // Add to history
+            addToHistory(friendName);
+            
+            // Clear input
+            document.getElementById('friendName').value = '';
+            
+            // Update progress (local update for immediate feedback)
+            referralCount++;
+            updateProgressFromCount(referralCount);
+            
+            if (referralCount >= 3) {
+                showToast('🎉 Congratulations! You earned a FREE CUT!');
+            } else {
+                showToast('Referral sent successfully!');
+            }
+        }
+        
+        // Add to history list
+        function addToHistory(name) {
+            const historyList = document.getElementById('historyList');
+            const emptyMsg = historyList.querySelector('.history-empty');
+            
+            if (emptyMsg) {
+                emptyMsg.remove();
+            }
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <span class="history-name">${name}</span>
+                <span class="history-status pending">Pending</span>
+            `;
+            
+            historyList.insertBefore(historyItem, historyList.firstChild);
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize
+        fetchUserData();
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+</body>
+</html>

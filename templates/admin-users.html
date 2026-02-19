@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - Celebrity Barber Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f0d875;
+            --dark: #0a0a0a;
+            --dark-secondary: #111111;
+            --dark-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --success: #00cc00;
+            --danger: #ff4444;
+            --info: #2196F3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(90deg, var(--dark-secondary) 0%, var(--dark-tertiary) 100%);
+            border-bottom: 2px solid var(--gold);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 15px;
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold);
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-count {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 20px 30px;
+            background: var(--dark-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            max-width: 500px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: var(--dark);
+            color: white;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0 0 16px 16px;
+            min-height: calc(100vh - 200px);
+            padding: 20px;
+        }
+
+        /* Users List - Chat-like horizontal stack */
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            background: var(--dark-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-row:hover {
+            border-color: var(--gold);
+            background: var(--dark-tertiary);
+        }
+
+        /* Profile Photo */
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), #ffae00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* User Info */
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .user-status.vip {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+        }
+
+        .user-status.regular {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Action Buttons */
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-btn {
+            background: rgba(33, 150, 243, 0.2);
+            color: var(--info);
+        }
+
+        .chat-btn:hover {
+            background: var(--info);
+            color: white;
+        }
+
+        .delete-btn {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* User Details Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--dark-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), #ffae00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-right: 15px;
+        }
+
+        .modal-user-info h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .modal-user-info p {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .modal-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+        }
+
+        .detail-section h4 {
+            color: var(--gold);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: var(--dark);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .detail-value.gold {
+            color: var(--gold);
+        }
+
+        /* Bookings List in Modal */
+        .bookings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .booking-item {
+            background: var(--dark);
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .booking-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .booking-service {
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .booking-date {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .booking-price {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .booking-status {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .booking-status.confirmed {
+            background: rgba(0, 204, 0, 0.2);
+            color: var(--success);
+        }
+
+        .booking-status.pending {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+        }
+
+        .booking-status.cancelled {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        /* Delete Confirmation Modal */
+        .confirm-modal {
+            max-width: 400px;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .confirm-modal p {
+            color: var(--text-secondary);
+            margin: 20px 0;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .confirm-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cancel-confirm {
+            background: var(--dark-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .delete-confirm {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .user-row {
+                flex-wrap: wrap;
+            }
+            .user-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 10px;
+            }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <a href="/admin" class="back-btn">← Dashboard</a>
+                <h1 class="page-title">👥 USERS</h1>
+            </div>
+            <div class="header-right">
+                <span class="user-count" id="userCount">0 Users</span>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by name or email...">
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="users-list" id="usersList">
+                <!-- Loading -->
+                <div class="empty-state">
+                    <div class="empty-icon">⏳</div>
+                    <div>Loading users...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal-overlay" id="userDetailsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-avatar" id="modalAvatar">U</div>
+                <div class="modal-user-info">
+                    <h3 id="modalName">User Name</h3>
+                    <p id="modalEmail">user@email.com</p>
+                </div>
+                <button class="modal-close" onclick="closeUserDetails()">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Stats -->
+                <div class="detail-section">
+                    <h4>📊 ACTIVITY SUMMARY</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Total Spent</div>
+                            <div class="detail-value gold" id="totalSpent">₦0</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Bookings</div>
+                            <div class="detail-value" id="totalBookings">0</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Referrals</div>
+                            <div class="detail-value" id="totalReferrals">0</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Member Since</div>
+                            <div class="detail-value" id="memberSince">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bookings -->
+                <div class="detail-section">
+                    <h4>📅 RECENT BOOKINGS</h4>
+                    <div class="bookings-list" id="bookingsList">
+                        <div class="empty-state" style="padding: 20px;">
+                            <div>No bookings yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal confirm-modal">
+            <div style="font-size: 48px;">🗑️</div>
+            <h3 style="color: var(--danger);">Delete User?</h3>
+            <p>Are you sure you want to permanently delete this user and all their data? This action cannot be undone.</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn cancel-confirm" onclick="closeDeleteConfirm()">CANCEL</button>
+                <button class="confirm-btn delete-confirm" onclick="confirmDelete()">DELETE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = [];
+        let selectedUserId = null;
+
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            filterUsers(e.target.value);
+        });
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                const result = await response.json();
+
+                if (result.success) {
+                    users = result.data || [];
+                    renderUsers(users);
+                    document.getElementById('userCount').textContent = `${users.length} Users`;
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function renderUsers(usersList) {
+            const container = document.getElementById('usersList');
+
+            if (usersList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👤</div>
+                        <div>No users found</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = usersList.map(user => {
+                const initials = getInitials(user.full_name || user.email || 'User');
+                const status = user.isVIP || user.is_vip ? 'vip' : 'regular';
+                const statusText = user.isVIP || user.is_vip ? '👑 VIP' : 'Regular Client';
+                
+                return `
+                    <div class="user-row" onclick="showUserDetails('${user.user_id || user.id}')">
+                        <div class="user-avatar">
+                            ${user.photo_url ? `<img src="${user.photo_url}" alt="${user.full_name}">` : initials}
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">${user.full_name || user.email}</div>
+                            <span class="user-status ${status}">${statusText}</span>
+                        </div>
+                        <div class="user-actions">
+                            <button class="action-btn chat-btn" onclick="event.stopPropagation(); openChat('${user.user_id || user.id}')">💬</button>
+                            <button class="action-btn delete-btn" onclick="event.stopPropagation(); showDeleteConfirm('${user.user_id || user.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterUsers(query) {
+            const lowerQuery = query.toLowerCase();
+            const filtered = users.filter(user => {
+                const name = (user.full_name || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                return name.includes(lowerQuery) || email.includes(lowerQuery);
+            });
+            renderUsers(filtered);
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        async function showUserDetails(userId) {
+            selectedUserId = userId;
+            const user = users.find(u => (u.user_id || u.id) === userId);
+            
+            if (!user) return;
+
+            // Update modal
+            document.getElementById('modalAvatar').textContent = getInitials(user.full_name || user.email || 'User');
+            document.getElementById('modalName').textContent = user.full_name || 'User';
+            document.getElementById('modalEmail').textContent = user.email || 'No email';
+            document.getElementById('totalSpent').textContent = `₦${(user.total_spent || 0).toLocaleString()}`;
+            document.getElementById('totalReferrals').textContent = user.referral_count || user.referrals_count || 0;
+            document.getElementById('memberSince').textContent = user.created_at || '-';
+
+            // Load user details
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/details`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('totalSpent').textContent = `₦${(result.data.total_spent || 0).toLocaleString()}`;
+                    document.getElementById('totalBookings').textContent = result.data.booking_count || 0;
+                    document.getElementById('totalReferrals').textContent = result.data.referral_count || 0;
+                    
+                    // Render bookings
+                    const bookingsList = document.getElementById('bookingsList');
+                    if (result.data.bookings && result.data.bookings.length > 0) {
+                        bookingsList.innerHTML = result.data.bookings.slice(0, 5).map(booking => `
+                            <div class="booking-item">
+                                <div class="booking-info">
+                                    <span class="booking-service">${booking.service || 'Service'}</span>
+                                    <span class="booking-date">${booking.date || 'No date'}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span class="booking-price">₦${(booking.price || 0).toLocaleString()}</span>
+                                    <span class="booking-status ${booking.status}">${booking.status}</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        bookingsList.innerHTML = '<div class="empty-state" style="padding: 20px;"><div>No bookings yet</div></div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user details:', error);
+            }
+
+            document.getElementById('userDetailsModal').classList.add('show');
+        }
+
+        function closeUserDetails() {
+            document.getElementById('userDetailsModal').classList.remove('show');
+            selectedUserId = null;
+        }
+
+        function openChat(userId) {
+            window.location.href = `/admin/messages?user=${userId}`;
+        }
+
+        function showDeleteConfirm(userId) {
+            selectedUserId = userId;
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteConfirm() {
+            document.getElementById('deleteModal').classList.remove('show');
+            selectedUserId = null;
+        }
+
+        async function confirmDelete() {
+            if (!selectedUserId) return;
+
+            try {
+                const response = await fetch(`/api/admin/users/${selectedUserId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    closeDeleteConfirm();
+                    loadUsers();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+            }
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.analytics-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Navigation */
+.analytics-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.back-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #d4af37;
+    border-color: #d4af37;
+    color: #000;
+}
+
+.page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    color: #fff;
+    letter-spacing: 2px;
+}
+
+.admin-label {
+    padding: 8px 16px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    color: #d4af37;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Core Metric Cards */
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.metric-card {
+    background: linear-gradient(145deg, #1a1a1a, #252525);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.metric-card.highlight {
+    border-color: #d4af37;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.metric-icon {
+    font-size: 32px;
+}
+
+.metric-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.metric-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 1px;
+}
+
+/* Section Cards */
+.section-card {
+    background: linear-gradient(145deg, #1a1a1a, #222);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: #d4af37;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+/* Daily Revenue List */
+.daily-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.daily-row {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.daily-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.daily-date {
+    width: 140px;
+    font-size: 14px;
+    color: #fff;
+}
+
+.daily-transactions {
+    flex: 1;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.daily-amount {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4caf50;
+}
+
+/* Monthly Performance */
+.monthly-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.monthly-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.monthly-date {
+    width: 150px;
+    font-size: 14px;
+    color: #fff;
+}
+
+.monthly-bar {
+    flex: 1;
+    height: 24px;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.6));
+    border-radius: 12px;
+    min-width: 60px;
+    width: var(--width);
+}
+
+.monthly-amount {
+    width: 100px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #d4af37;
+    text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .page-title {
+        font-size: 18px;
+    }
+    
+    .daily-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .daily-date, .daily-transactions, .daily-amount {
+        width: 100%;
+    }
+    
+    .monthly-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .monthly-date, .monthly-bar, .monthly-amount {
+        width: 100%;
+    }
+    
+    .monthly-bar {
+        height: 20px;
+    }
+}

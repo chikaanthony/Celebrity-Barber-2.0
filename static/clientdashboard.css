@@ -1,0 +1,735 @@
+/* ==================== CLIENT DASHBOARD STYLES ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #0a0a0a;
+    color: white;
+    padding-bottom: 100px;
+}
+
+/* ==================== NAVIGATION ==================== */
+
+.client-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #111;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-logo .logo-icon {
+    font-size: 22px;
+}
+
+.nav-logo .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    color: gold;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notification-btn {
+    position: relative;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.notif-icon {
+    font-size: 20px;
+}
+
+.notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #ff4444;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-weight: bold;
+    display: none;
+}
+
+.menu-dots {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.menu-dots span {
+    width: 5px;
+    height: 5px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100%;
+    background: #111;
+    z-index: 200;
+    padding: 80px 30px 30px;
+    transition: right 0.3s ease;
+    border-left: 1px solid #222;
+}
+
+.mobile-menu.active {
+    right: 0;
+}
+
+.mobile-menu a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 15px 0;
+    border-bottom: 1px solid #222;
+    font-size: 16px;
+}
+
+.mobile-menu a:hover {
+    color: gold;
+}
+
+.close-menu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* ==================== PROFILE SECTION ==================== */
+
+.profile-section {
+    padding: 30px 20px;
+    text-align: center;
+    background: linear-gradient(180deg, #151515 0%, #0a0a0a 100%);
+}
+
+.profile-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.profile-pic {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 15px;
+    width: 80px;
+    height: 80px;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
+    border: 2px solid rgba(212, 175, 55, 0.5);
+}
+
+.avatar span, .avatar emoji {
+    font-size: 40px;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.change-pic {
+    position: absolute;
+    bottom: 5px;
+    right: -10px;
+    background: gold;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.profile-section h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    color: gold;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    color: white;
+    font-weight: 700;
+}
+
+.vip-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.vip-badge {
+    background: linear-gradient(45deg, gold, #ffae00);
+    color: black;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.vip-status {
+    color: #00ff00;
+    font-size: 12px;
+}
+
+.user-email {
+    color: #666;
+    font-size: 14px;
+}
+
+/* ==================== DASHBOARD CONTENT ==================== */
+
+.dashboard-content {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.dashboard-card {
+    background: #111;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #1a1a1a;
+}
+
+.dashboard-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Updates Card */
+.updates-ticker {
+    background: #0a0a0a;
+    border-radius: 10px;
+    padding: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.updates-ticker:hover {
+    border: 1px solid gold;
+}
+
+.ticker-track {
+    display: flex;
+    gap: 50px;
+    white-space: nowrap;
+    animation: scrollTicker 20s linear infinite;
+}
+
+@keyframes scrollTicker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.ticker-track span {
+    color: #ccc;
+    font-size: 13px;
+}
+
+/* Spending Card */
+.spending-content {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.pie-chart-container {
+    flex-shrink: 0;
+}
+
+.pie-chart {
+    width: 120px;
+    height: 120px;
+    transform: rotate(-90deg);
+}
+
+.pie-bg {
+    fill: none;
+    stroke: #222;
+    stroke-width: 12;
+}
+
+.pie-fill {
+    fill: none;
+    stroke: gold;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+}
+
+.pie-text {
+    fill: white;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    transform: rotate(90deg);
+    transform-origin: center;
+}
+
+.pie-subtext {
+    fill: #666;
+    font-size: 8px;
+    transform: rotate(90deg);
+    transform-origin: center;
+}
+
+.spending-info {
+    flex: 1;
+}
+
+.spending-goal {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #222;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, gold, #ffae00);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.spending-hint {
+    color: #666;
+    font-size: 12px;
+}
+
+/* History Card */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #0a0a0a;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.history-item:hover {
+    background: #151515;
+    transform: translateX(5px);
+}
+
+.history-icon {
+    font-size: 24px;
+}
+
+.history-info {
+    flex: 1;
+}
+
+.history-info h4 {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.history-info p {
+    color: #666;
+    font-size: 12px;
+}
+
+.history-arrow {
+    color: #444;
+    font-size: 24px;
+}
+
+/* ==================== FLOATING MESSAGE ==================== */
+
+.floating-message {
+    position: fixed;
+    bottom: 110px;
+    right: 20px;
+    z-index: 90;
+}
+
+.message-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, gold, #ffae00);
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(255, 215, 0, 0.6);
+}
+
+/* ==================== BOTTOM NAV ==================== */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #111;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    z-index: 100;
+    overflow-x: auto;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 8px 12px;
+    min-width: 65px;
+    transition: color 0.3s;
+}
+
+.nav-item:active {
+    color: gold;
+}
+
+.nav-item .nav-icon {
+    font-size: 20px;
+}
+
+.nav-item span:last-child {
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+/* ==================== POPUP ==================== */
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.popup-overlay.active {
+    display: flex;
+}
+
+.popup-content {
+    background: #111;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 450px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid #222;
+}
+
+.popup-close {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #222;
+    color: gold;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.popup-content h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+    font-size: 18px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #222;
+}
+
+.popup-body {
+    padding: 20px;
+}
+
+.popup-body h3 {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.popup-body p {
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.popup-body ul {
+    list-style: none;
+    margin-bottom: 15px;
+}
+
+.popup-body ul li {
+    color: #ccc;
+    padding: 8px 0;
+    border-bottom: 1px solid #222;
+}
+
+.popup-body ul li::before {
+    content: "✓ ";
+    color: gold;
+}
+
+.popup-date {
+    color: #666;
+    font-size: 12px;
+}
+
+/* History Detail */
+.history-detail {
+    background: #0a0a0a;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.detail-date {
+    color: #666;
+    font-size: 12px;
+}
+
+.detail-status {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+
+.detail-status.completed {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+}
+
+.detail-service {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.detail-price {
+    color: gold;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Referral Stats */
+.referral-stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    flex: 1;
+    background: #0a0a0a;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-num {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    color: gold;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 12px;
+}
+
+.referral-list {
+    margin-bottom: 20px;
+}
+
+.referral-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #222;
+    color: white;
+}
+
+.reward-earned {
+    color: #00ff00;
+    font-size: 12px;
+}
+
+.reward-pending {
+    color: #666;
+    font-size: 12px;
+}
+
+.share-code-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, gold, #ffae00);
+    border: none;
+    border-radius: 10px;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Transaction List */
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0a0a0a;
+    padding: 12px 15px;
+    border-radius: 10px;
+}
+
+.trans-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.trans-type {
+    color: white;
+    font-size: 13px;
+}
+
+.trans-date {
+    color: #666;
+    font-size: 11px;
+}
+
+.trans-amount {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    color: #ff4444;
+}
+
+.transaction-item.bonus .trans-amount {
+    color: #00ff00;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 480px) {
+    .spending-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pie-chart-container {
+        margin: 0 auto;
+    }
+    
+    .profile-section h1 {
+        font-size: 18px;
+    }
+    
+    .dashboard-content {
+        padding: 15px;
+    }
+    
+    .nav-logo .logo-text {
+        display: none;
+    }
+}

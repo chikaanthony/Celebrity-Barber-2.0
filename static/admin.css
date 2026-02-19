@@ -1,0 +1,580 @@
+/* ==================== ADMIN COMMAND CENTER STYLES ==================== */
+
+.admin-interface {
+    min-height: 100vh;
+    background: #0a0a0a;
+}
+
+/* Admin Navigation */
+.admin-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: linear-gradient(90deg, #111 0%, #1a1a1a 100%);
+    border-bottom: 2px solid gold;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.admin-logo .logo-icon {
+    font-size: 24px;
+}
+
+.admin-logo .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    color: #ff4444;
+}
+
+/* Admin Content */
+.admin-content {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.admin-section {
+    background: #111;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #222;
+}
+
+.admin-section h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+    font-size: 14px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #222;
+}
+
+/* Analytics Section */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.stat-card {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #222;
+    transition: border-color 0.3s;
+}
+
+.stat-card:hover {
+    border-color: gold;
+}
+
+.stat-icon {
+    font-size: 24px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px;
+    color: white;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Approval System */
+.gold-glow-notification {
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 170, 0, 0.1));
+    border: 1px solid gold;
+    border-radius: 10px;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    animation: goldGlow 2s ease-in-out infinite;
+}
+
+@keyframes goldGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
+}
+
+.glow-icon {
+    font-size: 20px;
+}
+
+.glow-text {
+    color: gold;
+    font-size: 13px;
+}
+
+.approval-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.approval-item {
+    background: #0a0a0a;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #333;
+}
+
+.approval-item.pending {
+    border-color: gold;
+    animation: goldGlow 3s ease-in-out infinite;
+}
+
+.approval-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.approval-user {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.approval-type {
+    color: #666;
+    font-size: 12px;
+}
+
+.approval-amount {
+    color: gold;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+}
+
+.approval-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.approve-btn, .reject-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.approve-btn {
+    background: #00cc00;
+    color: white;
+}
+
+.approve-btn:hover {
+    background: #00ff00;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+}
+
+.reject-btn {
+    background: #cc0000;
+    color: white;
+}
+
+.reject-btn:hover {
+    background: #ff0000;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+}
+
+/* VIP Management */
+.punch-card {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #222;
+}
+
+.punch-card h4 {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.punches {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.punch {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #222;
+    border: 2px dashed #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+    font-size: 20px;
+}
+
+.punch.used {
+    background: gold;
+    border: 2px solid gold;
+    color: black;
+}
+
+.punch-info {
+    text-align: center;
+    color: #555;
+    font-size: 12px;
+}
+
+.vip-countdown {
+    background: #0a0a0a;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid #222;
+}
+
+.countdown-label {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.countdown-timer {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+    font-size: 18px;
+}
+
+/* Financial Ledger */
+.ledger-table {
+    background: #0a0a0a;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #222;
+}
+
+.ledger-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    padding: 12px 15px;
+    background: #151515;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ledger-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    padding: 12px 15px;
+    border-bottom: 1px solid #222;
+    font-size: 13px;
+    align-items: center;
+}
+
+.ledger-row.income {
+    background: rgba(0, 255, 0, 0.02);
+}
+
+.ledger-row.expense {
+    background: rgba(255, 0, 0, 0.02);
+}
+
+.type-income {
+    color: #00ff00;
+}
+
+.type-expense {
+    color: #ff4444;
+}
+
+.amount-income {
+    color: #00ff00;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.amount-expense {
+    color: #ff4444;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.ledger-summary {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background: #151515;
+    color: white;
+    font-weight: 600;
+}
+
+.net-positive {
+    color: #00ff00;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Broadcast Manager */
+.broadcast-controls textarea {
+    width: 100%;
+    height: 80px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 12px;
+    color: white;
+    font-size: 14px;
+    resize: none;
+    margin-bottom: 12px;
+}
+
+.broadcast-controls textarea:focus {
+    outline: none;
+    border-color: gold;
+}
+
+.broadcast-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.broadcast-btn {
+    padding: 10px 15px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.broadcast-btn:hover {
+    border-color: gold;
+    color: gold;
+}
+
+.broadcast-btn.highlight {
+    background: linear-gradient(45deg, gold, #ffae00);
+    color: black;
+    border: none;
+}
+
+/* Service Manager */
+.service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.service-edit {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0a0a0a;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #222;
+}
+
+.service-edit span:first-child {
+    color: white;
+    font-size: 14px;
+}
+
+.current-price {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+}
+
+.edit-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #888;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+.edit-btn:hover {
+    border-color: gold;
+    color: gold;
+}
+
+.add-service-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 2px dashed #333;
+    border-radius: 10px;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-service-btn:hover {
+    border-color: gold;
+    color: gold;
+}
+
+/* Chat Section */
+.chat-container {
+    background: #0a0a0a;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #222;
+}
+
+.chat-header {
+    padding: 12px 15px;
+    background: #151515;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #888;
+    font-size: 13px;
+}
+
+.unread-badge {
+    background: #ff4444;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.chat-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #222;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.chat-item:hover {
+    background: #151515;
+}
+
+.chat-item.unread {
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.chat-avatar {
+    font-size: 24px;
+}
+
+.chat-preview {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.chat-user {
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.chat-msg {
+    color: #666;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.chat-time {
+    color: #444;
+    font-size: 11px;
+}
+
+/* Full width sections */
+.analytics-section,
+.ledger-section,
+.broadcast-section,
+.service-manager,
+.chat-section {
+    grid-column: span 2;
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+    .admin-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-section,
+    .ledger-section,
+    .broadcast-section,
+    .service-manager,
+    .chat-section {
+        grid-column: span 1;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ledger-header,
+    .ledger-row {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    
+    .ledger-header span:nth-child(2),
+    .ledger-row span:nth-child(2) {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    .admin-nav {
+        padding: 12px 15px;
+    }
+    
+    .admin-logo .logo-text {
+        font-size: 14px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .approval-actions {
+        flex-direction: column;
+    }
+}

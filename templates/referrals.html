@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral History - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='clientdashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a12;
+            min-height: 100vh;
+        }
+        
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .page-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .back-btn {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #d4af37;
+            color: #0a0a12;
+        }
+        
+        .referral-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-num {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            color: #d4af37;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .referral-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .referral-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .referral-item:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+        
+        .referral-name {
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .reward-earned {
+            color: #4caf50;
+            font-size: 14px;
+        }
+        
+        .reward-pending {
+            color: #ffc107;
+            font-size: 14px;
+        }
+        
+        .share-code-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #d4af37 0%, #aa8a2e 100%);
+            color: #0a0a12;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .share-code-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+        
+        .referral-code-display {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .referral-code-display:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+        
+        .referral-code-label {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .referral-code-value {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 24px;
+        }
+        
+        /* Milestones */
+        .progress-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .milestones {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .milestone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .milestone-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .milestone-circle.active {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: #d4af37;
+        }
+        
+        .milestone-label {
+            color: #aaa;
+            font-size: 11px;
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        .milestone-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <h1>🎁 My Referrals</h1>
+            <a href="/clientdashboard" class="back-btn">← Back to Dashboard</a>
+        </div>
+        
+        <div class="referral-code-display" onclick="copyReferralCode()">
+            <div class="referral-code-label">YOUR REFERRAL CODE</div>
+            <div class="referral-code-value" id="referralCode">Loading...</div>
+        </div>
+        
+        <!-- Referral Streak / Progress -->
+        <div class="progress-section">
+            <h2 class="progress-title">🎯 PROGRESS TOWARD FREE CUT</h2>
+            <div class="milestones">
+                <div class="milestone" id="milestone1">
+                    <div class="milestone-circle">
+                        <span class="milestone-icon">🎟️</span>
+                    </div>
+                    <span class="milestone-label">30% OFF</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone" id="milestone2">
+                    <div class="milestone-circle">
+                        <span class="milestone-icon">🎟️</span>
+                    </div>
+                    <span class="milestone-label">60% OFF</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone" id="milestone3">
+                    <div class="milestone-circle">
+                        <span class="milestone-icon">✂️</span>
+                    </div>
+                    <span class="milestone-label">FREE CUT</span>
+                </div>
+            </div>
+            <p style="text-align: center; color: #aaa; margin-top: 10px;">Refer friends to unlock rewards!</p>
+        </div>
+        
+        <div class="referral-stats">
+            <div class="stat-box">
+                <span class="stat-num" id="totalReferrals">0</span>
+                <span class="stat-label">Total Referrals</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-num" id="rewardsEarned">0</span>
+                <span class="stat-label">Rewards Earned</span>
+            </div>
+        </div>
+        
+        <div class="referral-section">
+            <h2>Recent Referrals</h2>
+            <div id="referral-list">
+                <div class="empty-state">
+                    <h2>Loading...</h2>
+                    <p>Fetching your referral history</p>
+                </div>
+            </div>
+        </div>
+        
+        <button class="share-code-btn" onclick="shareReferral()">🔗 Share Referral Code</button>
+    </div>
+
+    <script>
+        // Load user's referral data
+        async function loadReferrals() {
+            try {
+                // Get user profile for referral code
+                const profileRes = await fetch('/api/user/profile');
+                const profileData = await profileRes.json();
+                
+                if (profileData.success && profileData.data) {
+                    document.getElementById('referralCode').textContent = profileData.data.referral_code || 'N/A';
+                    const referralCount = profileData.data.referral_count || 0;
+                    document.getElementById('totalReferrals').textContent = referralCount;
+                    
+                    // Update milestone progress
+                    updateMilestones(referralCount);
+                }
+                
+                // Get user's referral history
+                const historyRes = await fetch('/api/user/referrals');
+                const historyData = await historyRes.json();
+                
+                const rewardsEarned = document.getElementById('rewardsEarned');
+                const listContainer = document.getElementById('referral-list');
+                
+                if (historyData.success && historyData.data && historyData.data.length > 0) {
+                    const referrals = historyData.data;
+                    const successful = referrals.filter(r => r.status === 'successful').length;
+                    rewardsEarned.textContent = successful;
+                    
+                    listContainer.innerHTML = referrals.map(ref => `
+                        <div class="referral-item ${ref.status}">
+                            <div class="referral-info">
+                                <span class="referral-name">${ref.name}</span>
+                                <span class="referral-email">${ref.email}</span>
+                            </div>
+                            <span class="reward-${ref.status}">
+                                ${ref.status === 'successful' ? (ref.claimed === 'freecut' ? '🎉 Free Cut' : '🎫 30% OFF') : '⏳ Pending'}
+                            </span>
+                        </div>
+                    `).join('');
+                } else {
+                    rewardsEarned.textContent = '0';
+                    listContainer.innerHTML = `
+                        <div class="referral-item">
+                            <span class="referral-name">No referrals yet</span>
+                            <span class="reward-pending">Start sharing!</span>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error loading referrals:', error);
+            }
+        }
+        
+        function updateMilestones(count) {
+            // 1 referral = 30% off, 2 = 60% off, 3+ = free cut
+            const m1 = document.getElementById('milestone1');
+            const m2 = document.getElementById('milestone2');
+            const m3 = document.getElementById('milestone3');
+            
+            // Reset all
+            m1.querySelector('.milestone-circle').classList.remove('active');
+            m2.querySelector('.milestone-circle').classList.remove('active');
+            m3.querySelector('.milestone-circle').classList.remove('active');
+            
+            if (count >= 1) {
+                m1.querySelector('.milestone-circle').classList.add('active');
+            }
+            if (count >= 2) {
+                m2.querySelector('.milestone-circle').classList.add('active');
+            }
+            if (count >= 3) {
+                m3.querySelector('.milestone-circle').classList.add('active');
+            }
+        }
+        
+        function copyReferralCode() {
+            const code = document.getElementById('referralCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Referral code copied: ' + code);
+            });
+        }
+        
+        function shareReferral() {
+            const code = document.getElementById('referralCode').textContent;
+            const text = `Use my referral code ${code} at Celebrity Barber for exclusive discounts!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Refer a Friend',
+                    text: text
+                });
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Referral text copied to clipboard!');
+                });
+            }
+        }
+        
+        loadReferrals();
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+</body>
+</html>

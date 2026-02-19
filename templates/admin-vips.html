@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Management - Celebrity Barber Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f0d875;
+            --dark: #0a0a0a;
+            --dark-secondary: #111111;
+            --dark-tertiary1a1a;
+            --text: #1a-primary: #ffffff;
+            --text-secondary: #888888;
+            --success: #00cc00;
+            --danger: #ff4444;
+            --info: #2196F3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(90deg, var(--dark-secondary) 0%, var(--dark-tertiary) 100%);
+            border-bottom: 2px solid var(--gold);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 15px;
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold);
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
+        /* Priority Queue Section */
+        .queue-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0 0 16px 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .queue-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .queue-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold);
+            font-size: 16px;
+        }
+
+        .queue-list {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .queue-item {
+            min-width: 180px;
+            background: var(--dark-secondary);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s;
+        }
+
+        .queue-item:active {
+            cursor: grabbing;
+        }
+
+        .queue-item:hover {
+            border-color: var(--gold);
+        }
+
+        .queue-position {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .queue-name {
+            font-size: 14px;
+            margin-top: 8px;
+            color: var(--text-primary);
+        }
+
+        /* VIP List */
+        .vip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .vip-row {
+            display: flex;
+            align-items: center;
+            background: var(--dark-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 18px 20px;
+            transition: all 0.3s;
+        }
+
+        .vip-row:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .vip-row.new-vip {
+            animation: goldPulse 2s infinite;
+            border-color: var(--gold);
+        }
+
+        @keyframes goldPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.6); }
+        }
+
+        .vip-row.expiring {
+            border-color: var(--danger);
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        /* Profile */
+        .vip-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), #ffae00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .vip-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .vip-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .vip-level {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+        }
+
+        /* Time Remaining */
+        .vip-time {
+            text-align: center;
+            min-width: 100px;
+            margin-right: 20px;
+        }
+
+        .time-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .time-value {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .time-value.expiring {
+            color: var(--danger);
+        }
+
+        /* Usage Tracker */
+        .usage-tracker {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-right: 20px;
+            padding: 10px 15px;
+            background: var(--dark);
+            border-radius: 10px;
+        }
+
+        .cut-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cut-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--gold);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cut-btn.used {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .cut-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .lining-status {
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .lining-status.active {
+            color: var(--success);
+        }
+
+        .lining-status.inactive {
+            color: var(--text-secondary);
+        }
+
+        /* Actions */
+        .vip-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bump-btn {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+        }
+
+        .bump-btn:hover {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--dark-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            min-width: 150px;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-item.danger {
+            color: var(--danger);
+        }
+
+        .dropdown-item.gift {
+            color: var(--info);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--dark-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold);
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: var(--dark);
+            color: white;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn {
+            background: var(--dark-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .save-btn {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .vip-row {
+                flex-wrap: wrap;
+            }
+            .vip-time, .usage-tracker {
+                margin: 10px 0;
+            }
+            .vip-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <a href="/admin" class="back-btn">← Dashboard</a>
+                <h1 class="page-title">👑 VIP MANAGEMENT</h1>
+            </div>
+        </div>
+
+        <!-- Priority Queue -->
+        <div class="queue-section">
+            <div class="queue-header">
+                <span class="queue-title">📍 PRIORITY QUEUE - LIVE CUTTING LIST</span>
+            </div>
+            <div class="queue-list" id="queueList">
+                <!-- Queue items loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- VIP List -->
+        <div class="vip-list" id="vipList">
+            <div class="empty-state">
+                <div class="empty-icon">⏳</div>
+                <div>Loading VIPs...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gift Days Modal -->
+    <div class="modal-overlay" id="giftModal">
+        <div class="modal">
+            <h3 class="modal-title">🎁 Gift Days</h3>
+            <input type="number" class="modal-input" id="giftDaysInput" placeholder="Number of days to add" min="1" max="30">
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeGiftModal()">Cancel</button>
+                <button class="modal-btn save-btn" onclick="confirmGiftDays()">Add Days</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <h3 class="modal-title" id="confirmTitle">Confirm Action</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;" id="confirmMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeConfirmModal()">Cancel</button>
+                <button class="modal-btn save-btn" id="confirmBtn" style="background: var(--danger);">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vipUsers = [];
+        let selectedVipId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVips();
+        });
+
+        async function loadVips() {
+            try {
+                const response = await fetch('/api/admin/vips');
+                const result = await response.json();
+
+                if (result.success) {
+                    vipUsers = result.data || [];
+                    renderVips();
+                    renderQueue();
+                }
+            } catch (error) {
+                console.error('Error loading VIPs:', error);
+            }
+        }
+
+        function renderVips() {
+            const container = document.getElementById('vipList');
+
+            if (vipUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👑</div>
+                        <div>No VIP members yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = vipUsers.map(vip => {
+                const initials = getInitials(vip.full_name || vip.email || 'VIP');
+                const isNew = vip.is_new || false;
+                const isExpiring = vip.expiring_soon || false;
+                const timeRemaining = vip.time_remaining || '0d : 0h';
+                
+                // Usage tracking
+                const cutsUsed = vip.cuts_used || 0;
+                const cutsTotal = 2;
+                const liningActive = vip.lining_active !== false;
+
+                return `
+                    <div class="vip-row ${isNew ? 'new-vip' : ''} ${isExpiring ? 'expiring' : ''}" data-id="${vip.user_id}">
+                        <div class="vip-avatar">${initials}</div>
+                        <div class="vip-info">
+                            <div class="vip-name">${vip.full_name || vip.email}</div>
+                            <span class="vip-level">👑 ${vip.vip_level || 'Member'}</span>
+                        </div>
+                        <div class="vip-time">
+                            <div class="time-label">Time Left</div>
+                            <div class="time-value ${isExpiring ? 'expiring' : ''}">${timeRemaining}</div>
+                        </div>
+                        <div class="usage-tracker">
+                            <div class="cut-buttons">
+                                <button class="cut-btn ${cutsUsed >= 1 ? 'used' : ''}" onclick="toggleCut('${vip.user_id}', 1)" title="Cut 1">✂️</button>
+                                <button class="cut-btn ${cutsUsed >= 2 ? 'used' : ''}" onclick="toggleCut('${vip.user_id}', 2)" title="Cut 2">✂️</button>
+                            </div>
+                            <div class="lining-status ${liningActive ? 'active' : 'inactive'}">
+                                ${liningActive ? '✅ Lining' : '❌ Lining'}
+                            </div>
+                        </div>
+                        <div class="vip-actions">
+                            <button class="action-btn bump-btn" onclick="bumpToTop('${vip.user_id}')" title="Bump to Top">⬆️</button>
+                            <button class="action-btn menu-btn" onclick="toggleMenu('${vip.user_id}')">⋮</button>
+                            <div class="dropdown-menu" id="menu-${vip.user_id}">
+                                <div class="dropdown-item" onclick="viewReceipt('${vip.user_id}')">📄 View Receipt</div>
+                                <div class="dropdown-item gift" onclick="openGiftModal('${vip.user_id}')">🎁 Gift Days</div>
+                                <div class="dropdown-item danger" onclick="confirmRevoke('${vip.user_id}')">🚫 Revoke Status</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderQueue() {
+            const container = document.getElementById('queueList');
+            
+            if (vipUsers.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="padding: 20px;">No VIPs in queue</div>';
+                return;
+            }
+
+            container.innerHTML = vipUsers.slice(0, 5).map((vip, index) => `
+                <div class="queue-item" draggable="true">
+                    <div class="queue-position">#${index + 1}</div>
+                    <div class="queue-name">${vip.full_name || vip.email}</div>
+                </div>
+            `).join('');
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function toggleMenu(userId) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            document.getElementById(`menu-${userId}`).classList.toggle('show');
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.menu-btn')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+            }
+        });
+
+        function bumpToTop(userId) {
+            const vip = vipUsers.find(v => v.user_id === userId);
+            if (!vip) return;
+            
+            // Move to front
+            vipUsers = [vip, ...vipUsers.filter(v => v.user_id !== userId)];
+            renderVips();
+            renderQueue();
+            
+            // Save order
+            saveVipOrder();
+        }
+
+        async function saveVipOrder() {
+            try {
+                await fetch('/api/admin/vips/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order: vipUsers.map(v => v.user_id) })
+                });
+            } catch (error) {
+                console.error('Error saving order:', error);
+            }
+        }
+
+        async function toggleCut(userId, cutNumber) {
+            try {
+                const response = await fetch(`/api/admin/vips/${userId}/cut`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cut_number: cutNumber })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    loadVips();
+                }
+            } catch (error) {
+                console.error('Error toggling cut:', error);
+            }
+        }
+
+        function openGiftModal(userId) {
+            selectedVipId = userId;
+            document.getElementById('giftModal').classList.add('show');
+            document.getElementById('giftDaysInput').value = '';
+        }
+
+        function closeGiftModal() {
+            document.getElementById('giftModal').classList.remove('show');
+            selectedVipId = null;
+        }
+
+        async function confirmGiftDays() {
+            const days = parseInt(document.getElementById('giftDaysInput').value);
+            if (!days || days <= 0) {
+                alert('Please enter valid number of days');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/vips/${selectedVipId}/gift`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ days })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    closeGiftModal();
+                    loadVips();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error gifting days:', error);
+            }
+        }
+
+        function confirmRevoke(userId) {
+            selectedVipId = userId;
+            document.getElementById('confirmTitle').textContent = 'Revoke VIP Status?';
+            document.getElementById('confirmMessage').textContent = 'This will remove all VIP benefits from this user.';
+            document.getElementById('confirmBtn').onclick = revokeVip;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            selectedVipId = null;
+        }
+
+        async function revokeVip() {
+            if (!selectedVipId) return;
+
+            try {
+                const response = await fetch(`/api/admin/vips/${selectedVipId}/revoke`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    closeConfirmModal();
+                    loadVips();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error revoking VIP:', error);
+            }
+        }
+
+        function viewReceipt(userId) {
+            alert('Receipt viewer - Coming soon!');
+        }
+    </script>
+</body>
+</html>

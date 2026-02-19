@@ -1,0 +1,378 @@
+/* ==================== BOOK A CUT PAGE STYLES ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #0a0a0a;
+    color: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Close Button */
+.close-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+    transition: all 0.3s;
+    z-index: 100;
+}
+
+.close-btn:hover {
+    background: gold;
+    color: black;
+    border-color: gold;
+}
+
+/* Booking Container */
+.booking-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    padding-top: 60px;
+}
+
+/* Page Header */
+.booking-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.booking-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: white;
+}
+
+.booking-header .gold-accent {
+    color: gold;
+}
+
+/* Section Titles */
+.service-section h2,
+.date-section h2,
+.requests-section h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    color: gold;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+/* Service Grid */
+.service-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.service-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #111;
+    border: 2px solid #222;
+    border-radius: 12px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.service-card:hover {
+    border-color: #444;
+    transform: translateX(5px);
+}
+
+.service-card.selected {
+    border-color: gold;
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, #111 100%);
+}
+
+.service-card.highlight {
+    border-color: gold;
+}
+
+.service-name {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.service-price {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    color: gold;
+}
+
+.vip-tag {
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    background: linear-gradient(45deg, gold, #ffae00);
+    color: black;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+
+/* Date Picker */
+.date-section {
+    margin-bottom: 25px;
+}
+
+.date-input-wrapper {
+    position: relative;
+}
+
+.date-input {
+    width: 100%;
+    padding: 16px 50px 16px 20px;
+    background: #111;
+    border: 2px solid #222;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: gold;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.calendar-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    pointer-events: none;
+}
+
+/* Special Requests */
+.requests-section {
+    margin-bottom: 30px;
+}
+
+.textarea-wrapper {
+    position: relative;
+}
+
+.textarea-wrapper textarea {
+    width: 100%;
+    height: 120px;
+    padding: 15px;
+    background: #111;
+    border: 2px solid #222;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    resize: none;
+}
+
+.textarea-wrapper textarea:focus {
+    outline: none;
+    border-color: gold;
+}
+
+.textarea-wrapper textarea::placeholder {
+    color: #555;
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 18px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #888;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-btn:hover {
+    border-color: gold;
+    color: gold;
+}
+
+/* Book Now Button */
+.book-now-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(45deg, gold, #ffae00);
+    border: none;
+    border-radius: 12px;
+    color: black;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+}
+
+.book-now-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(255, 215, 0, 0.5);
+}
+
+.book-now-btn:active {
+    transform: translateY(0);
+}
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0.95));
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 10px 5px 20px;
+    backdrop-filter: blur(10px);
+    z-index: 99;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.nav-icon {
+    font-size: 20px;
+}
+
+/* Success Overlay */
+.success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.success-overlay.active {
+    display: flex;
+}
+
+.success-content {
+    background: #111;
+    border: 1px solid gold;
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    max-width: 350px;
+}
+
+.success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(45deg, gold, #ffae00);
+    border-radius: 50%;
+    font-size: 35px;
+    color: black;
+    margin-bottom: 20px;
+}
+
+.success-content h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.success-content p {
+    color: #888;
+    margin-bottom: 25px;
+}
+
+.return-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(45deg, gold, #ffae00);
+    color: black;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.return-btn:hover {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .booking-container {
+        padding-top: 50px;
+    }
+    
+    .booking-header h1 {
+        font-size: 26px;
+    }
+    
+    .service-card {
+        padding: 14px 16px;
+    }
+    
+    .service-name {
+        font-size: 14px;
+    }
+    
+    .service-price {
+        font-size: 14px;
+    }
+}

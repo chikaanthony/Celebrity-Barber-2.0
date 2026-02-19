@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='notifications.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="notifications-container">
+        <!-- Close Button -->
+        <button class="close-btn" onclick="window.location.href='/clientdashboard'">✕</button>
+        
+        <!-- Notifications Header -->
+        <h1 class="notifications-header">NOTIFICATIONS</h1>
+        <hr class="header-separator">
+        
+        <!-- Mark all as read button -->
+        <button class="mark-all-btn" onclick="markAllAsRead()">Mark all as read</button>
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Loading notifications...</p>
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <span class="empty-icon">🔔</span>
+            <p>No notifications yet</p>
+        </div>
+        
+        <!-- Notifications List -->
+        <div class="notifications-list" id="notificationsList">
+            <!-- Notifications will be dynamically loaded here -->
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast" id="toast" style="display: none;">
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+    
+    <script>
+        // Fetch notifications from API
+        async function fetchNotifications() {
+            try {
+                const response = await fetch('/api/user/notifications');
+                const result = await response.json();
+                
+                document.getElementById('loadingState').style.display = 'none';
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    renderNotifications(result.data);
+                } else {
+                    document.getElementById('emptyState').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'flex';
+            }
+        }
+        
+        // Render notifications
+        function renderNotifications(notifications) {
+            const container = document.getElementById('notificationsList');
+            container.innerHTML = '';
+            
+            // Sort: unread first, then read
+            notifications.sort((a, b) => (b.unread === true) - (a.unread === true));
+            
+            notifications.forEach(notif => {
+                const item = document.createElement('div');
+                item.className = `notification-item ${notif.unread ? 'unread' : ''}`;
+                item.setAttribute('data-id', notif.id);
+                item.onclick = () => openNotification(notif.id);
+                
+                item.innerHTML = `
+                    <div class="notif-icon-box ${notif.icon_type || 'booking'}">
+                        <span>${notif.icon || '📅'}</span>
+                    </div>
+                    <div class="notif-content">
+                        <div class="notif-top">
+                            <span class="notif-title">${notif.title || 'Notification'}</span>
+                            <span class="notif-time">${notif.time || 'recently'}</span>
+                        </div>
+                        <p class="notif-message">${notif.message || ''}</p>
+                    </div>
+                    ${notif.unread ? '<div class="unread-dot"></div>' : ''}
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+        
+        function openNotification(id) {
+            // Find the clicked notification item
+            const clickedItem = document.querySelector(`.notification-item[data-id="${id}"]`);
+            
+            if (clickedItem && clickedItem.classList.contains('unread')) {
+                // Call API to mark as read in database
+                fetch('/api/user/notifications/mark-read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ notification_id: id })
+                }).then(() => {
+                    // Mark only this notification as read
+                    clickedItem.classList.remove('unread');
+                    const dot = clickedItem.querySelector('.unread-dot');
+                    if (dot) dot.remove();
+                    
+                    // Move it to the bottom (after all unread ones)
+                    const container = document.getElementById('notificationsList');
+                    const unreadItems = container.querySelectorAll('.notification-item.unread');
+                    
+                    // Find the last unread item and insert after it
+                    if (unreadItems.length > 0) {
+                        const lastUnread = unreadItems[unreadItems.length - 1];
+                        lastUnread.parentNode.insertBefore(clickedItem, lastUnread.nextSibling);
+                    } else {
+                        // No unread items, just append to end
+                        container.appendChild(clickedItem);
+                    }
+                    
+                    // Update badge
+                    updateBadge();
+                });
+            }
+        }
+        
+        function markAllAsRead() {
+            const notifItems = document.querySelectorAll('.notification-item.unread');
+            notifItems.forEach(item => {
+                item.classList.remove('unread');
+                const dot = item.querySelector('.unread-dot');
+                if (dot) dot.remove();
+            });
+            
+            updateBadge();
+            showToast('All notifications marked as read');
+        }
+        
+        function updateBadge() {
+            const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+            // Update badge in parent page (if needed)
+            if (window.parent && window.parent.updateNotificationBadge) {
+                window.parent.updateNotificationBadge(unreadCount);
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.style.display = 'block';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+        
+        // Initialize
+        fetchNotifications();
+    </script>
+    
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/clientdashboard'">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/profile'">
+            <span class="nav-icon">👤</span>
+            <span>Profile</span>
+        </button>
+    </div>
+</body>
+</html>

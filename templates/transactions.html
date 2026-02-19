@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='clientdashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a12;
+            min-height: 100vh;
+        }
+        
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .page-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .back-btn {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #d4af37;
+            color: #0a0a12;
+        }
+        
+        /* Transaction Cards */
+        .transaction-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transaction-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+        
+        .transaction-card.bonus {
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+        
+        .transaction-card.bonus:hover {
+            border-color: rgba(76, 175, 80, 0.6);
+        }
+        
+        .trans-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .trans-type {
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .trans-date {
+            color: #888;
+            font-size: 13px;
+        }
+        
+        .trans-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .trans-amount.negative {
+            color: #ff6b6b;
+        }
+        
+        .trans-amount.positive {
+            color: #4caf50;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+        
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: 16px;
+            margin-bottom: 15px;
+            margin-top: 25px;
+        }
+        
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <h1>💳 Transaction History</h1>
+            <a href="/clientdashboard" class="back-btn">← Back to Dashboard</a>
+        </div>
+        
+        <div id="transactions-list">
+            <div class="empty-state">
+                <h2>Loading...</h2>
+                <p>Fetching your transactions</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load user's transactions
+        async function loadTransactions() {
+            try {
+                // Get bookings as transactions
+                const bookingsRes = await fetch('/api/user/bookings');
+                const bookingsData = await bookingsRes.json();
+                
+                // Get spending data
+                const spendingRes = await fetch('/api/user/spending');
+                const spendingData = await spendingRes.json();
+                
+                const container = document.getElementById('transactions-list');
+                let transactions = [];
+                
+                // Add bookings as transactions
+                if (bookingsData.success && bookingsData.data) {
+                    bookingsData.data.forEach(booking => {
+                        let dateStr = 'Recent';
+                        if (booking.createdAt) {
+                            // Handle Firestore timestamp (can be seconds or milliseconds)
+                            let timestamp = booking.createdAt;
+                            if (typeof timestamp === 'number') {
+                                // If timestamp is very small, it's in seconds, otherwise milliseconds
+                                const date = timestamp > 10000000000 ? new Date(timestamp) : new Date(timestamp * 1000);
+                                dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                            }
+                        }
+                        const service = booking.requests || booking.service || 'Haircut Service';
+                        const amount = booking.price || booking.amount || 2500; // Default to 2500 if not set
+                        
+                        transactions.push({
+                            type: '💈 ' + service,
+                            date: dateStr,
+                            amount: -amount,
+                            isBonus: false
+                        });
+                    });
+                }
+                
+                // Sort by date (newest first)
+                transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                if (transactions.length > 0) {
+                    container.innerHTML = `
+                        <h3 class="section-title">Recent Transactions</h3>
+                        ${transactions.map(t => `
+                            <div class="transaction-card ${t.isBonus ? 'bonus' : ''}">
+                                <div class="trans-info">
+                                    <span class="trans-type">${t.type}</span>
+                                    <span class="trans-date">${t.date}</span>
+                                </div>
+                                <span class="trans-amount ${t.amount > 0 ? 'positive' : 'negative'}">
+                                    ${t.amount > 0 ? '+' : ''}₦${Math.abs(t.amount).toLocaleString()}
+                                </span>
+                            </div>
+                        `).join('')}
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h2>💳 No Transactions Yet</h2>
+                            <p>Your booking history will appear here.</p>
+                            <a href="/bookcut" style="color: #d4af37; margin-top: 15px; display: inline-block;">Book your first appointment →</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('transactions-list').innerHTML = `
+                    <div class="empty-state">
+                        <h2>⚠️ Error</h2>
+                        <p>Failed to load transactions. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        loadTransactions();
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,597 @@
+/* ==================== BASE STYLES ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #0a0a0a;
+    color: white;
+    overflow-x: hidden;
+}
+
+/* ==================== NAVIGATION ==================== */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    position: fixed;
+    width: 100%;
+    background: rgba(10, 10, 10, 0.95);
+    z-index: 1000;
+    border-bottom: 1px solid #1a1a1a;
+    backdrop-filter: blur(10px);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    font-size: 24px;
+}
+
+.logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 20px;
+    color: gold;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: #888;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: gold;
+}
+
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-login {
+    color: gold;
+    text-decoration: none;
+    padding: 8px 20px;
+    border: 1px solid gold;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-login:hover {
+    background: gold;
+    color: black;
+}
+
+.btn-signup {
+    background: linear-gradient(45deg, gold, #ffae00);
+    color: black;
+    padding: 8px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    transition: all 0.3s;
+}
+
+.btn-signup:hover {
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-admin {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #333;
+    color: #666;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-admin:hover {
+    border-color: gold;
+    color: gold;
+}
+
+.menu-icon {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.menu-icon span {
+    width: 25px;
+    height: 2px;
+    background: white;
+    transition: all 0.3s;
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.98);
+    z-index: 2000;
+    transition: right 0.3s ease;
+    padding-top: 80px;
+}
+
+.mobile-overlay.active {
+    right: 0;
+}
+
+.overlay-content {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 40px 30px;
+    text-align: left;
+}
+
+.overlay-link {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    font-family: 'Orbitron', sans-serif;
+    transition: color 0.3s;
+}
+
+.overlay-link:hover {
+    color: gold;
+}
+
+.overlay-link.admin-btn {
+    color: #ff4444;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+/* ==================== HERO SECTION ==================== */
+
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 25px;
+    background: linear-gradient(180deg, #0a0a0a 0%, #151515 50%, #0a0a0a 100%);
+    padding: 0 20px;
+}
+
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    color: gold;
+    text-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+    letter-spacing: 4px;
+}
+
+.tagline {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    color: #666;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+.btn-cta {
+    background: linear-gradient(45deg, gold, #ffae00);
+    padding: 18px 50px;
+    border-radius: 35px;
+    color: black;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+    transition: all 0.3s;
+    margin-top: 20px;
+}
+
+.btn-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
+}
+
+.btn-admin.hero-admin {
+    background: transparent;
+    border: 1px solid #333;
+    color: #555;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-admin.hero-admin:hover {
+    border-color: gold;
+    color: gold;
+}
+
+.lock-icon {
+    margin-right: 5px;
+}
+
+.center-admin {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* ==================== SECTIONS ==================== */
+
+section {
+    padding: 80px 40px;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 32px;
+    color: gold;
+    letter-spacing: 3px;
+}
+
+/* ==================== FEATURES ==================== */
+
+.features {
+    background: #0a0a0a;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: gold;
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.1);
+}
+
+.feature-card.highlight {
+    border-color: gold;
+    background: linear-gradient(180deg, #1a1a1a 0%, #111 100%);
+}
+
+.feature-card .icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.feature-card p {
+    color: #666;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* ==================== SERVICES ==================== */
+
+.services {
+    background: #0f0f0f;
+    text-align: center;
+}
+
+.services h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 32px;
+    color: gold;
+    margin-bottom: 40px;
+    letter-spacing: 3px;
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.service-item {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 15px;
+    padding: 25px;
+    transition: all 0.3s;
+}
+
+.service-item:hover {
+    border-color: #444;
+    transform: translateY(-3px);
+}
+
+.service-item.highlight-border {
+    border-color: gold;
+}
+
+.service-item.highlight-vip {
+    border-color: gold;
+    background: linear-gradient(180deg, #1a1510 0%, #111 100%);
+    position: relative;
+}
+
+.service-item h3 {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.service-item .price {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    color: gold;
+}
+
+.vip-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: linear-gradient(45deg, gold, #ffae00);
+    color: black;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* ==================== TWEET SPACE ==================== */
+
+.tweet-space {
+    background: #0a0a0a;
+}
+
+.tweet-space h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    color: gold;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.tweet-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.tweet-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 15px;
+    padding: 25px;
+    transition: all 0.3s;
+}
+
+.tweet-card:hover {
+    border-color: #1da1f2;
+    box-shadow: 0 0 30px rgba(29, 161, 242, 0.1);
+}
+
+.tweet-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.tweet-avatar {
+    font-size: 28px;
+}
+
+.tweet-author {
+    color: #1da1f2;
+    font-weight: 600;
+}
+
+.tweet-content {
+    color: #ccc;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.tweet-rating {
+    color: gold;
+    font-size: 16px;
+}
+
+/* ==================== FOOTER ==================== */
+
+.footer {
+    background: #050505;
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid #1a1a1a;
+}
+
+.footer p:first-child {
+    font-family: 'Orbitron', sans-serif;
+    color: gold;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.location {
+    color: #444;
+    font-size: 14px;
+}
+
+/* ==================== MOBILE RESPONSIVE ==================== */
+
+@media (max-width: 900px) {
+    .navbar {
+        padding: 15px 20px;
+    }
+    
+    .nav-links.desktop-only {
+        display: none;
+    }
+    
+    .menu-icon {
+        display: flex;
+    }
+    
+    .brand-name {
+        font-size: 42px;
+    }
+    
+    .tagline {
+        font-size: 14px;
+        letter-spacing: 4px;
+    }
+    
+    section {
+        padding: 60px 20px;
+    }
+    
+    .service-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .nav-auth {
+        gap: 10px;
+    }
+    
+    .btn-signup {
+        padding: 8px 15px;
+        font-size: 12px;
+    }
+    
+    .btn-admin {
+        display: none;
+    }
+    
+    .brand-name {
+        font-size: 32px;
+    }
+    
+    .btn-cta {
+        padding: 14px 30px;
+        font-size: 14px;
+    }
+    
+    .service-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tweet-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Bottom Navigation Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.98), rgba(10, 10, 10, 0.95));
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 10px 5px 20px;
+    backdrop-filter: blur(10px);
+    z-index: 99;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover, .nav-item.active {
+    color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.nav-icon {
+    font-size: 20px;
+}

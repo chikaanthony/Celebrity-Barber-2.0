@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Celebrity Barber</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-main {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-content {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Admin Header */
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(90deg, #111 0%, #1a1a1a 100%);
+            border-bottom: 2px solid #d4af37;
+            border-radius: 16px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: #d4af37;
+            letter-spacing: 2px;
+        }
+
+        .admin-user {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .admin-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .admin-role {
+            font-size: 12px;
+            color: #d4af37;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #d4af37;
+            color: #000;
+        }
+
+        /* Analytics Cards */
+        .analytics-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .analytics-card {
+            background: linear-gradient(145deg, #1a1a1a, #252525);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .analytics-card.highlight {
+            border-color: #d4af37;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .card-icon {
+            font-size: 32px;
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .card-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        /* Management Stack */
+        .management-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+        }
+
+        .stack-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stack-item:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .stack-item.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: #d4af37;
+        }
+
+        .stack-icon {
+            font-size: 24px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .stack-label {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .stack-badge {
+            background: #d4af37;
+            color: #000;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .stack-badge {
+            background: #d4af37;
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        /* Pulse animation for unread badge */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+            }
+        }
+        
+        .stack-badge.pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Unread dot indicator */
+        .unread-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: #ff4444;
+            border-radius: 50%;
+            border: 2px solid #111;
+            animation: pulse-dot 1.5s infinite;
+        }
+        
+        @keyframes pulse-dot {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(255, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);
+            }
+        }
+
+        /* Section Content */
+        .section-content {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* Approval Cards */
+        .approval-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .approval-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .request-type {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .request-type.vip {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+        }
+
+        .request-type.booking {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .receipt-preview {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .receipt-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+
+        .booking-details {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .booking-details p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .booking-details strong {
+            color: #d4af37;
+        }
+
+        .approval-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-approve, .btn-decline {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #d4af37, #f4cf57);
+            border: none;
+            color: #000;
+        }
+
+        .btn-approve:hover {
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-decline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-decline:hover {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        /* Bookings List */
+        .bookings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .booking-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+
+        .booking-date, .booking-time, .booking-service, .booking-user {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+        }
+
+        .booking-date { width: 120px; }
+        .booking-time { width: 80px; }
+        .booking-service { flex: 1; }
+        .booking-user { width: 120px; }
+
+        .booking-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .booking-status.confirmed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .booking-status.pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+
+        /* Messages List */
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .message-item.unread {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-user {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .message-preview {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Placeholder */
+        .placeholder-text {
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        /* Toast */
+        .admin-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(145deg, #1a1a1a, #252525);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 15px 25px;
+            color: #fff;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .admin-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .admin-toast span {
+            color: #d4af37;
+            margin-right: 10px;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .admin-main {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+            
+            .analytics-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .analytics-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .management-stack {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .stack-item {
+                flex: 1 1 calc(50% - 5px);
+                min-width: unset;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Admin Header -->
+        <nav class="admin-nav">
+            <div class="logo">
+                <span class="logo-icon">✂️</span>
+                <span class="logo-text">CELEBRITY BARBER</span>
+            </div>
+            <div class="admin-user">
+                <span class="admin-name">Admin User</span>
+                <span class="admin-role">Super Admin</span>
+            </div>
+            <button class="logout-btn" onclick="window.location.href='/logout'">LOGOUT</button>
+        </nav>
+        
+        <!-- Analytics Cards -->
+        <div class="analytics-row">
+            <div class="analytics-card">
+                <div class="card-icon">👥</div>
+                <div class="card-info">
+                    <span class="card-value" id="totalUsers">24</span>
+                    <span class="card-label">TOTAL USERS</span>
+                </div>
+            </div>
+            <div class="analytics-card">
+                <div class="card-icon">💰</div>
+                <div class="card-info">
+                    <span class="card-value" id="totalRevenue">156,500</span>
+                    <span class="card-label">TOTAL REVENUE</span>
+                </div>
+            </div>
+            <div class="analytics-card">
+                <div class="card-icon">👑</div>
+                <div class="card-info">
+                    <span class="card-value" id="activeVips">8</span>
+                    <span class="card-label">ACTIVE VIPs</span>
+                </div>
+            </div>
+            <div class="analytics-card highlight">
+                <div class="card-icon">⏰</div>
+                <div class="card-info">
+                    <span class="card-value" id="pendingCount">5</span>
+                    <span class="card-label">PENDING</span>
+                </div>
+            </div>
+        </div>
+        <!-- Management Stack as Sidebar -->
+        <div class="admin-main">
+            <div class="sidebar">
+                <!-- Management Stack -->
+                                <div class="management-stack">
+            <div class="stack-item active" onclick="window.location.href='/admin/approvals'">
+                <span class="stack-icon">✅</span>
+                <span class="stack-label">APPROVALS</span>
+                <span class="stack-badge">3</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/bookings'">
+                <span class="stack-icon">🗓️</span>
+                <span class="stack-label">BOOKINGS</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/referrals'">
+                <span class="stack-icon">👥</span>
+                <span class="stack-label">REFERRALS</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/analytics'">
+                <span class="stack-icon">📊</span>
+                <span class="stack-label">ANALYTICS</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/broadcast'">
+                <span class="stack-icon">📢</span>
+                <span class="stack-label">BROADCAST</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/service-updates'">
+                <span class="stack-icon">🔧</span>
+                <span class="stack-label">SERVICE UPDATES</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/services'">
+                <span class="stack-icon">⚙️</span>
+                <span class="stack-label">SERVICE MANAGER</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/vips'">
+                <span class="stack-icon">👑</span>
+                <span class="stack-label">VIPs</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/ledger'">
+                <span class="stack-icon">🧾</span>
+                <span class="stack-label">LEDGER</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/users'">
+                <span class="stack-icon">👨‍👦‍👦</span>
+                <span class="stack-label">USERS</span>
+            </div>
+            <div class="stack-item" onclick="window.location.href='/admin/chat'" style="position: relative;">
+                <span class="stack-icon">💬</span>
+                <span class="stack-label">CHAT</span>
+                <span class="stack-badge" id="chatBadge" style="display: none;">0</span>
+                <span class="unread-dot" id="chatDot" style="display: none;"></span>
+            </div>
+        </div>
+        </div>
+        
+        <!-- Section Content - Removed - Will be separate pages -->
+        </div>
+    </div>
+    <script>
+        // DEBUG MODE - Set to true to always show badge for testing
+        const DEBUG_SHOW_BADGE = false;
+        
+        // Fetch unread chat count on page load
+        async function updateChatBadge() {
+            try {
+                const response = await fetch('/api/admin/chat/unread-count');
+                const result = await response.json();
+                
+                console.log('Unread count response:', result);
+                
+                const badge = document.getElementById('chatBadge');
+                const dot = document.getElementById('chatDot');
+                
+                // For testing: use DEBUG_SHOW_BADGE or real count
+                const hasUnread = DEBUG_SHOW_BADGE || (result.success && result.total_unread > 0);
+                
+                if (hasUnread) {
+                    // Show badge with count
+                    const displayCount = DEBUG_SHOW_BADGE ? (result.total_unread || 1) : result.total_unread;
+                    badge.textContent = displayCount > 99 ? '99+' : displayCount;
+                    badge.style.display = 'inline-flex';
+                    badge.classList.add('pulse');
+                    
+                    // Show red dot indicator
+                    dot.style.display = 'block';
+                    console.log('Showing badge with count:', displayCount);
+                } else {
+                    badge.style.display = 'none';
+                    badge.classList.remove('pulse');
+                    dot.style.display = 'none';
+                    console.log('No unread messages');
+                }
+            } catch (error) {
+                console.error('Error fetching unread count:', error);
+            }
+        }
+        async function loadDashboardMetrics() {
+            try {
+                const [analyticsResponse, pendingResponse] = await Promise.all([
+                    fetch('/api/admin/analytics'),
+                    fetch('/api/admin/pending-approvals')
+                ]);
+
+                const analyticsResult = await analyticsResponse.json();
+                const pendingResult = await pendingResponse.json();
+
+                if (analyticsResult.success) {
+                    const data = analyticsResult.data || {};
+                    document.getElementById('totalUsers').textContent = data.total_users || 0;
+                    document.getElementById('totalRevenue').textContent = '₦' + Number(data.total_revenue || 0).toLocaleString();
+                    document.getElementById('activeVips').textContent = data.active_vips || 0;
+                }
+
+                if (pendingResult.success) {
+                    document.getElementById('pendingCount').textContent = (pendingResult.data || []).length;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard metrics:', error);
+            }
+        }
+        // Update badge on page load
+        updateChatBadge();
+        loadDashboardMetrics();
+        
+        // Refresh every 30 seconds
+        setInterval(updateChatBadge, 30000);
+        setInterval(loadDashboardMetrics, 30000);
+    </script>
+</body>
+</html>

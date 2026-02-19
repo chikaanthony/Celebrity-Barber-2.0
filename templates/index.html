@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celebrity Barber | Freshness Delivered</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ==================== PUBLIC INTERFACE ==================== -->
+    <div id="public-interface">
+        
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo">
+                <span class="logo-icon">✂️</span>
+                <span class="logo-text">CELEBRITY BARBER</span>
+            </div>
+            
+            <div class="nav-links desktop-only">
+                <a href="#features">FEATURES</a>
+                <a href="#services">SERVICES</a>
+                <a href="#reviews">TWEET SPACE</a>
+            </div>
+
+            <div class="nav-auth">
+                <a href="/login" class="btn-login">LOGIN</a>
+                <a href="/signup" class="btn-signup">SIGN UP</a>
+                <div class="menu-icon" id="menuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" id="mobileOverlay">
+            <div class="overlay-content">
+                <button class="close-btn" id="closeMenu">×</button>
+                <a href="#features" class="overlay-link">FEATURES</a>
+                <a href="#services" class="overlay-link">SERVICES</a>
+                <a href="#reviews" class="overlay-link">TWEET SPACE</a>
+                <a href="/login" class="overlay-link">LOGIN</a>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="brand-name">CELEBRITY BARBER</h1>
+                <p class="tagline">FRESHNESS DELIVERED</p>
+                <button class="btn-cta" onclick="window.location.href='/login'">CLAIM YOUR IDENTITY</button>
+                <div class="center-admin">
+                    <button class="btn-admin hero-admin" onclick="window.location.href='/admin-login'"><span class="lock-icon">🔒</span> ADMIN LOGIN</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <div class="container">
+                <div class="section-title">
+                    <h2>FEATURES</h2>
+                </div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">✂️</div>
+                        <h3>Expert Stylists</h3>
+                        <p>Our team consists of the finest barbers in UNIUYO with years of experience.</p>
+                    </div>
+                    <div class="feature-card highlight">
+                        <div class="icon">👑</div>
+                        <h3>VIP Treatment</h3>
+                        <p>Join our VIP program for exclusive perks and priority booking.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">💎</div>
+                        <h3>Premium Products</h3>
+                        <p>We use only the finest grooming products for your perfect look.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="services">
+            <h2>OUR SERVICES</h2>
+            <div class="service-grid" id="landingServicesGrid">
+                <!-- Services loaded dynamically from API -->
+            </div>
+        </section>
+
+        <!-- Tweet Space Reviews -->
+        <section id="reviews" class="reviews tweet-space">
+            <h2>🐦 TWEET SPACE</h2>
+            <div class="tweet-container" id="tweetContainer">
+                <!-- Reviews loaded dynamically from API -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>CELEBRITY BARBER</p>
+            <p class="location">Freshness Delivered - UNIUYO, Nigeria</p>
+        </footer>
+    </div>
+
+    <!-- ==================== ADMIN COMMAND CENTER ==================== -->
+    <div id="admin-dashboard" class="admin-interface" style="display: none;">
+        
+        <!-- Admin Nav -->
+        <nav class="admin-nav">
+            <div class="logo admin-logo">
+                <span class="logo-icon">⚙️</span>
+                <span class="logo-text">ADMIN COMMAND CENTER</span>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-logout" onclick="showSection('public-interface')">← BACK</button>
+            </div>
+        </nav>
+
+        <!-- Admin Dashboard Content -->
+        <div class="admin-content">
+            
+            <!-- Analytics Dashboard -->
+            <div class="admin-section analytics-section">
+                <h3>📊 ANALYTICS DASHBOARD</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-icon">👥</span>
+                        <span class="stat-value">156</span>
+                        <span class="stat-label">Total Users</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">💵</span>
+                        <span class="stat-value">₦6000.0</span>
+                        <span class="stat-label">Total Revenue</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">👑</span>
+                        <span class="stat-value">42</span>
+                        <span class="stat-label">Active VIPs</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">📅</span>
+                        <span class="stat-value">28</span>
+                        <span class="stat-label">Today's Bookings</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approval System -->
+            <div class="admin-section approval-section">
+                <h3>✨ APPROVAL SYSTEM</h3>
+                <div class="gold-glow-notification">
+                    <span class="glow-icon">🟡</span>
+                    <span class="glow-text">3 Pending Receipts Awaiting Verification</span>
+                </div>
+                <div class="approval-list">
+                    <div class="approval-item pending">
+                        <div class="approval-info">
+                            <span class="approval-user">@john_doe</span>
+                            <span class="approval-type">Booking Payment</span>
+                            <span class="approval-amount">₦1500</span>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="approve-btn">✓ Approve</button>
+                            <button class="reject-btn">✗ Reject</button>
+                        </div>
+                    </div>
+                    <div class="approval-item pending">
+                        <div class="approval-info">
+                            <span class="approval-user">@sarah_s</span>
+                            <span class="approval-type">VIP Enrollment</span>
+                            <span class="approval-amount">₦5000</span>
+                        </div>
+                        <div class="approval-actions">
+                            <button class="approve-btn">✓ Approve</button>
+                            <button class="reject-btn">✗ Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIP Management -->
+            <div class="admin-section vip-management">
+                <h3>👑 VIP MANAGEMENT</h3>
+                <div class="punch-card">
+                    <h4>Priority Haircuts This Month</h4>
+                    <div class="punches">
+                        <div class="punch used">✓</div>
+                        <div class="punch">○</div>
+                    </div>
+                    <p class="punch-info">2 priority haircuts per month</p>
+                </div>
+                <div class="vip-countdown">
+                    <span class="countdown-label">Membership expires in:</span>
+                    <span class="countdown-timer">14 days : 06 hrs : 23 min</span>
+                </div>
+            </div>
+
+            <!-- Financial Ledger -->
+            <div class="admin-section ledger-section">
+                <h3>📒 FINANCIAL LEDGER</h3>
+                <div class="ledger-table">
+                    <div class="ledger-header">
+                        <span>Date</span>
+                        <span>Description</span>
+                        <span>Type</span>
+                        <span>Amount</span>
+                    </div>
+                    <div class="ledger-row income">
+                        <span>Today</span>
+                        <span>Classic Haircut - @mike</span>
+                        <span class="type-income">Income</span>
+                        <span class="amount-income">+₦1500</span>
+                    </div>
+                    <div class="ledger-row income">
+                        <span>Today</span>
+                        <span>VIP Enrollment - @sarah</span>
+                        <span class="type-income">Income</span>
+                        <span class="amount-income">+₦5000</span>
+                    </div>
+                    <div class="ledger-row expense">
+                        <span>Yesterday</span>
+                        <span>Shop Supplies</span>
+                        <span class="type-expense">Expense</span>
+                        <span class="amount-expense">-₦2000</span>
+                    </div>
+                    <div class="ledger-summary">
+                        <span>NET INCOME</span>
+                        <span class="net-positive">+₦4500</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Broadcast Manager -->
+            <div class="admin-section broadcast-section">
+                <h3>📢 BROADCAST MANAGER</h3>
+                <div class="broadcast-controls">
+                    <textarea placeholder="Type your announcement here..."></textarea>
+                    <div class="broadcast-actions">
+                        <button class="broadcast-btn">📷 Update Photo</button>
+                        <button class="broadcast-btn">🗑️ Delete History</button>
+                        <button class="broadcast-btn highlight">⬆️ Bump Post</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Manager -->
+            <div class="admin-section service-manager">
+                <h3>✂️ SERVICE MANAGER</h3>
+                <div class="service-list">
+                    <div class="service-edit">
+                        <span>Classic Haircut</span>
+                        <span class="current-price">₦1500</span>
+                        <button class="edit-btn">✏️ Edit</button>
+                    </div>
+                    <div class="service-edit">
+                        <span>Full Service</span>
+                        <span class="current-price">₦2500</span>
+                        <button class="edit-btn">✏️ Edit</button>
+                    </div>
+                    <div class="service-edit">
+                        <span>VIP Treatment</span>
+                        <span class="current-price">₦5000</span>
+                        <button class="edit-btn">✏️ Edit</button>
+                    </div>
+                </div>
+                <button class="add-service-btn">+ Add New Service</button>
+            </div>
+
+            <!-- Communication Center -->
+            <div class="admin-section chat-section">
+                <h3>💬 COMMUNICATION CENTER</h3>
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <span class="unread-badge">5</span>
+                        <span>Unread Messages</span>
+                    </div>
+                    <div class="chat-list">
+                        <div class="chat-item unread">
+                            <span class="chat-avatar">👤</span>
+                            <div class="chat-preview">
+                                <span class="chat-user">@mike_cool</span>
+                                <span class="chat-msg">Hey, can I book for tomorrow?</span>
+                            </div>
+                            <span class="chat-time">2m ago</span>
+                        </div>
+                        <div class="chat-item unread">
+                            <span class="chat-avatar">👤</span>
+                            <div class="chat-preview">
+                                <span class="chat-user">@sarah_g</span>
+                                <span class="chat-msg">VIP inquiry...</span>
+                            </div>
+                            <span class="chat-time">15m ago</span>
+                        </div>
+                        <div class="chat-item">
+                            <span class="chat-avatar">👤</span>
+                            <div class="chat-preview">
+                                <span class="chat-user">@anthony</span>
+                                <span class="chat-msg">Thanks for the cut!</span>
+                            </div>
+                            <span class="chat-time">1h ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load services and reviews on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLandingServices();
+            loadReviews();
+        });
+
+        async function loadLandingServices() {
+            try {
+                const response = await fetch('/api/services');
+                const result = await response.json();
+                
+                const container = document.getElementById('landingServicesGrid');
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    container.innerHTML = result.data.map((service, index) => `
+                        <div class="service-item ${index % 2 === 0 ? 'highlight-border' : ''}">
+                            <h3>${service.name}</h3>
+                            <p class="price">₦${service.price.toLocaleString()}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="service-item" style="grid-column: 1/-1; text-align: center;">
+                            <h3>Services Coming Soon</h3>
+                            <p class="price">Check back later</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+
+        async function loadReviews() {
+            try {
+                const response = await fetch('/api/reviews');
+                const result = await response.json();
+                
+                const container = document.getElementById('tweetContainer');
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    container.innerHTML = result.data.slice(0, 6).map(review => {
+                        const rating = review.rating || 5;
+                        const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+                        // Handle different field names for author and content
+                        const author = review.name || review.user_name || review.userName || review.full_name || 'User';
+                        const content = review.content || review.review || review.text || 'Great service!';
+                        return `
+                            <div class="tweet-card">
+                                <div class="tweet-header">
+                                    <span class="tweet-avatar">⭐</span>
+                                    <span class="tweet-author">${author}</span>
+                                </div>
+                                <p class="tweet-content">"${content}"</p>
+                                <span class="tweet-rating">${stars}</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="tweet-card" style="grid-column: 1/-1; text-align: center;">
+                            <p class="tweet-content">No reviews yet. Be the first to review!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            }
+        }
+
+        // Section navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('public-interface').style.display = 'none';
+            document.getElementById('client-dashboard').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            
+            // Show selected section
+            document.getElementById(sectionId).style.display = 'block';
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Mobile menu toggle
+        document.getElementById('menuBtn').addEventListener('click', function() {
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        });
+
+        document.getElementById('closeMenu').addEventListener('click', function() {
+            document.getElementById('mobileOverlay').classList.remove('active');
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.overlay-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                document.getElementById('mobileOverlay').classList.remove('active');
+            });
+        });
+
+        // Auto-scrolling broadcast
+        const tickerContent = document.querySelector('.ticker-content');
+        if (tickerContent) {
+            let scrollPos = 0;
+            setInterval(() => {
+                scrollPos -= 1;
+                if (scrollPos < -tickerContent.offsetWidth / 2) {
+                    scrollPos = 0;
+                }
+                tickerContent.style.transform = `translateX(${scrollPos}px)`;
+            }, 30);
+        }
+    </script>
+
+</body>
+</html>

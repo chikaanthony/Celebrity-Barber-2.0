@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join the VIPs - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='joinvip.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="vip-container">
+        <!-- Close Button -->
+        <button class="close-btn" onclick="window.location.href='/clientdashboard'">✕</button>
+        
+        <!-- Page Header -->
+        <h1 class="page-title">JOIN THE <span class="gold-text">VIPS</span></h1>
+        
+        <!-- Membership Details Box -->
+        <div class="membership-box">
+            <div class="tier-name">
+                <span class="tier-label">VIP CELEBRITY</span>
+            </div>
+            <div class="price-section">
+                <span class="price">₦2,500</span>
+                <span class="duration">Valid for 1 Month</span>
+            </div>
+        </div>
+        
+        <!-- VIP Privilege Section -->
+        <div class="privilege-section">
+            <h2 class="privilege-title">THE VIP PRIVILEGE</h2>
+            <p class="privilege-text">
+                <strong>PRIORITY CUTTING:</strong> 2 prior cuts in a month plus unlimited lining.
+            </p>
+        </div>
+        
+        <!-- Payment Verification / Receipt Upload -->
+        <div class="upload-section">
+            <label class="upload-label">Upload Payment Receipt</label>
+            <div class="upload-box" id="uploadBox" onclick="document.getElementById('receiptInput').click()">
+                <input type="file" id="receiptInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                <div class="upload-content" id="uploadContent">
+                    <span class="upload-icon">📁</span>
+                    <span class="upload-text">Click or drag image here</span>
+                </div>
+                <div class="preview-container" id="previewContainer" style="display: none;">
+                    <img id="receiptPreview" class="receipt-preview" src="" alt="Receipt Preview">
+                    <button class="remove-btn" onclick="removeReceipt(event)">✕</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Become VIP Button -->
+        <button class="become-vip-btn" onclick="submitVIP()">BECOME A VIP</button>
+    </div>
+    
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>Welcome to the VIP Club!</h2>
+            <p>Your receipt has been submitted for verification.</p>
+            <p class="success-note">You'll receive your VIP badge once verified by admin.</p>
+            <button class="success-btn" onclick="window.location.href='/clientdashboard'">Back to Dashboard</button>
+        </div>
+    </div>
+    
+    <script>
+        let receiptFile = null;
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                receiptFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('uploadContent').style.display = 'none';
+                    document.getElementById('previewContainer').style.display = 'block';
+                    document.getElementById('receiptPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeReceipt(event) {
+            event.stopPropagation();
+            receiptFile = null;
+            document.getElementById('receiptInput').value = '';
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('uploadContent').style.display = 'flex';
+        }
+        
+        function submitVIP() {
+            if (!receiptFile) {
+                alert('Please upload your payment receipt first!');
+                return;
+            }
+            
+            // Convert receipt to base64
+            const convertToBase64 = (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                });
+            };
+            
+            const processVIP = async () => {
+                let receiptBase64 = '';
+                try {
+                    receiptBase64 = await convertToBase64(receiptFile);
+                } catch (e) {
+                    console.error('Error converting receipt:', e);
+                }
+
+                // Send VIP request to Firebase
+                fetch('/api/vip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 2500,
+                        tier: 'VIP CELEBRITY',
+                        receipt: receiptBase64
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success overlay
+                        document.getElementById('successOverlay').style.display = 'flex';
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error submitting VIP request. Please try again.');
+                });
+            };
+            
+            processVIP();
+        }
+        
+        // Drag and drop functionality
+        const uploadBox = document.getElementById('uploadBox');
+        
+        uploadBox.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadBox.classList.add('dragover');
+        });
+        
+        uploadBox.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+        });
+        
+        uploadBox.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadBox.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('receiptInput').files = dataTransfer.files;
+                handleFileSelect({ target: { files: dataTransfer.files } });
+            }
+        });
+    </script>
+    </script>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='/bookcut'">
+            <span class="nav-icon">✂️</span>
+            <span>Book a Cut</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/joinvip'">
+            <span class="nav-icon">👑</span>
+            <span>Join VIP</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/refer'">
+            <span class="nav-icon">🎁</span>
+            <span>Refer Friend</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/reviews'">
+            <span class="nav-icon">⭐</span>
+            <span>Reviews</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='/leaderboard'">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </button>
+    </div>
+</body>
+</html>

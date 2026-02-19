@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger - Celebrity Barber Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .ledger-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .ledger-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(90deg, #111 0%, #1a1a1a 100%);
+            border-bottom: 2px solid #d4af37;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #d4af37;
+            color: #000;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            color: #d4af37;
+            letter-spacing: 2px;
+        }
+
+        .add-expense-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .add-expense-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0 0 16px 16px;
+            padding: 30px;
+        }
+
+        /* Revenue Overview */
+        .revenue-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .revenue-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .revenue-card h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .revenue-card .amount {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .revenue-card.total .amount {
+            color: #d4af37;
+        }
+
+        .revenue-card.expense .amount {
+            color: #ff6b6b;
+        }
+
+        .revenue-card.net .amount {
+            color: #4CAF50;
+        }
+
+        .revenue-card.net {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        /* Transaction History */
+        .transaction-history {
+            margin-top: 30px;
+        }
+
+        .transaction-history h2 {
+            font-size: 18px;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.3s;
+        }
+
+        .transaction-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .transaction-icon.income {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .transaction-icon.expense {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-label {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .transaction-amount {
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .transaction-amount.income {
+            color: #4CAF50;
+        }
+
+        .transaction-amount.expense {
+            color: #ff6b6b;
+        }
+
+        .three-dots {
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            color: #888;
+        }
+
+        .three-dots:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 5px;
+            min-width: 120px;
+            display: none;
+            z-index: 100;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            font-size: 13px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-item.danger {
+            color: #ff4444;
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        .transaction-item {
+            position: relative;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #d4af37;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .cancel-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .cancel-btn:hover {
+            border-color: #fff;
+        }
+
+        .save-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+            border: none;
+            color: #000;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .revenue-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .ledger-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .transaction-item {
+                flex-wrap: wrap;
+            }
+
+            .transaction-amount {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ledger-container">
+        <div class="ledger-header">
+            <div class="header-left">
+                <a href="/admin" class="back-btn">← Dashboard</a>
+                <span class="logo-text">LEDGER</span>
+            </div>
+            <button class="add-expense-btn" onclick="showAddExpenseModal()">
+                <span>➕</span> Add Expense
+            </button>
+        </div>
+
+        <div class="main-content">
+            <!-- Revenue Overview -->
+            <div class="revenue-overview">
+                <div class="revenue-card total">
+                    <h3>Total Revenue</h3>
+                    <div class="amount" id="totalRevenue">₦0</div>
+                </div>
+                <div class="revenue-card expense">
+                    <h3>Total Expenses</h3>
+                    <div class="amount" id="totalExpenses">₦0</div>
+                </div>
+                <div class="revenue-card net">
+                    <h3>Net Income</h3>
+                    <div class="amount" id="netIncome">₦0</div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="transaction-history">
+                <h2>📊 Transaction History</h2>
+                <div class="transaction-list" id="transactionList">
+                    <!-- Transactions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div class="modal-overlay" id="expenseModal">
+        <div class="modal">
+            <h2>💰 Add Expense</h2>
+            <div class="form-group">
+                <label>Amount (₦)</label>
+                <input type="number" id="expenseAmount" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="expenseDescription" placeholder="e.g., Barbing equipment, Electricity bill">
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="hideAddExpenseModal()">Cancel</button>
+                <button class="save-btn" onclick="addExpense()">Save Expense</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let transactions = [];
+        let totalRevenue = 0;
+        let totalExpenses = 0;
+
+        async function loadLedger() {
+            try {
+                const response = await fetch('/api/admin/ledger');
+                const result = await response.json();
+                
+                if (result.success) {
+                    transactions = result.data || [];
+                    calculateTotals();
+                    renderTransactions();
+                }
+            } catch (error) {
+                console.error('Error loading ledger:', error);
+            }
+        }
+
+        function calculateTotals() {
+            totalRevenue = 0;
+            totalExpenses = 0;
+
+            transactions.forEach(tx => {
+                const amount = parseFloat(tx.amount) || 0;
+                if (tx.type === 'income' || tx.type === 'vip' || tx.type === 'booking') {
+                    totalRevenue += amount;
+                } else if (tx.type === 'expense') {
+                    totalExpenses += amount;
+                }
+            });
+
+            document.getElementById('totalRevenue').textContent = '₦' + totalRevenue.toLocaleString();
+            document.getElementById('totalExpenses').textContent = '₦' + totalExpenses.toLocaleString();
+            document.getElementById('netIncome').textContent = '₦' + (totalRevenue - totalExpenses).toLocaleString();
+        }
+
+        function renderTransactions() {
+            const container = document.getElementById('transactionList');
+            container.innerHTML = '';
+
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>No transactions yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by date (newest first)
+            const sorted = [...transactions].sort((a, b) => {
+                const dateA = a.created_at || a.createdAt || 0;
+                const dateB = b.created_at || b.createdAt || 0;
+                return new Date(dateB) - new Date(dateA);
+            });
+
+            sorted.forEach(tx => {
+                const amount = parseFloat(tx.amount) || 0;
+                const isIncome = tx.type === 'income' || tx.type === 'vip' || tx.type === 'booking';
+                
+                let dateStr = '';
+                if (tx.created_at) {
+                    dateStr = formatDate(tx.created_at);
+                } else if (tx.createdAt) {
+                    dateStr = formatDate(tx.createdAt);
+                }
+
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                item.innerHTML = `
+                    <div class="transaction-icon ${isIncome ? 'income' : 'expense'}">
+                        ${isIncome ? '↑' : '↓'}
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-label">${tx.service || tx.label || tx.type || 'Transaction'}</div>
+                        <div class="transaction-date">${dateStr}</div>
+                    </div>
+                    <div class="transaction-amount ${isIncome ? 'income' : 'expense'}">
+                        ${isIncome ? '+' : '-'}₦${amount.toLocaleString()}
+                    </div>
+                    <div style="position: relative;">
+                        <button class="three-dots" onclick="toggleDropdown('${tx.id}')">⋮</button>
+                        <div class="dropdown-menu" id="dropdown-${tx.id}">
+                            <div class="dropdown-item danger" onclick="deleteTransaction('${tx.id}')">🗑️ Delete</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function formatDate(dateStr) {
+            try {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch {
+                return dateStr;
+            }
+        }
+
+        function showAddExpenseModal() {
+            document.getElementById('expenseModal').classList.add('show');
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseDescription').value = '';
+        }
+
+        function hideAddExpenseModal() {
+            document.getElementById('expenseModal').classList.remove('show');
+        }
+
+        async function addExpense() {
+            const amount = document.getElementById('expenseAmount').value;
+            const description = document.getElementById('expenseDescription').value;
+
+            if (!amount || !description) {
+                alert('Please enter both amount and description');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/ledger/expense', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: parseFloat(amount),
+                        description: description
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    hideAddExpenseModal();
+                    await loadLedger();
+                } else {
+                    alert('Error adding expense: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error adding expense:', error);
+                alert('Error adding expense');
+            }
+        }
+
+        function toggleDropdown(id) {
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-menu.show').forEach(d => {
+                if (d.id !== 'dropdown-' + id) {
+                    d.classList.remove('show');
+                }
+            });
+            
+            const dropdown = document.getElementById('dropdown-' + id);
+            dropdown.classList.toggle('show');
+        }
+
+        async function deleteTransaction(id) {
+            if (!confirm('Are you sure you want to delete this transaction?')) return;
+
+            try {
+                const response = await fetch(`/api/admin/ledger/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    await loadLedger();
+                } else {
+                    alert('Error deleting transaction: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting transaction:', error);
+                alert('Error deleting transaction');
+            }
+
+            // Close all dropdowns
+            document.querySelectorAll('.dropdown-menu.show').forEach(d => d.classList.remove('show'));
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.three-dots') && !e.target.closest('.dropdown-menu')) {
+                document.querySelectorAll('.dropdown-menu.show').forEach(d => d.classList.remove('show'));
+            }
+        });
+
+        // Load data on page load
+        loadLedger();
+    </script>
+</body>
+</html>

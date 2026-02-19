@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Celebrity Barber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin-login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-login-container">
+        <!-- Background Pattern -->
+        <div class="bg-pattern"></div>
+        
+        <!-- Admin Login Box -->
+        <div class="admin-login-box">
+            <!-- Logo & Header -->
+            <div class="admin-header">
+                <div class="admin-logo">
+                    <span class="logo-icon">⚙️</span>
+                    <span class="logo-text">ADMIN PORTAL</span>
+                </div>
+                <div class="brand-name">
+                    <span class="brand-icon">✂️</span>
+                    <span class="brand-text">CELEBRITY BARBER</span>
+                </div>
+            </div>
+            
+            <!-- Title -->
+            <div class="login-title">
+                <h2>COMMAND CENTER</h2>
+                <p>Enter your admin credentials</p>
+            </div>
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-messages">
+                  {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+            
+            <!-- Admin Login Form -->
+            <form class="admin-form" action="/login" method="POST">
+                <div class="form-group">
+                    <label for="email">
+                        <span class="input-icon">📧</span>
+                        Admin Email
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="chikaanthony896@gmail.com" 
+                        value="chikaanthony896@gmail.com"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <span class="input-icon">🔐</span>
+                        Password
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Enter admin password"
+                            required
+                        >
+                        <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="admin-login-btn">
+                    <span class="btn-icon">🔓</span>
+                    ACCESS DASHBOARD
+                </button>
+            </form>
+            
+            <!-- Back to Home -->
+            <div class="back-section">
+                <a href="/" class="back-link">← Return to Main Site</a>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="admin-footer">
+            <span>🔒 Secure Admin Access</span>
+            <span class="separator">|</span>
+            <span> Celebrity Barber System</span>
+        </div>
+    </div>
+    
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const toggle = document.querySelector('.toggle-password');
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.textContent = '🔒';
+            } else {
+                input.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+    </script>
+</body>
+</html>
