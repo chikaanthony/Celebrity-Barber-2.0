@@ -10,7 +10,7 @@
 body {
     background: #0a0a0a;
     color: white;
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ==================== NAVIGATION ==================== */
@@ -733,3 +733,4 @@ body {
         display: none;
     }
 }
+

@@ -11,7 +11,7 @@ body {
     display: flex;
     justify-content: center;
     padding: 20px;
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px));
 }
 
 .chat-container {
@@ -432,3 +432,4 @@ body {
         height: 42px;
     }
 }
+

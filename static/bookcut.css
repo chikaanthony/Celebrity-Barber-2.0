@@ -12,7 +12,7 @@ body {
     color: white;
     min-height: 100vh;
     padding: 20px;
-    padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(180px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Close Button */
@@ -377,3 +377,4 @@ body {
         font-size: 14px;
     }
 }
+
