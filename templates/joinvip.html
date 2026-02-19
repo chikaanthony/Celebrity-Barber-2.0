@@ -21,7 +21,7 @@
                 <span class="tier-label">VIP CELEBRITY</span>
             </div>
             <div class="price-section">
-                <span class="price">₦2,500</span>
+                <span class="price" id="vipPriceTag">₦2,500</span>
                 <span class="duration">Valid for 1 Month</span>
             </div>
         </div>
@@ -67,6 +67,7 @@
     
     <script>
         let receiptFile = null;
+        let currentVipPrice = 2500;
         
         function handleFileSelect(event) {
             const file = event.target.files[0];
@@ -89,6 +90,22 @@
             document.getElementById('previewContainer').style.display = 'none';
             document.getElementById('uploadContent').style.display = 'flex';
         }
+
+        async function loadVipPrice() {
+            try {
+                const response = await fetch('/api/vip-price');
+                const result = await response.json();
+                if (result.success) {
+                    currentVipPrice = Number(result.price || 2500);
+                    const tag = document.getElementById('vipPriceTag');
+                    if (tag) tag.textContent = '\u20A6' + currentVipPrice.toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error loading VIP price:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadVipPrice);
         
         function submitVIP() {
             if (!receiptFile) {
@@ -119,7 +136,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: 2500,
+                        amount: currentVipPrice,
                         tier: 'VIP CELEBRITY',
                         receipt: receiptBase64
                     })
