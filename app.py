@@ -54,6 +54,38 @@ def normalize_referral_code(code):
     return str(code or '').strip().upper()
 
 
+def parse_amount(value):
+    if value is None:
+        return 0.0
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        cleaned = ''.join(ch for ch in value if ch.isdigit() or ch in ['.', '-'])
+        if not cleaned or cleaned in ['-', '.', '-.']:
+            return 0.0
+        try:
+            return float(cleaned)
+        except Exception:
+            return 0.0
+    return 0.0
+
+
+
+
+def get_configured_vip_price():
+    default_price = 2500
+    if not db:
+        return default_price
+    try:
+        doc = db.collection('settings').document('vip').get()
+        if doc.exists:
+            price = parse_amount((doc.to_dict() or {}).get('monthly_price', default_price))
+            if price > 0:
+                return int(price)
+    except Exception as e:
+        print(f"Error loading VIP price: {e}")
+    return default_price
+
 # Routes
 @app.route('/')
 def index():
@@ -310,6 +342,7 @@ def join_vip():
     user_id = session.get('user_id')
     user_email = session.get('email')
     user_name = session.get('user_name')
+    vip_price = get_configured_vip_price()
     
     if db:
         try:
@@ -319,14 +352,14 @@ def join_vip():
                 'user_email': user_email,
                 'user_name': user_name,
                 'type': 'vip',
-                'amount': 2500,
+                'amount': vip_price,
                 'receipt': data.get('receipt', ''),  # base64 receipt image
                 'status': 'pending',
                 'created_at': firestore.SERVER_TIMESTAMP
             }
             db.collection('approvals').add(approval_data)
             
-            return {'success': True, 'message': 'VIP request submitted for approval'}
+            return {'success': True, 'message': 'VIP request submitted for approval', 'amount': vip_price}
         except Exception as e:
             return {'success': False, 'message': str(e)}, 500
     
@@ -336,33 +369,54 @@ def join_vip():
 @app.route('/api/user/spending')
 @login_required
 def get_user_spending():
-    """Get user's total spending from approved/confirmed bookings"""
+    """Get user's total spending for streak bonus."""
     user_id = session.get('user_id')
-    
+
     if db:
         try:
-            # Calculate from approved/confirmed bookings (more accurate)
+            # 1) Canonical from confirmed/approved/completed bookings
             bookings = db.collection('bookings').where('user_id', '==', user_id).get()
-            total_spent = 0
+            bookings_total = 0.0
             for doc in bookings:
-                data = doc.to_dict()
-                status = data.get('status', '')
-                # Only count approved or confirmed bookings
-                if status not in ['approved', 'confirmed']:
+                data = doc.to_dict() or {}
+                status = str(data.get('status', '')).lower()
+                if status not in ['approved', 'confirmed', 'completed']:
                     continue
-                amount = data.get('price') or data.get('amount') or 0
-                if amount:
-                    # Convert to number if it's a string
-                    if isinstance(amount, str):
-                        try:
-                            amount = int(amount.replace(',', '').replace('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¦', ''))
-                        except:
-                            amount = 0
-                    total_spent += amount
-            return {'success': True, 'total_spent': total_spent}
+                amount = data.get('price') if data.get('price') is not None else data.get('amount')
+                bookings_total += parse_amount(amount)
+
+            # 2) Backup from confirmed booking ledger entries
+            ledger_total = 0.0
+            ledger_entries = db.collection('ledger').where('user_id', '==', user_id).limit(200).get()
+            for doc in ledger_entries:
+                data = doc.to_dict() or {}
+                tx_type = str(data.get('type', '')).lower()
+                tx_status = str(data.get('status', '')).lower()
+                if tx_type != 'booking':
+                    continue
+                if tx_status and tx_status not in ['confirmed', 'approved', 'completed']:
+                    continue
+                ledger_total += parse_amount(data.get('amount', 0))
+
+            # 3) Last fallback from stored profile aggregate
+            stored_total = 0.0
+            user_doc = db.collection('users').document(user_id).get()
+            if user_doc.exists:
+                user_data = user_doc.to_dict() or {}
+                stored_total = parse_amount(user_data.get('total_spent', 0))
+            # Use canonical bookings total first.
+            # Ledger/stored totals are fallbacks for legacy data where bookings may be missing.
+            if bookings_total > 0:
+                total_spent = bookings_total
+            elif ledger_total > 0:
+                total_spent = ledger_total
+            else:
+                total_spent = stored_total
+
+            return {'success': True, 'total_spent': int(total_spent)}
         except Exception as e:
             return {'success': False, 'message': str(e)}, 500
-    
+
     return {'success': False, 'message': 'Database not available'}, 500
 
 
@@ -1235,8 +1289,8 @@ def get_user_notifications():
             # Get user profile for VIP status
             user_doc = db.collection('users').document(user_id).get()
             if user_doc.exists:
-                user_data = user_doc.to_dict()
-                is_vip = user_data.get('isVIP', False)
+                user_data = user_doc.to_dict() or {}
+                is_vip = user_data.get('is_vip', False) or user_data.get('isVIP', False)
                 
                 if is_vip:
                     notifications.append({
@@ -1308,8 +1362,23 @@ def admin_bookings():
             for doc in all_bookings:
                 booking = doc.to_dict()
                 booking['id'] = doc.id
+                status = booking.get('status')
+
+                # Self-heal: if booking is pending_approval but approval doc is missing,
+                # move it back to pending so admin can re-queue it.
+                if status == 'pending_approval':
+                    try:
+                        queued_docs = db.collection('approvals').where('booking_id', '==', doc.id).limit(5).get()
+                        has_pending = any((q.to_dict() or {}).get('status') == 'pending' for q in queued_docs)
+                        if not has_pending:
+                            db.collection('bookings').document(doc.id).update({'status': 'pending'})
+                            booking['status'] = 'pending'
+                            status = 'pending'
+                    except Exception as e:
+                        print(f"Error checking approval queue for booking {doc.id}: {e}")
+
                 # Show pending and pending_approval bookings
-                if booking.get('status') in ['pending', 'pending_approval']:
+                if status in ['pending', 'pending_approval']:
                     bookings.append(booking)
         except Exception as e:
             print(f"Error loading bookings: {e}")
@@ -1320,29 +1389,35 @@ def admin_bookings():
 @app.route('/api/admin/approve-booking', methods=['POST'])
 @login_required
 def approve_booking():
-    """Update booking status - confirm (move to approvals) or finalize"""
+    """Move bookings into approvals queue, or finalize/cancel booking status."""
     if not session.get('is_admin'):
         return jsonify({'success': False, 'message': 'Access denied'}), 403
-    
-    data = request.get_json()
+
+    data = request.get_json() or {}
     booking_id = data.get('bookingId')
     action = data.get('action', 'confirm')
-    
+
     if not booking_id:
         return jsonify({'success': False, 'message': 'No booking ID provided'}), 400
-    
+
     if db:
         try:
-            # Get the booking
             booking_doc = db.collection('bookings').document(booking_id).get()
             if not booking_doc.exists:
                 return jsonify({'success': False, 'message': 'Booking not found'}), 404
-            
-            booking_data = booking_doc.to_dict()
-            current_status = booking_data.get('status')
-            
+
+            booking_data = booking_doc.to_dict() or {}
+            current_status = str(booking_data.get('status', '')).lower()
+
             if action == 'confirm':
-                # Move to approvals - add to approvals collection
+                # Prevent duplicate queueing
+                existing = db.collection('approvals').where('booking_id', '==', booking_id).get()
+                has_pending = any((doc.to_dict() or {}).get('status') == 'pending' for doc in existing)
+
+                if has_pending:
+                    db.collection('bookings').document(booking_id).update({'status': 'pending_approval'})
+                    return jsonify({'success': True, 'message': 'Booking already in approvals queue'})
+
                 approval_data = {
                     'user_id': booking_data.get('user_id'),
                     'user_email': booking_data.get('user_email'),
@@ -1350,51 +1425,36 @@ def approve_booking():
                     'type': 'booking',
                     'service': booking_data.get('service') or booking_data.get('requests'),
                     'amount': booking_data.get('price'),
+                    'receipt': booking_data.get('receipt', ''),
                     'booking_id': booking_id,
                     'status': 'pending',
                     'created_at': firestore.SERVER_TIMESTAMP
                 }
                 db.collection('approvals').add(approval_data)
-                
-                # Update booking status to 'pending_approval'
-                db.collection('bookings').document(booking_id).update({
-                    'status': 'pending_approval'
-                })
-                
+                db.collection('bookings').document(booking_id).update({'status': 'pending_approval'})
+
                 return jsonify({'success': True, 'message': 'Booking moved to approvals'})
-            
+
             elif action == 'approve':
-                # Final approval - mark as confirmed
-                db.collection('bookings').document(booking_id).update({
-                    'status': 'confirmed'
-                })
-                
-                # Remove from approvals if exists
+                db.collection('bookings').document(booking_id).update({'status': 'confirmed'})
                 approvals = db.collection('approvals').where('booking_id', '==', booking_id).get()
                 for doc in approvals:
                     doc.reference.delete()
-                
                 return jsonify({'success': True, 'message': 'Booking confirmed successfully'})
-            
-            elif action == 'cancel' or action == 'cancelled':
-                # Cancel the booking
-                db.collection('bookings').document(booking_id).update({
-                    'status': 'cancelled'
-                })
-                
-                # Remove from approvals if exists
+
+            elif action in ['cancel', 'cancelled']:
+                db.collection('bookings').document(booking_id).update({'status': 'cancelled'})
                 approvals = db.collection('approvals').where('booking_id', '==', booking_id).get()
                 for doc in approvals:
                     doc.reference.delete()
-                
                 return jsonify({'success': True, 'message': 'Booking cancelled'})
-            
+
             else:
                 return jsonify({'success': False, 'message': 'Invalid action'}), 400
-                
+
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
-    
+
     return jsonify({'success': False, 'message': 'Database not available'}), 500
 
 
@@ -1628,7 +1688,13 @@ def get_user_profile():
         try:
             user_doc = db.collection('users').document(user_id).get()
             if user_doc.exists:
-                return {'success': True, 'data': user_doc.to_dict()}
+                profile = user_doc.to_dict() or {}
+                is_vip = profile.get('is_vip', False) or profile.get('isVIP', False)
+                profile['is_vip'] = is_vip
+                profile['isVIP'] = is_vip
+                if not profile.get('vip_expires') and profile.get('vipExpires'):
+                    profile['vip_expires'] = profile.get('vipExpires')
+                return {'success': True, 'data': profile}
         except Exception as e:
             return {'success': False, 'message': str(e)}, 500
     
@@ -1764,13 +1830,63 @@ def get_analytics():
             # Get total users
             users = db.collection('users').get()
             total_users = len(users)
-            
-            # Get total revenue
-            transactions = db.collection('transactions').get()
-            total_revenue = sum(t.get('amount', 0) for t in [doc.to_dict() for doc in transactions] if t.get('type') == 'income')
-            
-            # Get VIP users
-            vip_users = len([u for u in db.collection('users').where('is_vip', '==', True).get()])
+
+            # Revenue sources: ledger first, then canonical collections, then legacy transactions
+            ledger_revenue = 0.0
+            ledger_entries = db.collection('ledger').get()
+            for doc in ledger_entries:
+                data = doc.to_dict() or {}
+                tx_type = str(data.get('type', '')).lower()
+                tx_status = str(data.get('status', '')).lower()
+                if tx_status in ['declined', 'cancelled', 'canceled']:
+                    continue
+                if tx_type in ['expense', 'refund', 'chargeback', 'withdrawal']:
+                    continue
+                amount = parse_amount(data.get('amount', 0))
+                if amount > 0:
+                    ledger_revenue += amount
+
+            canonical_revenue = 0.0
+            if ledger_revenue <= 0:
+                bookings = db.collection('bookings').get()
+                for doc in bookings:
+                    b = doc.to_dict() or {}
+                    status = str(b.get('status', '')).lower()
+                    if status not in ['approved', 'confirmed', 'completed']:
+                        continue
+                    amount = b.get('price') if b.get('price') is not None else b.get('amount')
+                    canonical_revenue += parse_amount(amount)
+
+                vip_approvals = db.collection('approvals').where('type', '==', 'vip').get()
+                for doc in vip_approvals:
+                    a = doc.to_dict() or {}
+                    status = str(a.get('status', '')).lower()
+                    if status not in ['confirmed', 'approved', 'completed']:
+                        continue
+                    canonical_revenue += parse_amount(a.get('amount', 0))
+
+            legacy_revenue = 0.0
+            if ledger_revenue <= 0 and canonical_revenue <= 0:
+                transactions = db.collection('transactions').get()
+                for doc in transactions:
+                    t = doc.to_dict() or {}
+                    if str(t.get('type', '')).lower() == 'income':
+                        legacy_revenue += parse_amount(t.get('amount', 0))
+
+            if ledger_revenue > 0:
+                total_revenue = int(ledger_revenue)
+            elif canonical_revenue > 0:
+                total_revenue = int(canonical_revenue)
+            else:
+                total_revenue = int(legacy_revenue)
+
+            # Get VIP users (support both field formats)
+            vip_ids = set()
+            for u in db.collection('users').where('is_vip', '==', True).get():
+                vip_ids.add(u.id)
+            for u in db.collection('users').where('isVIP', '==', True).get():
+                vip_ids.add(u.id)
+            vip_users = len(vip_ids)
             
             return {
                 'success': True,
@@ -1791,115 +1907,135 @@ def get_analytics():
 def get_pending_approvals():
     if not session.get('is_admin'):
         return {'success': False, 'message': 'Access denied'}, 403
-    
+
     if db:
         try:
-            # Get all approvals and filter manually (faster than complex queries)
-            all_approvals = db.collection('approvals').limit(50).get()
+            pending_docs = db.collection('approvals').where('status', '==', 'pending').limit(100).get()
             approval_list = []
-            for doc in all_approvals:
-                data = doc.to_dict()
-                if data.get('status') == 'pending':
-                    data['id'] = doc.id
-                    approval_list.append(data)
-                # Stop after getting 20 pending approvals
-                if len(approval_list) >= 20:
-                    break
-            return {'success': True, 'data': approval_list}
+            for doc in pending_docs:
+                data = doc.to_dict() or {}
+                data['id'] = doc.id
+                approval_list.append(data)
+
+            def _created_ts(item):
+                created = item.get('created_at')
+                try:
+                    return created.timestamp() if created else 0
+                except Exception:
+                    return 0
+
+            approval_list.sort(key=_created_ts, reverse=True)
+            return {'success': True, 'data': approval_list[:50]}
         except Exception as e:
             print(f"Error fetching approvals: {e}")
-            return {'success': False, 'data': [], 'message': str(e)}, 200  # Return empty instead of error
-    
+            return {'success': False, 'data': [], 'message': str(e)}, 200
+
     return {'success': True, 'data': []}
 
 
 @app.route('/api/admin/approve', methods=['POST'])
 @login_required
 def approve_request():
-    """Final confirmation from approvals - adds to ledger and updates user spending"""
+    """Final confirmation from approvals - adds to ledger and updates related records."""
     if not session.get('is_admin'):
         return {'success': False, 'message': 'Access denied'}, 403
-    
-    data = request.get_json()
+
+    data = request.get_json() or {}
     request_id = data.get('requestId')
     request_type = data.get('requestType')
-    
+
     if not request_id:
         return {'success': False, 'message': 'No request ID provided'}, 400
-    
+
     if db:
         try:
-            # Get the approval document
             doc_ref = db.collection('approvals').document(request_id)
             approval_doc = doc_ref.get()
-            
+
             if not approval_doc.exists:
                 return {'success': False, 'message': 'Approval not found'}, 404
-            
-            approval_data = approval_doc.to_dict()
-            amount = approval_data.get('amount', 0)
+
+            approval_data = approval_doc.to_dict() or {}
+            current_status = str(approval_data.get('status', 'pending')).lower()
+            if current_status != 'pending':
+                return {'success': True, 'message': f'Request already {current_status}'}
+
+            request_type = request_type or approval_data.get('type')
             user_id_from_approval = approval_data.get('user_id')
-            
-            # Update approval status to confirmed
+            amount = parse_amount(approval_data.get('amount', 0))
+            booking_id = approval_data.get('booking_id')
+
+            # Mark approval processed first (idempotent guard)
             doc_ref.update({
                 'status': 'confirmed',
                 'confirmedAt': datetime.now().isoformat(),
                 'confirmedBy': session.get('email')
             })
-            
-            # Add to ledger
-            ledger_entry = {
-                'user_id': user_id_from_approval,
-                'user_email': approval_data.get('user_email'),
-                'user_name': approval_data.get('user_name'),
-                'type': request_type,
-                'service': approval_data.get('service'),
-                'amount': amount,
-                'status': 'confirmed',
-                'created_at': firestore.SERVER_TIMESTAMP
-            }
-            db.collection('ledger').add(ledger_entry)
-            
-            # If VIP request, update user VIP status
+
+            # Add ledger entry once per approval request
+            existing_ledger = db.collection('ledger').where('approval_id', '==', request_id).limit(1).get()
+            if not existing_ledger:
+                ledger_entry = {
+                    'approval_id': request_id,
+                    'booking_id': booking_id,
+                    'user_id': user_id_from_approval,
+                    'user_email': approval_data.get('user_email'),
+                    'user_name': approval_data.get('user_name'),
+                    'type': request_type,
+                    'service': approval_data.get('service'),
+                    'amount': amount,
+                    'status': 'confirmed',
+                    'created_at': firestore.SERVER_TIMESTAMP
+                }
+                db.collection('ledger').add(ledger_entry)
+
             if request_type == 'vip' and user_id_from_approval:
                 try:
+                    now = datetime.now()
+                    vip_exp = (now + timedelta(days=30)).isoformat()
                     db.collection('users').document(user_id_from_approval).update({
                         'is_vip': True,
-                        'vipSince': datetime.now().isoformat(),
-                        'vipExpires': datetime.now().replace(month=datetime.now().month + 1).isoformat()
+                        'isVIP': True,
+                        'vipSince': now.isoformat(),
+                        'vipExpires': vip_exp,
+                        'vip_expires': vip_exp
                     })
                 except Exception as e:
                     print(f"Error updating VIP: {e}")
-            
-            # Update user's total_spent when booking is confirmed
-            if request_type == 'booking' and user_id_from_approval and amount > 0:
-                try:
-                    # Convert amount to number if it's a string
-                    if isinstance(amount, str):
-                        try:
-                            amount = int(amount.replace(',', '').replace('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¦', ''))
-                        except:
-                            amount = 0
-                    user_doc = db.collection('users').document(user_id_from_approval).get()
-                    if user_doc.exists:
-                        user_data = user_doc.to_dict()
-                        current_spent = user_data.get('total_spent', 0)
-                        # Convert current_spent to number if it's a string
-                        if isinstance(current_spent, str):
-                            try:
-                                current_spent = int(current_spent.replace(',', '').replace('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¦', ''))
-                            except:
-                                current_spent = 0
-                        db.collection('users').document(user_id_from_approval).update({
-                            'total_spent': current_spent + amount
+
+            if request_type == 'booking':
+                if booking_id:
+                    try:
+                        db.collection('bookings').document(booking_id).update({
+                            'status': 'confirmed',
+                            'approved_at': firestore.SERVER_TIMESTAMP
                         })
-                except Exception as e:
-                    print(f"Error updating spending: {e}")
-            
-            return {'success': True, 'message': 'Request confirmed and added to ledger'}
+                    except Exception as e:
+                        print(f"Error updating booking status: {e}")
+
+                # Keep user aggregate aligned with canonical bookings total
+                if user_id_from_approval:
+                    try:
+                        user_bookings = db.collection('bookings').where('user_id', '==', user_id_from_approval).get()
+                        canonical_total = 0.0
+                        for bdoc in user_bookings:
+                            bdata = bdoc.to_dict() or {}
+                            status = str(bdata.get('status', '')).lower()
+                            if status not in ['approved', 'confirmed', 'completed']:
+                                continue
+                            b_amount = bdata.get('price') if bdata.get('price') is not None else bdata.get('amount')
+                            canonical_total += parse_amount(b_amount)
+
+                        db.collection('users').document(user_id_from_approval).update({
+                            'total_spent': canonical_total
+                        })
+                    except Exception as e:
+                        print(f"Error updating spending: {e}")
+
+            return {'success': True, 'message': 'Request confirmed and records updated'}
         except Exception as e:
             return {'success': False, 'message': str(e)}, 500
-    
+
     return {'success': False, 'message': 'Database not available'}, 500
 
 
@@ -2296,7 +2432,7 @@ def get_all_vips():
                     user_data['full_name'] = user_data.get('full_name', user_data.get('email', 'Unknown').split('@')[0])
                     
                     # Calculate time remaining
-                    vip_expires = user_data.get('vip_expires')
+                    vip_expires = user_data.get('vip_expires') or user_data.get('vipExpires')
                     if vip_expires:
                         try:
                             from datetime import datetime
@@ -2411,8 +2547,8 @@ def gift_vip_days(user_id):
             if not user_doc.exists:
                 return {'success': False, 'message': 'User not found'}, 404
             
-            user_data = user_doc.to_dict()
-            vip_expires = user_data.get('vip_expires')
+            user_data = user_doc.to_dict() or {}
+            vip_expires = user_data.get('vip_expires') or user_data.get('vipExpires')
             
             # Add days to current expiry
             if vip_expires:
@@ -2425,7 +2561,10 @@ def gift_vip_days(user_id):
                 new_exp = datetime.now() + timedelta(days=30)
             
             db.collection('users').document(user_id).update({
+                'is_vip': True,
+                'isVIP': True,
                 'vip_expires': new_exp.isoformat(),
+                'vipExpires': new_exp.isoformat(),
                 'bonus_days_added': firestore.SERVER_TIMESTAMP
             })
             
@@ -2446,6 +2585,9 @@ def revoke_vip(user_id):
         try:
             db.collection('users').document(user_id).update({
                 'is_vip': False,
+                'isVIP': False,
+                'vip_expires': None,
+                'vipExpires': None,
                 'vip_revoked_at': firestore.SERVER_TIMESTAMP
             })
             
@@ -2845,17 +2987,14 @@ def toggle_service_visibility(service_id):
 def get_vip_price():
     if not session.get('is_admin'):
         return {'success': False, 'message': 'Access denied'}, 403
-    
-    if db:
-        try:
-            doc = db.collection('settings').document('vip').get()
-            if doc.exists:
-                return {'success': True, 'price': doc.to_dict().get('monthly_price', 2500)}
-            return {'success': True, 'price': 2500}
-        except Exception as e:
-            return {'success': False, 'message': str(e)}, 500
-    
-    return {'success': False, 'message': 'Database not available'}, 500
+
+    return {'success': True, 'price': get_configured_vip_price()}
+
+
+@app.route('/api/vip-price', methods=['GET'])
+@login_required
+def get_vip_price_public():
+    return {'success': True, 'price': get_configured_vip_price()}
 
 
 @app.route('/api/admin/vip-price', methods=['POST'])
@@ -2864,8 +3003,8 @@ def update_vip_price():
     if not session.get('is_admin'):
         return {'success': False, 'message': 'Access denied'}, 403
     
-    data = request.get_json()
-    price = data.get('price', 0)
+    data = request.get_json() or {}
+    price = parse_amount(data.get('price', 0))
     
     if price <= 0:
         return {'success': False, 'message': 'Valid price required'}, 400
@@ -2873,7 +3012,7 @@ def update_vip_price():
     if db:
         try:
             db.collection('settings').document('vip').set({
-                'monthly_price': price
+                'monthly_price': int(price)
             }, merge=True)
             return {'success': True, 'message': 'VIP price updated'}
         except Exception as e:
