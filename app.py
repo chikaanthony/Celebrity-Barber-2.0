@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 import os
+import json
 from functools import wraps
 from datetime import datetime, timedelta
 
@@ -15,23 +16,18 @@ app = Flask(__name__,
             static_folder='static')
 app.secret_key = 'your-secret-key-change-in-production'
 
-# Firebase Configuration
-# Replace with your actual Firebase service account JSON
-FIREBASE_CONFIG = {
-    'apiKey': "YOUR_API_KEY",
-    'authDomain': "YOUR_PROJECT.firebaseapp.com",
-    'projectId': "YOUR_PROJECT_ID",
-    'storageBucket': "YOUR_PROJECT.appspot.com",
-    'messagingSenderId': "YOUR_SENDER_ID",
-    'appId': "YOUR_APP_ID",
-    'databaseURL': "https://YOUR_PROJECT.firebaseio.com"
-}
-
 # Initialize Firebase
 try:
-    # Use service account JSON file
-    cred = credentials.Certificate('serviceAccountKey.json')
-    firebase_admin.initialize_app(cred)
+    firebase_env = os.environ.get('FIREBASE_CONFIG')
+    if firebase_env:
+        service_account_info = json.loads(firebase_env)
+        cred = credentials.Certificate(service_account_info)
+    else:
+        cred = credentials.Certificate('serviceAccountKey.json')
+
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(cred)
+
     db = firestore.client()
     print("Firebase initialized successfully!")
 except Exception as e:
