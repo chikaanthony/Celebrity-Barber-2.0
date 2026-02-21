@@ -60,7 +60,7 @@
         .back-btn {
             color: var(--gold);
             text-decoration: none;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             padding: 8px 15px;
             border: 1px solid var(--gold);
             border-radius: 8px;
@@ -75,7 +75,7 @@
         .page-title {
             font-family: 'Orbitron', sans-serif;
             color: var(--gold);
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             letter-spacing: 2px;
         }
 
@@ -90,7 +90,7 @@
             color: var(--dark);
             padding: 5px 15px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             font-weight: 700;
         }
 
@@ -125,20 +125,20 @@
         }
 
         .stat-icon {
-            font-size: 32px;
+            font-size: calc(32px * var(--mobile-font-scale, 1));
             margin-bottom: 10px;
         }
 
         .stat-value {
             font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
+            font-size: calc(28px * var(--mobile-font-scale, 1));
             color: var(--gold);
             font-weight: 700;
         }
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 13px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
             margin-top: 5px;
         }
 
@@ -181,7 +181,7 @@
         .section-title {
             font-family: 'Orbitron', sans-serif;
             color: var(--text-primary);
-            font-size: 16px;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -240,7 +240,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             border: 2px solid var(--gold);
         }
 
@@ -253,11 +253,11 @@
 
         .referrer-name {
             font-weight: 600;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
 
         .referrer-code {
-            font-size: 11px;
+            font-size: calc(11px * var(--mobile-font-scale, 1));
             color: var(--text-secondary);
         }
 
@@ -270,11 +270,11 @@
 
         .referred-name {
             font-weight: 500;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
 
         .referred-date {
-            font-size: 11px;
+            font-size: calc(11px * var(--mobile-font-scale, 1));
             color: var(--text-secondary);
         }
 
@@ -282,7 +282,7 @@
         .status-badge {
             padding: 6px 14px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -308,7 +308,7 @@
         }
 
         .milestone-text {
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             font-weight: 500;
         }
 
@@ -343,7 +343,7 @@
             border: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -368,7 +368,7 @@
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             cursor: pointer;
             padding: 5px 10px;
             border-radius: 5px;
@@ -404,7 +404,7 @@
             gap: 10px;
             cursor: pointer;
             transition: background 0.3s;
-            font-size: 13px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
         }
 
         .dropdown-item:hover {
@@ -427,13 +427,13 @@
         }
 
         .empty-icon {
-            font-size: 60px;
+            font-size: calc(60px * var(--mobile-font-scale, 1));
             margin-bottom: 20px;
             opacity: 0.5;
         }
 
         .empty-title {
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             margin-bottom: 10px;
             color: var(--text-primary);
         }
@@ -463,12 +463,12 @@
                 align-items: flex-start;
             }
             .status-badge {
-                font-size: 10px;
+                font-size: calc(10px * var(--mobile-font-scale, 1));
                 padding: 4px 10px;
             }
             .verify-btn {
                 padding: 6px 10px;
-                font-size: 10px;
+                font-size: calc(10px * var(--mobile-font-scale, 1));
             }
         }
 

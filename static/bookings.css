@@ -37,7 +37,7 @@ body {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -50,7 +50,7 @@ body {
 
 .page-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
+    font-size: calc(22px * var(--mobile-font-scale, 1));
     color: #fff;
     letter-spacing: 2px;
 }
@@ -61,7 +61,7 @@ body {
     border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 25px;
     color: #d4af37;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
 }
 
@@ -91,13 +91,13 @@ body {
 .booking-id {
     font-family: 'Orbitron', sans-serif;
     color: #d4af37;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .booking-status {
     padding: 5px 15px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -134,7 +134,7 @@ body {
 
 .booking-details p {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 8px;
 }
 
@@ -155,7 +155,7 @@ body {
     flex: 1;
     padding: 12px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -194,13 +194,13 @@ body {
 }
 
 .empty-icon {
-    font-size: 50px;
+    font-size: calc(50px * var(--mobile-font-scale, 1));
     margin-bottom: 20px;
     opacity: 0.5;
 }
 
 .empty-state p {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.7);
 }
 

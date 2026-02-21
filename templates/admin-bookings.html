@@ -25,7 +25,7 @@
         .page-header h1 {
             font-family: 'Orbitron', sans-serif;
             color: #d4af37;
-            font-size: 24px;
+            font-size: calc(24px * var(--mobile-font-scale, 1));
             margin: 0;
         }
         
@@ -37,7 +37,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             transition: all 0.3s;
             text-decoration: none;
         }
@@ -65,13 +65,13 @@
         
         .stat-card .stat-number {
             font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
+            font-size: calc(28px * var(--mobile-font-scale, 1));
             color: #d4af37;
         }
         
         .stat-card .stat-label {
             color: #888;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             margin-top: 5px;
         }
         
@@ -89,7 +89,7 @@
             padding: 15px;
             text-align: left;
             font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
         }
         
         .bookings-table td {
@@ -105,7 +105,7 @@
         .status-badge {
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: calc(11px * var(--mobile-font-scale, 1));
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -152,7 +152,7 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             margin-right: 5px;
             transition: all 0.3s;
         }
@@ -422,7 +422,7 @@
             background: none;
             border: none;
             color: #888;
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             cursor: pointer;
         }
         
@@ -462,7 +462,7 @@
         .modal-actions .action-btn {
             flex: 1;
             padding: 12px;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
     </style>
 </body>

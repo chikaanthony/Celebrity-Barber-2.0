@@ -32,7 +32,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s ease;
     z-index: 100;
@@ -47,7 +47,7 @@ body {
 /* Page Title */
 .page-title {
     font-family: 'Playfair Display', serif;
-    font-size: 28px;
+    font-size: calc(28px * var(--mobile-font-scale, 1));
     color: #fff;
     text-align: center;
     margin-bottom: 10px;
@@ -90,7 +90,7 @@ body {
 }
 
 .avatar-emoji {
-    font-size: 50px;
+    font-size: calc(50px * var(--mobile-font-scale, 1));
 }
 
 .avatar-overlay {
@@ -109,7 +109,7 @@ body {
 }
 
 .avatar-overlay span {
-    font-size: 30px;
+    font-size: calc(30px * var(--mobile-font-scale, 1));
 }
 
 .current-avatar:hover .avatar-overlay {
@@ -128,7 +128,7 @@ body {
     gap: 8px;
     padding: 10px 18px;
     border-radius: 25px;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -180,7 +180,7 @@ body {
 
 .preview-title {
     display: block;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     color: #d4af37;
     margin-bottom: 20px;
     font-weight: 600;
@@ -204,7 +204,7 @@ body {
 .btn-cancel, .btn-save {
     padding: 12px 25px;
     border-radius: 25px;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -245,7 +245,7 @@ body {
 }
 
 .form-group label {
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.6);
     font-weight: 500;
     letter-spacing: 1px;
@@ -253,7 +253,7 @@ body {
 
 .form-group input {
     padding: 15px 18px;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: #fff;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -279,7 +279,7 @@ body {
 .save-btn {
     margin-top: 10px;
     padding: 16px;
-    font-size: 15px;
+    font-size: calc(15px * var(--mobile-font-scale, 1));
     font-weight: 600;
     color: #000;
     background: linear-gradient(135deg, #d4af37 0%, #f4cf57 50%, #d4af37 100%);
@@ -307,7 +307,7 @@ body {
     border-radius: 12px;
     padding: 15px 25px;
     color: #4caf50;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     display: flex;
     align-items: center;
     gap: 10px;
@@ -322,7 +322,7 @@ body {
 }
 
 .success-toast span {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
 }
 
 /* Responsive */
@@ -332,7 +332,7 @@ body {
     }
     
     .page-title {
-        font-size: 24px;
+        font-size: calc(24px * var(--mobile-font-scale, 1));
     }
     
     .current-avatar {
@@ -341,7 +341,7 @@ body {
     }
     
     .avatar-emoji {
-        font-size: 40px;
+        font-size: calc(40px * var(--mobile-font-scale, 1));
     }
     
     .profile-actions {
@@ -378,7 +378,7 @@ body {
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.5);
-    font-size: 10px;
+    font-size: calc(10px * var(--mobile-font-scale, 1));
     cursor: pointer;
     padding: 8px 12px;
     border-radius: 12px;
@@ -391,6 +391,6 @@ body {
 }
 
 .nav-icon {
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
 

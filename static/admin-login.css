@@ -66,7 +66,7 @@ body {
 }
 
 .logo-icon {
-    font-size: 32px;
+    font-size: calc(32px * var(--mobile-font-scale, 1));
 }
 
 @keyframes spin {
@@ -76,7 +76,7 @@ body {
 
 .logo-text {
     font-family: 'Orbitron', sans-serif;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     font-weight: 700;
     color: #d4af37;
     letter-spacing: 3px;
@@ -92,12 +92,12 @@ body {
 }
 
 .brand-icon {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
 }
 
 .brand-text {
     font-family: 'Playfair Display', serif;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.5);
     letter-spacing: 2px;
 }
@@ -110,14 +110,14 @@ body {
 
 .login-title h2 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     color: #fff;
     letter-spacing: 3px;
     margin-bottom: 8px;
 }
 
 .login-title p {
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.5);
 }
 
@@ -132,7 +132,7 @@ body {
     color: #f44336;
     padding: 12px 16px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     text-align: center;
 }
 
@@ -142,7 +142,7 @@ body {
     color: #4caf50;
     padding: 12px 16px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     text-align: center;
 }
 
@@ -160,7 +160,7 @@ body {
 }
 
 .form-group label {
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.6);
     font-weight: 500;
     display: flex;
@@ -169,12 +169,12 @@ body {
 }
 
 .input-icon {
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .form-group input {
     padding: 16px 18px;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: #fff;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -209,7 +209,7 @@ body {
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     opacity: 0.6;
     transition: opacity 0.2s ease;
 }
@@ -223,7 +223,7 @@ body {
     margin-top: 10px;
     padding: 18px;
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
     color: #000;
     background: linear-gradient(135deg, #d4af37 0%, #f4cf57 50%, #d4af37 100%);
@@ -249,7 +249,7 @@ body {
 }
 
 .btn-icon {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
 }
 
 /* Back Section */
@@ -263,7 +263,7 @@ body {
 .back-link {
     color: rgba(255, 255, 255, 0.5);
     text-decoration: none;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     transition: color 0.2s ease;
     display: inline-flex;
     align-items: center;
@@ -278,7 +278,7 @@ body {
 .admin-footer {
     text-align: center;
     margin-top: 25px;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.3);
     display: flex;
     justify-content: center;
@@ -297,15 +297,15 @@ body {
     }
     
     .logo-text {
-        font-size: 14px;
+        font-size: calc(14px * var(--mobile-font-scale, 1));
     }
     
     .login-title h2 {
-        font-size: 20px;
+        font-size: calc(20px * var(--mobile-font-scale, 1));
     }
     
     .admin-login-btn {
         padding: 16px;
-        font-size: 13px;
+        font-size: calc(13px * var(--mobile-font-scale, 1));
     }
 }

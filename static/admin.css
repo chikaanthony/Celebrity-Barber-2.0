@@ -19,12 +19,12 @@
 }
 
 .admin-logo .logo-icon {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
 }
 
 .admin-logo .logo-text {
     font-family: 'Orbitron', sans-serif;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     color: #ff4444;
 }
 
@@ -48,7 +48,7 @@
 .admin-section h3 {
     font-family: 'Orbitron', sans-serif;
     color: gold;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid #222;
@@ -75,21 +75,21 @@
 }
 
 .stat-icon {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     display: block;
     margin-bottom: 8px;
 }
 
 .stat-value {
     font-family: 'Orbitron', sans-serif;
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
     color: white;
     display: block;
     margin-bottom: 5px;
 }
 
 .stat-label {
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     color: #666;
 }
 
@@ -112,12 +112,12 @@
 }
 
 .glow-icon {
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
 
 .glow-text {
     color: gold;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
 }
 
 .approval-list {
@@ -150,18 +150,18 @@
 .approval-user {
     color: white;
     font-weight: 600;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .approval-type {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .approval-amount {
     color: gold;
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .approval-actions {
@@ -174,7 +174,7 @@
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     font-weight: 600;
     transition: all 0.3s;
 }
@@ -210,7 +210,7 @@
 
 .punch-card h4 {
     color: #888;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     margin-bottom: 12px;
 }
 
@@ -231,7 +231,7 @@
     align-items: center;
     justify-content: center;
     color: #444;
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
 
 .punch.used {
@@ -243,7 +243,7 @@
 .punch-info {
     text-align: center;
     color: #555;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .vip-countdown {
@@ -257,14 +257,14 @@
 .countdown-label {
     display: block;
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     margin-bottom: 8px;
 }
 
 .countdown-timer {
     font-family: 'Orbitron', sans-serif;
     color: gold;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
 }
 
 /* Financial Ledger */
@@ -281,7 +281,7 @@
     padding: 12px 15px;
     background: #151515;
     color: #888;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     font-weight: 600;
 }
 
@@ -290,7 +290,7 @@
     grid-template-columns: 1fr 2fr 1fr 1fr;
     padding: 12px 15px;
     border-bottom: 1px solid #222;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     align-items: center;
 }
 
@@ -343,7 +343,7 @@
     border-radius: 10px;
     padding: 12px;
     color: white;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     resize: none;
     margin-bottom: 12px;
 }
@@ -365,7 +365,7 @@
     border: 1px solid #333;
     border-radius: 8px;
     color: #888;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -401,7 +401,7 @@
 
 .service-edit span:first-child {
     color: white;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .current-price {
@@ -416,7 +416,7 @@
     padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     transition: all 0.3s;
 }
 
@@ -432,7 +432,7 @@
     border: 2px dashed #333;
     border-radius: 10px;
     color: #666;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -457,7 +457,7 @@
     align-items: center;
     gap: 10px;
     color: #888;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
 }
 
 .unread-badge {
@@ -465,7 +465,7 @@
     color: white;
     padding: 2px 8px;
     border-radius: 10px;
-    font-size: 11px;
+    font-size: calc(11px * var(--mobile-font-scale, 1));
     font-weight: bold;
 }
 
@@ -493,7 +493,7 @@
 }
 
 .chat-avatar {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
 }
 
 .chat-preview {
@@ -505,13 +505,13 @@
 
 .chat-user {
     color: white;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     font-weight: 600;
 }
 
 .chat-msg {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -520,7 +520,7 @@
 
 .chat-time {
     color: #444;
-    font-size: 11px;
+    font-size: calc(11px * var(--mobile-font-scale, 1));
 }
 
 /* Full width sections */
@@ -567,7 +567,7 @@
     }
     
     .admin-logo .logo-text {
-        font-size: 14px;
+        font-size: calc(14px * var(--mobile-font-scale, 1));
     }
     
     .stats-grid {

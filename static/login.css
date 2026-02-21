@@ -9,7 +9,7 @@
     gap: 8px;
     color: #666;
     text-decoration: none;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     padding: 10px 15px;
     background: #111;
     border: 1px solid #222;
@@ -24,7 +24,7 @@
 }
 
 .return-icon {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
 }
 
 .login-container {
@@ -52,7 +52,7 @@
 }
 
 .login-icon {
-    font-size: 48px;
+    font-size: calc(48px * var(--mobile-font-scale, 1));
     display: block;
     margin-bottom: 15px;
 }
@@ -60,14 +60,14 @@
 .login-box h2 {
     font-family: 'Orbitron', sans-serif;
     color: gold;
-    font-size: 26px;
+    font-size: calc(26px * var(--mobile-font-scale, 1));
     margin-bottom: 8px;
     letter-spacing: 2px;
 }
 
 .login-subtitle {
     color: #666;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .form-group {
@@ -78,7 +78,7 @@
 .form-group label {
     display: block;
     color: #888;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     margin-bottom: 8px;
     font-weight: 500;
 }
@@ -86,7 +86,7 @@
 .form-group label .optional {
     color: #555;
     font-weight: 400;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .form-group input {
@@ -96,7 +96,7 @@
     border-radius: 10px;
     background: #0a0a0a;
     color: white;
-    font-size: 15px;
+    font-size: calc(15px * var(--mobile-font-scale, 1));
     transition: all 0.3s ease;
 }
 
@@ -125,7 +125,7 @@
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     user-select: none;
 }
 
@@ -167,7 +167,7 @@
     gap: 8px;
     cursor: pointer;
     color: #666;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
 }
 
 .remember-me input[type="checkbox"] {
@@ -182,7 +182,7 @@
 
 .forgot-password {
     color: gold;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     text-decoration: none;
     transition: opacity 0.3s;
 }
@@ -199,7 +199,7 @@
     border-radius: 10px;
     color: black;
     font-family: 'Orbitron', sans-serif;
-    font-size: 15px;
+    font-size: calc(15px * var(--mobile-font-scale, 1));
     font-weight: 700;
     letter-spacing: 2px;
     cursor: pointer;
@@ -219,7 +219,7 @@
 .signup-link {
     margin-top: 25px;
     color: #666;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .signup-link a {
@@ -238,7 +238,7 @@
     margin-top: 20px;
     color: #444;
     text-decoration: none;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     transition: color 0.3s;
 }
 
@@ -254,7 +254,7 @@
     }
     
     .login-box h2 {
-        font-size: 22px;
+        font-size: calc(22px * var(--mobile-font-scale, 1));
     }
     
     .form-options {
@@ -267,6 +267,6 @@
         top: 10px;
         left: 10px;
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: calc(12px * var(--mobile-font-scale, 1));
     }
 }

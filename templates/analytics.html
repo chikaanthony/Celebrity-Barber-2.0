@@ -42,7 +42,7 @@
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             transition: all 0.3s;
             text-decoration: none;
         }
@@ -55,7 +55,7 @@
         .page-title {
             font-family: 'Orbitron', sans-serif;
             color: #d4af37;
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             margin: 0;
         }
         
@@ -90,7 +90,7 @@
         }
         
         .metric-icon {
-            font-size: 32px;
+            font-size: calc(32px * var(--mobile-font-scale, 1));
         }
         
         .metric-info {
@@ -100,14 +100,14 @@
         
         .metric-value {
             font-family: 'Orbitron', sans-serif;
-            font-size: 24px;
+            font-size: calc(24px * var(--mobile-font-scale, 1));
             color: #d4af37;
             font-weight: 700;
         }
         
         .metric-label {
             color: #888;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             margin-top: 4px;
         }
         
@@ -122,7 +122,7 @@
         .section-title {
             font-family: 'Orbitron', sans-serif;
             color: #d4af37;
-            font-size: 16px;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -145,12 +145,12 @@
         
         .daily-date, .monthly-date {
             color: #aaa;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
         
         .daily-transactions {
             color: #888;
-            font-size: 13px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
         }
         
         .daily-amount, .monthly-amount {

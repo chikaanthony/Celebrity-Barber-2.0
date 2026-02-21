@@ -32,7 +32,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -50,7 +50,7 @@ body {
 /* Leaderboard Header */
 .leaderboard-header {
     font-family: 'Playfair Display', serif;
-    font-size: 26px;
+    font-size: calc(26px * var(--mobile-font-scale, 1));
     color: #fff;
     text-align: center;
     margin-bottom: 30px;
@@ -75,7 +75,7 @@ body {
 }
 
 .crown {
-    font-size: 28px;
+    font-size: calc(28px * var(--mobile-font-scale, 1));
     position: absolute;
     top: -35px;
     animation: bounce 2s infinite;
@@ -94,7 +94,7 @@ body {
 }
 
 .medal {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     margin-bottom: 5px;
 }
 
@@ -105,7 +105,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: calc(32px * var(--mobile-font-scale, 1));
     border: 3px solid;
     background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
 }
@@ -113,7 +113,7 @@ body {
 .rank-1 .avatar {
     width: 85px;
     height: 85px;
-    font-size: 40px;
+    font-size: calc(40px * var(--mobile-font-scale, 1));
     border-color: #ffd700;
     box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
 }
@@ -129,14 +129,14 @@ body {
 }
 
 .rank-name {
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     color: #fff;
     margin-top: 10px;
     font-weight: 500;
 }
 
 .rank-spend {
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: #d4af37;
     font-weight: 600;
     margin-top: 4px;
@@ -148,7 +148,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     font-weight: 700;
     color: rgba(255, 255, 255, 0.3);
     margin-top: 10px;
@@ -191,7 +191,7 @@ body {
 }
 
 .position {
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
     color: rgba(255, 255, 255, 0.5);
     width: 35px;
@@ -212,17 +212,17 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
 }
 
 .user-name {
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: #fff;
     font-weight: 500;
 }
 
 .spend-amount {
-    font-size: 15px;
+    font-size: calc(15px * var(--mobile-font-scale, 1));
     font-weight: 600;
     color: #d4af37;
 }
@@ -257,13 +257,13 @@ body {
 }
 
 .your-rank-label {
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.5);
     letter-spacing: 1px;
 }
 
 .your-rank-number {
-    font-size: 22px;
+    font-size: calc(22px * var(--mobile-font-scale, 1));
     font-weight: 700;
     color: #d4af37;
 }
@@ -277,7 +277,7 @@ body {
 }
 
 .spend-to-overtake {
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     color: #fff;
 }
 
@@ -289,11 +289,11 @@ body {
 }
 
 .streak-icon {
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
 }
 
 .streak-text {
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.6);
 }
 
@@ -304,7 +304,7 @@ body {
     }
     
     .leaderboard-header {
-        font-size: 22px;
+        font-size: calc(22px * var(--mobile-font-scale, 1));
     }
     
     .podium {
@@ -314,28 +314,28 @@ body {
     .avatar {
         width: 55px;
         height: 55px;
-        font-size: 26px;
+        font-size: calc(26px * var(--mobile-font-scale, 1));
     }
     
     .rank-1 .avatar {
         width: 70px;
         height: 70px;
-        font-size: 32px;
+        font-size: calc(32px * var(--mobile-font-scale, 1));
     }
     
     .medal {
-        font-size: 20px;
+        font-size: calc(20px * var(--mobile-font-scale, 1));
     }
     
     .crown {
-        font-size: 22px;
+        font-size: calc(22px * var(--mobile-font-scale, 1));
         top: -28px;
     }
     
     .podium-stand {
         width: 65px;
         height: 40px;
-        font-size: 20px;
+        font-size: calc(20px * var(--mobile-font-scale, 1));
     }
     
     .rank-1 .podium-stand {
@@ -349,15 +349,15 @@ body {
     .user-avatar {
         width: 34px;
         height: 34px;
-        font-size: 16px;
+        font-size: calc(16px * var(--mobile-font-scale, 1));
     }
     
     .user-name {
-        font-size: 13px;
+        font-size: calc(13px * var(--mobile-font-scale, 1));
     }
     
     .spend-amount {
-        font-size: 14px;
+        font-size: calc(14px * var(--mobile-font-scale, 1));
     }
 }
 
@@ -384,7 +384,7 @@ body {
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.5);
-    font-size: 10px;
+    font-size: calc(10px * var(--mobile-font-scale, 1));
     cursor: pointer;
     padding: 8px 12px;
     border-radius: 12px;
@@ -397,6 +397,6 @@ body {
 }
 
 .nav-icon {
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
 

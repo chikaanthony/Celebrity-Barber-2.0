@@ -37,7 +37,7 @@ body {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -50,7 +50,7 @@ body {
 
 .page-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
+    font-size: calc(22px * var(--mobile-font-scale, 1));
     color: #fff;
     letter-spacing: 2px;
 }
@@ -61,7 +61,7 @@ body {
     border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 25px;
     color: #d4af37;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
 }
 
@@ -108,7 +108,7 @@ body {
 .request-tag {
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: calc(11px * var(--mobile-font-scale, 1));
     font-weight: 600;
     letter-spacing: 1px;
 }
@@ -129,13 +129,13 @@ body {
 }
 
 .user-name {
-    font-size: 15px;
+    font-size: calc(15px * var(--mobile-font-scale, 1));
     font-weight: 600;
     color: #fff;
 }
 
 .user-email {
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.5);
 }
 
@@ -146,13 +146,13 @@ body {
 }
 
 .request-amount {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     font-weight: 700;
     color: #d4af37;
 }
 
 .row-arrow {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.3);
 }
 
@@ -169,13 +169,13 @@ body {
 }
 
 .empty-icon {
-    font-size: 50px;
+    font-size: calc(50px * var(--mobile-font-scale, 1));
     color: #4caf50;
     margin-bottom: 20px;
 }
 
 .empty-state p {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.7);
 }
 
@@ -229,7 +229,7 @@ body {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     color: #fff;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     cursor: pointer;
 }
 
@@ -246,7 +246,7 @@ body {
     display: inline-block;
     padding: 6px 16px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: calc(11px * var(--mobile-font-scale, 1));
     font-weight: 600;
     letter-spacing: 1px;
     margin-bottom: 15px;
@@ -263,13 +263,13 @@ body {
 }
 
 .modal-title {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     color: #fff;
     margin-bottom: 5px;
 }
 
 .modal-email {
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.6);
 }
 
@@ -302,18 +302,18 @@ body {
 }
 
 .receipt-icon {
-    font-size: 50px;
+    font-size: calc(50px * var(--mobile-font-scale, 1));
     opacity: 0.5;
 }
 
 .receipt-placeholder p {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .receipt-placeholder small {
     color: rgba(255, 255, 255, 0.4);
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 /* Modal Amount */
@@ -329,11 +329,11 @@ body {
 
 .amount-label {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .amount-value {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     font-weight: 700;
     color: #d4af37;
 }
@@ -348,7 +348,7 @@ body {
     flex: 1;
     padding: 16px;
     border-radius: 12px;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -392,13 +392,13 @@ body {
 
 .decline-content h3 {
     color: #ff4444;
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
     margin-bottom: 10px;
 }
 
 .decline-content p {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 20px;
 }
 
@@ -409,7 +409,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     color: #fff;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     resize: none;
     height: 100px;
     margin-bottom: 20px;
@@ -429,7 +429,7 @@ body {
     flex: 1;
     padding: 14px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     font-weight: 600;
     cursor: pointer;
 }
@@ -457,7 +457,7 @@ body {
     border-radius: 12px;
     padding: 15px 25px;
     color: #4caf50;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     display: flex;
     align-items: center;
     gap: 10px;
@@ -472,7 +472,7 @@ body {
 }
 
 .success-toast span:first-child {
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
 }
 
 /* Responsive */

@@ -34,12 +34,12 @@ body {
 }
 
 .nav-logo .logo-icon {
-    font-size: 22px;
+    font-size: calc(22px * var(--mobile-font-scale, 1));
 }
 
 .nav-logo .logo-text {
     font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     color: gold;
 }
 
@@ -58,7 +58,7 @@ body {
 }
 
 .notif-icon {
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
 
 .notif-badge {
@@ -67,7 +67,7 @@ body {
     right: -2px;
     background: #ff4444;
     color: white;
-    font-size: 10px;
+    font-size: calc(10px * var(--mobile-font-scale, 1));
     padding: 2px 5px;
     border-radius: 10px;
     font-weight: bold;
@@ -115,7 +115,7 @@ body {
     text-decoration: none;
     padding: 15px 0;
     border-bottom: 1px solid #222;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
 }
 
 .mobile-menu a:hover {
@@ -129,7 +129,7 @@ body {
     background: transparent;
     border: none;
     color: white;
-    font-size: 28px;
+    font-size: calc(28px * var(--mobile-font-scale, 1));
     cursor: pointer;
 }
 
@@ -167,7 +167,7 @@ body {
 }
 
 .avatar span, .avatar emoji {
-    font-size: 40px;
+    font-size: calc(40px * var(--mobile-font-scale, 1));
 }
 
 .avatar img {
@@ -186,12 +186,12 @@ body {
     width: 30px;
     height: 30px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .profile-section h1 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
+    font-size: calc(22px * var(--mobile-font-scale, 1));
     color: gold;
     margin-bottom: 10px;
 }
@@ -213,18 +213,18 @@ body {
     color: black;
     padding: 5px 12px;
     border-radius: 15px;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     font-weight: bold;
 }
 
 .vip-status {
     color: #00ff00;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .user-email {
     color: #666;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 /* ==================== DASHBOARD CONTENT ==================== */
@@ -246,7 +246,7 @@ body {
 .dashboard-card h3 {
     font-family: 'Orbitron', sans-serif;
     color: gold;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 15px;
 }
 
@@ -278,7 +278,7 @@ body {
 
 .ticker-track span {
     color: #ccc;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
 }
 
 /* Spending Card */
@@ -315,14 +315,14 @@ body {
 .pie-text {
     fill: white;
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     transform: rotate(90deg);
     transform-origin: center;
 }
 
 .pie-subtext {
     fill: #666;
-    font-size: 8px;
+    font-size: calc(8px * var(--mobile-font-scale, 1));
     transform: rotate(90deg);
     transform-origin: center;
 }
@@ -333,7 +333,7 @@ body {
 
 .spending-goal {
     color: white;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 12px;
 }
 
@@ -355,7 +355,7 @@ body {
 
 .spending-hint {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 /* History Card */
@@ -382,7 +382,7 @@ body {
 }
 
 .history-icon {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
 }
 
 .history-info {
@@ -391,18 +391,18 @@ body {
 
 .history-info h4 {
     color: white;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 3px;
 }
 
 .history-info p {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .history-arrow {
     color: #444;
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
 }
 
 /* ==================== FLOATING MESSAGE ==================== */
@@ -420,7 +420,7 @@ body {
     border-radius: 50%;
     background: linear-gradient(45deg, gold, #ffae00);
     border: none;
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     cursor: pointer;
     box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
     transition: transform 0.3s, box-shadow 0.3s;
@@ -469,11 +469,11 @@ body {
 }
 
 .nav-item .nav-icon {
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
 
 .nav-item span:last-child {
-    font-size: 10px;
+    font-size: calc(10px * var(--mobile-font-scale, 1));
     white-space: nowrap;
 }
 
@@ -515,7 +515,7 @@ body {
     border: none;
     border-bottom: 1px solid #222;
     color: gold;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     text-align: left;
     cursor: pointer;
 }
@@ -523,7 +523,7 @@ body {
 .popup-content h2 {
     font-family: 'Orbitron', sans-serif;
     color: gold;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     padding: 15px 20px;
     border-bottom: 1px solid #222;
 }
@@ -534,7 +534,7 @@ body {
 
 .popup-body h3 {
     color: white;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     margin-bottom: 15px;
 }
 
@@ -562,7 +562,7 @@ body {
 
 .popup-date {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 /* History Detail */
@@ -581,11 +581,11 @@ body {
 
 .detail-date {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .detail-status {
-    font-size: 11px;
+    font-size: calc(11px * var(--mobile-font-scale, 1));
     padding: 3px 8px;
     border-radius: 10px;
 }
@@ -597,7 +597,7 @@ body {
 
 .detail-service {
     color: white;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 5px;
 }
 
@@ -624,14 +624,14 @@ body {
 .stat-num {
     display: block;
     font-family: 'Orbitron', sans-serif;
-    font-size: 28px;
+    font-size: calc(28px * var(--mobile-font-scale, 1));
     color: gold;
     margin-bottom: 5px;
 }
 
 .stat-label {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .referral-list {
@@ -648,12 +648,12 @@ body {
 
 .reward-earned {
     color: #00ff00;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .reward-pending {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .share-code-btn {
@@ -691,17 +691,17 @@ body {
 
 .trans-type {
     color: white;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
 }
 
 .trans-date {
     color: #666;
-    font-size: 11px;
+    font-size: calc(11px * var(--mobile-font-scale, 1));
 }
 
 .trans-amount {
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: #ff4444;
 }
 
@@ -722,7 +722,7 @@ body {
     }
     
     .profile-section h1 {
-        font-size: 18px;
+        font-size: calc(18px * var(--mobile-font-scale, 1));
     }
     
     .dashboard-content {

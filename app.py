@@ -16,6 +16,31 @@ app = Flask(__name__,
             static_folder='static')
 app.secret_key = 'your-secret-key-change-in-production'
 
+MOBILE_FONT_SCALE_STYLE = (
+    '<style id="mobile-font-scale">'
+    ':root{--mobile-font-scale:1;}'
+    '@media (max-width:768px){:root{--mobile-font-scale:0.55;}}'
+    '</style>'
+)
+
+
+@app.after_request
+def inject_mobile_font_scale(response):
+    content_type = response.headers.get('Content-Type', '')
+    if 'text/html' not in content_type or response.direct_passthrough:
+        return response
+
+    try:
+        html = response.get_data(as_text=True)
+    except Exception:
+        return response
+
+    if 'id="mobile-font-scale"' in html or '</head>' not in html:
+        return response
+
+    response.set_data(html.replace('</head>', f'{MOBILE_FONT_SCALE_STYLE}</head>', 1))
+    return response
+
 # Initialize Firebase
 try:
     firebase_env = os.environ.get('FIREBASE_CONFIG')

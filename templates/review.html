@@ -29,7 +29,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             cursor: pointer;
             z-index: 100;
         }
@@ -41,7 +41,7 @@
         .reviews-header {
             font-family: 'Orbitron', sans-serif;
             color: #d4af37;
-            font-size: 28px;
+            font-size: calc(28px * var(--mobile-font-scale, 1));
             text-align: center;
             margin: 30px 0 20px;
         }
@@ -79,25 +79,25 @@
         }
         
         .profile-avatar {
-            font-size: 32px;
+            font-size: calc(32px * var(--mobile-font-scale, 1));
         }
         
         .user-name {
             color: #fff;
             font-weight: 600;
-            font-size: 15px;
+            font-size: calc(15px * var(--mobile-font-scale, 1));
         }
         
         .review-date {
             color: #666;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
         }
         
         .review-content {
             color: #ccc;
             line-height: 1.6;
             margin-bottom: 15px;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
         
         .review-actions {
@@ -115,7 +115,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 13px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
             transition: all 0.3s;
         }
         
@@ -159,7 +159,7 @@
         .section-title {
             font-family: 'Orbitron', sans-serif;
             color: #d4af37;
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             margin-bottom: 15px;
         }
         
@@ -175,7 +175,7 @@
             border-radius: 10px;
             padding: 15px;
             color: #fff;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             font-family: 'Poppins', sans-serif;
             resize: vertical;
             min-height: 100px;
@@ -196,7 +196,7 @@
             border: none;
             padding: 14px;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;

@@ -59,7 +59,7 @@
         .back-btn {
             color: var(--gold);
             text-decoration: none;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             padding: 8px 15px;
             border: 1px solid var(--gold);
             border-radius: 8px;
@@ -74,7 +74,7 @@
         .page-title {
             font-family: 'Orbitron', sans-serif;
             color: var(--gold);
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             letter-spacing: 2px;
         }
 
@@ -86,7 +86,7 @@
 
         .user-count {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
 
         /* Search Bar */
@@ -108,7 +108,7 @@
             border-radius: 12px;
             background: var(--dark);
             color: white;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
 
         .search-input:focus {
@@ -121,7 +121,7 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
         }
 
         /* Main Content */
@@ -165,7 +165,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             font-weight: 600;
             color: var(--dark);
             margin-right: 15px;
@@ -188,7 +188,7 @@
         .user-name {
             font-weight: 600;
             color: var(--text-primary);
-            font-size: 15px;
+            font-size: calc(15px * var(--mobile-font-scale, 1));
             margin-bottom: 4px;
         }
 
@@ -196,7 +196,7 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             padding: 3px 10px;
             border-radius: 20px;
         }
@@ -224,7 +224,7 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
             transition: all 0.3s;
             display: flex;
             align-items: center;
@@ -259,7 +259,7 @@
         }
 
         .empty-icon {
-            font-size: 48px;
+            font-size: calc(48px * var(--mobile-font-scale, 1));
             margin-bottom: 15px;
             opacity: 0.5;
         }
@@ -320,7 +320,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: calc(24px * var(--mobile-font-scale, 1));
             font-weight: 600;
             color: var(--dark);
             margin-right: 15px;
@@ -328,13 +328,13 @@
 
         .modal-user-info h3 {
             color: var(--text-primary);
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             margin-bottom: 5px;
         }
 
         .modal-user-info p {
             color: var(--text-secondary);
-            font-size: 13px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
         }
 
         .modal-close {
@@ -342,7 +342,7 @@
             background: none;
             border: none;
             color: var(--text-secondary);
-            font-size: 24px;
+            font-size: calc(24px * var(--mobile-font-scale, 1));
             cursor: pointer;
         }
 
@@ -361,7 +361,7 @@
         .detail-section h4 {
             color: var(--gold);
             font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             margin-bottom: 15px;
             letter-spacing: 1px;
         }
@@ -380,13 +380,13 @@
 
         .detail-label {
             color: var(--text-secondary);
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             margin-bottom: 5px;
         }
 
         .detail-value {
             color: var(--text-primary);
-            font-size: 16px;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
             font-weight: 600;
         }
 
@@ -417,12 +417,12 @@
 
         .booking-service {
             color: var(--text-primary);
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
 
         .booking-date {
             color: var(--text-secondary);
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
         }
 
         .booking-price {
@@ -431,7 +431,7 @@
         }
 
         .booking-status {
-            font-size: 11px;
+            font-size: calc(11px * var(--mobile-font-scale, 1));
             padding: 3px 8px;
             border-radius: 10px;
         }
@@ -474,7 +474,7 @@
             border: none;
             border-radius: 10px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -594,7 +594,7 @@
     <!-- Delete Confirmation Modal -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal confirm-modal">
-            <div style="font-size: 48px;">🗑️</div>
+            <div style="font-size: calc(48px * var(--mobile-font-scale, 1));">🗑️</div>
             <h3 style="color: var(--danger);">Delete User?</h3>
             <p>Are you sure you want to permanently delete this user and all their data? This action cannot be undone.</p>
             <div class="confirm-buttons">

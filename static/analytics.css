@@ -37,7 +37,7 @@ body {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -50,7 +50,7 @@ body {
 
 .page-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
+    font-size: calc(22px * var(--mobile-font-scale, 1));
     color: #fff;
     letter-spacing: 2px;
 }
@@ -61,7 +61,7 @@ body {
     border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 20px;
     color: #d4af37;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     font-weight: 600;
 }
 
@@ -89,7 +89,7 @@ body {
 }
 
 .metric-icon {
-    font-size: 32px;
+    font-size: calc(32px * var(--mobile-font-scale, 1));
 }
 
 .metric-info {
@@ -98,13 +98,13 @@ body {
 }
 
 .metric-value {
-    font-size: 24px;
+    font-size: calc(24px * var(--mobile-font-scale, 1));
     font-weight: 700;
     color: #fff;
 }
 
 .metric-label {
-    font-size: 10px;
+    font-size: calc(10px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.5);
     letter-spacing: 1px;
 }
@@ -120,7 +120,7 @@ body {
 
 .section-title {
     font-family: 'Playfair Display', serif;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     color: #d4af37;
     margin-bottom: 20px;
     padding-bottom: 15px;
@@ -149,18 +149,18 @@ body {
 
 .daily-date {
     width: 140px;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: #fff;
 }
 
 .daily-transactions {
     flex: 1;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     color: rgba(255, 255, 255, 0.6);
 }
 
 .daily-amount {
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     font-weight: 600;
     color: #4caf50;
 }
@@ -181,7 +181,7 @@ body {
 
 .monthly-date {
     width: 150px;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: #fff;
 }
 
@@ -196,7 +196,7 @@ body {
 
 .monthly-amount {
     width: 100px;
-    font-size: 15px;
+    font-size: calc(15px * var(--mobile-font-scale, 1));
     font-weight: 600;
     color: #d4af37;
     text-align: right;
@@ -209,7 +209,7 @@ body {
     }
     
     .page-title {
-        font-size: 18px;
+        font-size: calc(18px * var(--mobile-font-scale, 1));
     }
     
     .daily-row {

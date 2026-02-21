@@ -30,7 +30,7 @@ body {
     justify-content: center;
     text-decoration: none;
     color: white;
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
     transition: all 0.3s;
     z-index: 100;
 }
@@ -57,7 +57,7 @@ body {
 
 .booking-header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 32px;
+    font-size: calc(32px * var(--mobile-font-scale, 1));
     color: white;
 }
 
@@ -70,7 +70,7 @@ body {
 .date-section h2,
 .requests-section h2 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     color: gold;
     margin-bottom: 15px;
     letter-spacing: 1px;
@@ -112,13 +112,13 @@ body {
 }
 
 .service-name {
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     font-weight: 500;
 }
 
 .service-price {
     font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     color: gold;
 }
 
@@ -128,7 +128,7 @@ body {
     right: 10px;
     background: linear-gradient(45deg, gold, #ffae00);
     color: black;
-    font-size: 10px;
+    font-size: calc(10px * var(--mobile-font-scale, 1));
     font-weight: bold;
     padding: 3px 10px;
     border-radius: 10px;
@@ -150,7 +150,7 @@ body {
     border: 2px solid #222;
     border-radius: 12px;
     color: white;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     cursor: pointer;
 }
 
@@ -169,7 +169,7 @@ body {
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
     pointer-events: none;
 }
 
@@ -190,7 +190,7 @@ body {
     border: 2px solid #222;
     border-radius: 12px;
     color: white;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     resize: none;
 }
 
@@ -213,7 +213,7 @@ body {
     border: 1px solid #333;
     border-radius: 8px;
     color: #888;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -232,7 +232,7 @@ body {
     border-radius: 12px;
     color: black;
     font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     font-weight: 700;
     letter-spacing: 2px;
     cursor: pointer;
@@ -272,7 +272,7 @@ body {
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.5);
-    font-size: 10px;
+    font-size: calc(10px * var(--mobile-font-scale, 1));
     cursor: pointer;
     padding: 8px 12px;
     border-radius: 12px;
@@ -285,7 +285,7 @@ body {
 }
 
 .nav-icon {
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
 
 /* Success Overlay */
@@ -323,7 +323,7 @@ body {
     height: 70px;
     background: linear-gradient(45deg, gold, #ffae00);
     border-radius: 50%;
-    font-size: 35px;
+    font-size: calc(35px * var(--mobile-font-scale, 1));
     color: black;
     margin-bottom: 20px;
 }
@@ -331,7 +331,7 @@ body {
 .success-content h2 {
     font-family: 'Orbitron', sans-serif;
     color: gold;
-    font-size: 22px;
+    font-size: calc(22px * var(--mobile-font-scale, 1));
     margin-bottom: 10px;
 }
 
@@ -362,7 +362,7 @@ body {
     }
     
     .booking-header h1 {
-        font-size: 26px;
+        font-size: calc(26px * var(--mobile-font-scale, 1));
     }
     
     .service-card {
@@ -370,11 +370,11 @@ body {
     }
     
     .service-name {
-        font-size: 14px;
+        font-size: calc(14px * var(--mobile-font-scale, 1));
     }
     
     .service-price {
-        font-size: 14px;
+        font-size: calc(14px * var(--mobile-font-scale, 1));
     }
 }
 

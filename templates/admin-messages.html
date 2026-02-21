@@ -50,7 +50,7 @@
             padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
             align-items: center;
             justify-content: center;
         }
@@ -66,7 +66,7 @@
             padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             transition: all 0.3s;
         }
 
@@ -77,7 +77,7 @@
 
         .logo-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             color: #d4af37;
             letter-spacing: 2px;
         }
@@ -93,7 +93,7 @@
             color: #000;
             padding: 5px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             font-weight: 600;
         }
 
@@ -122,13 +122,13 @@
         }
 
         .chat-list-header h2 {
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             color: #d4af37;
             margin-bottom: 5px;
         }
 
         .chat-list-header span {
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             color: #888;
         }
 
@@ -144,7 +144,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: #fff;
-            font-size: 13px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
         }
 
         .search-input:focus {
@@ -162,7 +162,7 @@
             top: 50%;
             transform: translateY(-50%);
             color: #666;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
 
         .search-results {
@@ -245,7 +245,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: calc(20px * var(--mobile-font-scale, 1));
             color: #d4af37;
             position: relative;
             flex-shrink: 0;
@@ -272,7 +272,7 @@
 
         .user-name {
             font-weight: 600;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             color: #fff;
             white-space: nowrap;
             overflow: hidden;
@@ -284,13 +284,13 @@
             color: #000;
             padding: 2px 8px;
             border-radius: 10px;
-            font-size: 10px;
+            font-size: calc(10px * var(--mobile-font-scale, 1));
             font-weight: 700;
             text-transform: uppercase;
         }
 
         .message-preview {
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             color: #888;
             white-space: nowrap;
             overflow: hidden;
@@ -303,7 +303,7 @@
         }
 
         .time-badge {
-            font-size: 11px;
+            font-size: calc(11px * var(--mobile-font-scale, 1));
             color: #666;
             white-space: nowrap;
         }
@@ -311,7 +311,7 @@
         .unread-count {
             background: #d4af37;
             color: #000;
-            font-size: 11px;
+            font-size: calc(11px * var(--mobile-font-scale, 1));
             font-weight: 700;
             padding: 2px 8px;
             border-radius: 10px;
@@ -348,16 +348,16 @@
 
         .chat-user-name {
             font-weight: 600;
-            font-size: 16px;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
         }
 
         .chat-user-status {
-            font-size: 12px;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
             color: #888;
         }
 
         .three-dots {
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             cursor: pointer;
             padding: 5px 10px;
             border-radius: 5px;
@@ -387,7 +387,7 @@
 
         .dropdown-item {
             padding: 10px 15px;
-            font-size: 13px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
             color: #fff;
             cursor: pointer;
             border-radius: 5px;
@@ -436,13 +436,13 @@
         }
 
         .message-bubble p {
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             line-height: 1.5;
             margin-bottom: 5px;
         }
 
         .message-time {
-            font-size: 10px;
+            font-size: calc(10px * var(--mobile-font-scale, 1));
             color: #666;
             display: block;
             text-align: right;
@@ -471,7 +471,7 @@
             border-radius: 12px;
             padding: 12px 16px;
             color: #fff;
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
             resize: none;
             min-height: 50px;
             max-height: 120px;
@@ -494,7 +494,7 @@
             background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
             border: none;
             color: #000;
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -526,19 +526,19 @@
         }
 
         .empty-state-icon {
-            font-size: 60px;
+            font-size: calc(60px * var(--mobile-font-scale, 1));
             margin-bottom: 20px;
             opacity: 0.3;
         }
 
         .empty-state h3 {
-            font-size: 18px;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
             margin-bottom: 10px;
             color: #888;
         }
 
         .empty-state p {
-            font-size: 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
         }
 
         ::-webkit-scrollbar {
@@ -628,7 +628,7 @@
             .user-avatar {
                 width: 45px;
                 height: 45px;
-                font-size: 16px;
+                font-size: calc(16px * var(--mobile-font-scale, 1));
             }
 
             .message-bubble {
@@ -654,15 +654,15 @@
             }
 
             .chat-user-name {
-                font-size: 14px;
+                font-size: calc(14px * var(--mobile-font-scale, 1));
             }
 
             .chat-user-status {
-                font-size: 11px;
+                font-size: calc(11px * var(--mobile-font-scale, 1));
             }
 
             .logo-text {
-                font-size: 12px;
+                font-size: calc(12px * var(--mobile-font-scale, 1));
             }
 
             /* Show mobile menu button */
@@ -693,20 +693,20 @@
 
             .back-btn {
                 padding: 5px 8px;
-                font-size: 10px;
+                font-size: calc(10px * var(--mobile-font-scale, 1));
             }
 
             .logo-text {
-                font-size: 9px;
+                font-size: calc(9px * var(--mobile-font-scale, 1));
             }
 
             .mobile-menu-btn {
                 padding: 5px 8px;
-                font-size: 14px;
+                font-size: calc(14px * var(--mobile-font-scale, 1));
             }
 
             .chat-list-header h2 {
-                font-size: 14px;
+                font-size: calc(14px * var(--mobile-font-scale, 1));
             }
 
             .chat-list-header {
@@ -714,7 +714,7 @@
             }
 
             .search-input {
-                font-size: 11px;
+                font-size: calc(11px * var(--mobile-font-scale, 1));
                 padding: 6px 8px 6px 25px;
             }
 
@@ -725,23 +725,23 @@
             .user-avatar {
                 width: 38px;
                 height: 38px;
-                font-size: 14px;
+                font-size: calc(14px * var(--mobile-font-scale, 1));
             }
 
             .user-name {
-                font-size: 12px;
+                font-size: calc(12px * var(--mobile-font-scale, 1));
             }
 
             .message-preview {
-                font-size: 10px;
+                font-size: calc(10px * var(--mobile-font-scale, 1));
             }
 
             .time-badge {
-                font-size: 9px;
+                font-size: calc(9px * var(--mobile-font-scale, 1));
             }
 
             .unread-count {
-                font-size: 9px;
+                font-size: calc(9px * var(--mobile-font-scale, 1));
                 padding: 1px 4px;
             }
 
@@ -751,11 +751,11 @@
             }
 
             .message-bubble p {
-                font-size: 12px;
+                font-size: calc(12px * var(--mobile-font-scale, 1));
             }
 
             .message-textarea {
-                font-size: 12px;
+                font-size: calc(12px * var(--mobile-font-scale, 1));
                 padding: 8px;
             }
 
@@ -765,11 +765,11 @@
             }
 
             .chat-user-name {
-                font-size: 12px;
+                font-size: calc(12px * var(--mobile-font-scale, 1));
             }
 
             .chat-user-status {
-                font-size: 10px;
+                font-size: calc(10px * var(--mobile-font-scale, 1));
             }
 
             .admin-badge {
@@ -785,11 +785,11 @@
 
             .back-btn {
                 padding: 5px 8px;
-                font-size: 11px;
+                font-size: calc(11px * var(--mobile-font-scale, 1));
             }
 
             .logo-text {
-                font-size: 11px;
+                font-size: calc(11px * var(--mobile-font-scale, 1));
             }
 
             .chat-user-item {
@@ -799,7 +799,7 @@
             .user-avatar {
                 width: 38px;
                 height: 38px;
-                font-size: 14px;
+                font-size: calc(14px * var(--mobile-font-scale, 1));
             }
         }
     </style>
@@ -1237,12 +1237,12 @@
                 item.onclick = () => startChatWithUser(user.user_id, user.full_name, user.email, user.is_vip);
                 
                 item.innerHTML = `
-                    <div class="user-avatar" style="width: 35px; height: 35px; font-size: 14px;">
+                    <div class="user-avatar" style="width: 35px; height: 35px; font-size: calc(14px * var(--mobile-font-scale, 1));">
                         ${user.photo_url ? `<img src="${user.photo_url}" alt="${user.full_name}">` : getInitials(user.full_name)}
                     </div>
                     <div style="flex: 1;">
-                        <div style="font-weight: 500; font-size: 13px;">${user.full_name}</div>
-                        <div style="font-size: 11px; color: #888;">${user.email}</div>
+                        <div style="font-weight: 500; font-size: calc(13px * var(--mobile-font-scale, 1));">${user.full_name}</div>
+                        <div style="font-size: calc(11px * var(--mobile-font-scale, 1)); color: #888;">${user.email}</div>
                     </div>
                     ${user.is_vip || user.isVIP ? '<span class="vip-badge">VIP</span>' : ''}
                 `;

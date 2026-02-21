@@ -23,7 +23,7 @@ body {
 .broadcast-header h1 {
     font-family: 'Orbitron', sans-serif;
     color: #d4af37;
-    font-size: 28px;
+    font-size: calc(28px * var(--mobile-font-scale, 1));
     margin: 0;
 }
 
@@ -50,7 +50,7 @@ body {
 .composer-section h2 {
     color: #fff;
     font-family: 'Poppins', sans-serif;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -64,7 +64,7 @@ body {
 .form-group label {
     display: block;
     color: #aaa;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     margin-bottom: 8px;
     font-family: 'Poppins', sans-serif;
 }
@@ -78,7 +78,7 @@ body {
     background: rgba(0, 0, 0, 0.3);
     color: #fff;
     font-family: 'Poppins', sans-serif;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     box-sizing: border-box;
 }
 
@@ -109,7 +109,7 @@ body {
 }
 
 .photo-upload span {
-    font-size: 40px;
+    font-size: calc(40px * var(--mobile-font-scale, 1));
     display: block;
     margin-bottom: 10px;
 }
@@ -117,7 +117,7 @@ body {
 .photo-upload p {
     color: #aaa;
     margin: 0;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
 .photo-preview {
@@ -136,7 +136,7 @@ body {
     background: linear-gradient(135deg, #d4af37 0%, #aa8a2e 100%);
     color: #000;
     font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     font-weight: 700;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -157,7 +157,7 @@ body {
 .preview-section h2 {
     color: #fff;
     font-family: 'Poppins', sans-serif;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     margin-bottom: 20px;
 }
 
@@ -177,7 +177,7 @@ body {
     align-items: center;
     justify-content: center;
     color: #666;
-    font-size: 50px;
+    font-size: calc(50px * var(--mobile-font-scale, 1));
 }
 
 .preview-image img {
@@ -193,20 +193,20 @@ body {
 .preview-content h3 {
     color: #d4af37;
     font-family: 'Poppins', sans-serif;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     margin: 0 0 10px 0;
 }
 
 .preview-content p {
     color: #ccc;
-    font-size: 14px;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
     line-height: 1.6;
     margin: 0;
 }
 
 .preview-date {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     margin-top: 15px;
 }
 
@@ -217,7 +217,7 @@ body {
 .history-section h2 {
     color: #fff;
     font-family: 'Poppins', sans-serif;
-    font-size: 18px;
+    font-size: calc(18px * var(--mobile-font-scale, 1));
     margin-bottom: 20px;
 }
 
@@ -254,13 +254,13 @@ body {
 .history-card h4 {
     color: #d4af37;
     font-family: 'Poppins', sans-serif;
-    font-size: 16px;
+    font-size: calc(16px * var(--mobile-font-scale, 1));
     margin: 0 0 8px 0;
 }
 
 .history-card p {
     color: #999;
-    font-size: 13px;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
     line-height: 1.5;
     margin: 0 0 10px 0;
     display: -webkit-box;
@@ -279,7 +279,7 @@ body {
 
 .history-date {
     color: #666;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .history-actions {
@@ -292,7 +292,7 @@ body {
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
     font-family: 'Poppins', sans-serif;
     transition: all 0.2s;
 }
@@ -323,7 +323,7 @@ body {
 }
 
 .empty-history span {
-    font-size: 50px;
+    font-size: calc(50px * var(--mobile-font-scale, 1));
     display: block;
     margin-bottom: 15px;
 }
@@ -340,5 +340,5 @@ body {
 }
 
 .success-message span {
-    font-size: 20px;
+    font-size: calc(20px * var(--mobile-font-scale, 1));
 }
