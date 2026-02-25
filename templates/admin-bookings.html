@@ -8,285 +8,667 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            background: #0a0a12;
+            margin: 0;
             min-height: 100vh;
             padding: 20px;
+            background: #0a0a12;
+            color: #ddd;
+            font-family: 'Poppins', sans-serif;
         }
-        
+
+        .admin-bookings-page {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
         .page-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
             border-bottom: 2px solid rgba(212, 175, 55, 0.3);
         }
-        
+
         .page-header h1 {
-            font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
-            font-size: calc(24px * var(--mobile-font-scale, 1));
             margin: 0;
-        }
-        
-        .back-btn {
-            background: rgba(212, 175, 55, 0.2);
             color: #d4af37;
-            border: 1px solid #d4af37;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            font-size: calc(14px * var(--mobile-font-scale, 1));
-            transition: all 0.3s;
-            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            letter-spacing: 0.5px;
         }
-        
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            background: rgba(212, 175, 55, 0.15);
+            color: #d4af37;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
         .back-btn:hover {
             background: #d4af37;
             color: #0a0a12;
         }
-        
+
         .stats-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
         }
-        
+
         .stat-card {
-            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 20px;
-            min-width: 150px;
+            background: rgba(255, 255, 255, 0.04);
             text-align: center;
         }
-        
+
         .stat-card .stat-number {
-            font-family: 'Orbitron', sans-serif;
-            font-size: calc(28px * var(--mobile-font-scale, 1));
             color: #d4af37;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            line-height: 1.1;
         }
-        
+
         .stat-card .stat-label {
-            color: #888;
-            font-size: calc(14px * var(--mobile-font-scale, 1));
-            margin-top: 5px;
+            margin-top: 6px;
+            color: #8f8f8f;
+            font-size: 13px;
         }
-        
-        .bookings-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.02);
+
+        .bookings-desktop {
+            display: block;
+        }
+
+        .table-shell {
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
             overflow: hidden;
         }
-        
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .bookings-table {
+            width: 100%;
+            min-width: 920px;
+            border-collapse: collapse;
+        }
+
         .bookings-table th {
-            background: rgba(212, 175, 55, 0.1);
-            color: #d4af37;
-            padding: 15px;
+            padding: 13px 12px;
             text-align: left;
+            color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
             font-family: 'Orbitron', sans-serif;
-            font-size: calc(12px * var(--mobile-font-scale, 1));
+            font-size: 12px;
+            letter-spacing: 0.5px;
         }
-        
+
         .bookings-table td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: #ccc;
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            color: #ddd;
+            font-size: 13px;
+            vertical-align: middle;
         }
-        
-        .bookings-table tr:hover {
-            background: rgba(255, 255, 255, 0.02);
+
+        .bookings-table tr:last-child td {
+            border-bottom: none;
         }
-        
+
+        .bookings-table tbody tr {
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .bookings-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .price-cell {
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .muted {
+            color: #777;
+        }
+
         .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: calc(11px * var(--mobile-font-scale, 1));
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-        
+
         .status-badge.pending {
-            background: rgba(255, 193, 7, 0.2);
             color: #ffc107;
+            background: rgba(255, 193, 7, 0.2);
         }
-        
+
         .status-badge.pending_approval {
-            background: rgba(156, 39, 176, 0.2);
             color: #9c27b0;
+            background: rgba(156, 39, 176, 0.2);
         }
-        
+
         .status-badge.confirmed {
-            background: rgba(33, 150, 243, 0.2);
             color: #2196f3;
+            background: rgba(33, 150, 243, 0.2);
         }
-        
+
         .status-badge.completed {
-            background: rgba(76, 175, 80, 0.2);
             color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
         }
-        
+
         .status-badge.cancelled {
-            background: rgba(244, 67, 54, 0.2);
             color: #f44336;
+            background: rgba(244, 67, 54, 0.2);
         }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #666;
+
+        .action-btn {
+            margin-right: 6px;
+            padding: 7px 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        
-        .empty-state h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
+
+        .action-btn:last-child {
+            margin-right: 0;
+        }
+
+        .action-btn.confirm {
+            color: #4caf50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .action-btn.confirm:hover {
+            color: #fff;
+            background: #4caf50;
+        }
+
+        .action-btn.decline {
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.2);
+        }
+
+        .action-btn.decline:hover {
+            color: #fff;
+            background: #f44336;
+        }
+
+        .bookings-mobile {
+            display: none;
+        }
+
+        .booking-card {
+            margin-bottom: 12px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+        }
+
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 10px;
         }
-        
-        .action-btn {
-            padding: 6px 12px;
+
+        .card-label {
+            margin: 0 0 4px;
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .card-customer {
+            margin: 0;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .card-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 14px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .meta-key {
+            color: #8d8d8d;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .meta-value {
+            color: #ddd;
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        .meta-value.price-cell {
+            color: #d4af37;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .card-actions .action-btn {
+            flex: 1;
+            margin-right: 0;
+            padding: 10px 12px;
+        }
+
+        .empty-state {
+            padding: 48px 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            color: #747474;
+        }
+
+        .empty-state h2 {
+            margin: 0 0 10px;
+            color: #d4af37;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.82);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            width: min(520px, 92vw);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            padding: 24px 22px;
+            border: 1px solid #d4af37;
+            border-radius: 14px;
+            background: #161616;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
             border: none;
-            border-radius: 6px;
+            background: transparent;
+            color: #8a8a8a;
+            font-size: 22px;
+            line-height: 1;
             cursor: pointer;
-            font-size: calc(14px * var(--mobile-font-scale, 1));
-            margin-right: 5px;
-            transition: all 0.3s;
         }
-        
-        .action-btn.confirm {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
+
+        .modal-close:hover {
+            color: #d4af37;
         }
-        
-        .action-btn.confirm:hover {
-            background: #4caf50;
-            color: white;
+
+        .modal-header h2 {
+            margin: 0 0 14px;
+            text-align: center;
+            color: #d4af37;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
         }
-        
-        .action-btn.decline {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .action-btn.decline:hover {
-            background: #f44336;
-            color: white;
+
+        .detail-label {
+            color: #8d8d8d;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .modal-actions .action-btn {
+            flex: 1;
+            margin-right: 0;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 14px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 18px;
+            }
+
+            .page-header h1 {
+                font-size: 22px;
+            }
+
+            .back-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                margin-bottom: 16px;
+            }
+
+            .bookings-desktop {
+                display: none;
+            }
+
+            .bookings-mobile {
+                display: block;
+            }
+
+            .modal-content {
+                width: calc(100% - 24px);
+                max-width: none;
+                max-height: calc(100vh - 24px);
+                padding: 20px 16px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+                padding: 8px 0;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .card-meta {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="page-header">
-        <h1>📅 ALL BOOKINGS</h1>
-        <a href="/admin" class="back-btn">← Back to Dashboard</a>
-    </div>
-    
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-number">{{ bookings|length }}</div>
-            <div class="stat-label">Total Bookings</div>
+    <div class="admin-bookings-page">
+        <div class="page-header">
+            <h1>ALL BOOKINGS</h1>
+            <a href="/admin" class="back-btn">Back to Dashboard</a>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'pending')|list|length }}</div>
-            <div class="stat-label">Pending</div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|length }}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'confirmed')|list|length }}</div>
+                <div class="stat-label">Confirmed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'completed')|list|length }}</div>
+                <div class="stat-label">Completed</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'confirmed')|list|length }}</div>
-            <div class="stat-label">Confirmed</div>
+
+        {% if bookings %}
+        <div class="bookings-desktop">
+            <div class="table-shell">
+                <div class="table-scroll">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>CUSTOMER</th>
+                                <th>SERVICE</th>
+                                <th>PRICE</th>
+                                <th>STATUS</th>
+                                <th>CREATED</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr onclick='showBookingDetails({{ booking | tojson }})'>
+                                <td>{{ booking.booking_date or 'N/A' }}</td>
+                                <td>
+                                    {% if booking.user_name %}
+                                    {{ booking.user_name }}
+                                    {% elif booking.name %}
+                                    {{ booking.name }}
+                                    {% else %}
+                                    {{ booking.user_id[:8] }}...
+                                    {% endif %}
+                                </td>
+                                <td>{{ booking.requests or booking.service or 'Haircut' }}</td>
+                                <td class="price-cell">NGN {{ booking.price or 0 }}</td>
+                                <td>
+                                    <span class="status-badge {{ booking.status }}">{{ booking.status }}</span>
+                                </td>
+                                <td>{{ booking.createdAt or 'Recently' }}</td>
+                                <td>
+                                    {% if booking.status == 'pending' %}
+                                    <button class="action-btn confirm" onclick="event.stopPropagation(); updateStatus('{{ booking.id }}', 'confirm')">Confirm</button>
+                                    <button class="action-btn decline" onclick="event.stopPropagation(); updateStatus('{{ booking.id }}', 'cancel')">Decline</button>
+                                    {% else %}
+                                    <span class="muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'completed')|list|length }}</div>
-            <div class="stat-label">Completed</div>
-        </div>
-    </div>
-    
-    {% if bookings %}
-    <table class="bookings-table">
-        <thead>
-            <tr>
-                <th>DATE</th>
-                <th>CUSTOMER</th>
-                <th>SERVICE</th>
-                <th>PRICE</th>
-                <th>STATUS</th>
-                <th>CREATED</th>
-                <th>ACTIONS</th>
-            </tr>
-        </thead>
-        <tbody>
+
+        <div class="bookings-mobile">
             {% for booking in bookings %}
-            <tr onclick='showBookingDetails({{ booking | tojson }})' style="cursor: pointer;">
-                <td>
-                    {% if booking.booking_date %}
-                    {{ booking.booking_date }}
-                    {% else %}
-                    N/A
-                    {% endif %}
-                </td>
-                <td>
-                    {% if booking.user_name %}
-                    {{ booking.user_name }}
-                    {% elif booking.name %}
-                    {{ booking.name }}
-                    {% else %}
-                    {{ booking.user_id[:8] }}...
-                    {% endif %}
-                </td>
-                <td>{{ booking.requests or booking.service or 'Haircut' }}</td>
-                <td style="color: #d4af37;">₦{{ booking.price or 0 }}</td>
-                <td>
+            <article class="booking-card" onclick='showBookingDetails({{ booking | tojson }})'>
+                <div class="card-top">
+                    <div>
+                        <p class="card-label">Customer</p>
+                        <h2 class="card-customer">
+                            {% if booking.user_name %}
+                            {{ booking.user_name }}
+                            {% elif booking.name %}
+                            {{ booking.name }}
+                            {% else %}
+                            {{ booking.user_id[:8] }}...
+                            {% endif %}
+                        </h2>
+                    </div>
                     <span class="status-badge {{ booking.status }}">{{ booking.status }}</span>
-                </td>
-                <td>
-                    {% if booking.createdAt %}
-                    {{ booking.createdAt }}
-                    {% else %}
-                    Recently
-                    {% endif %}
-                </td>
-                <td>
-                    {% if booking.status == 'pending' %}
-                    <button class="action-btn confirm" onclick="updateStatus('{{ booking.id }}', 'confirm')">✓</button>
-                    <button class="action-btn decline" onclick="updateStatus('{{ booking.id }}', 'cancel')">✕</button>
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-            </tr>
+                </div>
+
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <span class="meta-key">Service</span>
+                        <span class="meta-value">{{ booking.requests or booking.service or 'Haircut' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-key">Price</span>
+                        <span class="meta-value price-cell">NGN {{ booking.price or 0 }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-key">Booking Date</span>
+                        <span class="meta-value">{{ booking.booking_date or 'N/A' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-key">Created</span>
+                        <span class="meta-value">{{ booking.createdAt or 'Recently' }}</span>
+                    </div>
+                </div>
+
+                {% if booking.status == 'pending' %}
+                <div class="card-actions">
+                    <button class="action-btn confirm" onclick="event.stopPropagation(); updateStatus('{{ booking.id }}', 'confirm')">Confirm</button>
+                    <button class="action-btn decline" onclick="event.stopPropagation(); updateStatus('{{ booking.id }}', 'cancel')">Decline</button>
+                </div>
+                {% endif %}
+            </article>
             {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <div class="empty-state">
-        <h2>📅 No Bookings Yet</h2>
-        <p>There are no bookings in the system.</p>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>No Bookings Yet</h2>
+            <p>There are no bookings in the system.</p>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-    
+
+    <div id="bookingModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">x</button>
+
+            <div class="modal-header">
+                <h2>BOOKING DETAILS</h2>
+            </div>
+
+            <div class="modal-body">
+                <div class="detail-row">
+                    <span class="detail-label">Booking ID</span>
+                    <span class="detail-value" id="detailId"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Customer</span>
+                    <span class="detail-value" id="detailCustomer"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value" id="detailEmail"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Service</span>
+                    <span class="detail-value" id="detailService"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Price</span>
+                    <span class="detail-value" id="detailPrice"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Booking Date</span>
+                    <span class="detail-value" id="detailDate"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value"><span id="detailStatus" class="status-badge"></span></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Created</span>
+                    <span class="detail-value" id="detailCreated"></span>
+                </div>
+
+                <div id="detailActions" class="modal-actions" style="display: none;">
+                    <button class="action-btn decline" onclick="declineFromModal()">Decline</button>
+                    <button class="action-btn confirm" onclick="confirmFromModal()">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         async function updateStatus(bookingId, newStatus) {
-            if (!confirm('Are you sure you want to ' + newStatus + ' this booking?')) {
+            const actionLabel = newStatus === 'confirm' ? 'confirm' : 'decline';
+            if (!confirm('Are you sure you want to ' + actionLabel + ' this booking?')) {
                 return;
             }
-            
+
             try {
                 const response = await fetch('/api/admin/approve-booking', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         bookingId: bookingId,
                         action: newStatus
                     })
                 });
-                
+
                 const result = await response.json();
-                
                 if (result.success) {
-                    alert('Booking ' + newStatus + ' successfully!');
-                    location.reload();
+                    alert(result.message || 'Booking updated successfully.');
+                    window.location.reload();
                 } else {
                     alert('Error: ' + (result.message || 'Failed to update booking'));
                 }
@@ -295,175 +677,60 @@
                 alert('Error updating booking. Please try again.');
             }
         }
-        
+
         function showBookingDetails(booking) {
             document.getElementById('detailId').textContent = booking.id || 'N/A';
             document.getElementById('detailCustomer').textContent = booking.user_name || booking.name || 'N/A';
             document.getElementById('detailEmail').textContent = booking.user_email || 'N/A';
             document.getElementById('detailService').textContent = booking.requests || booking.service || 'Haircut';
-            document.getElementById('detailPrice').textContent = '₦' + (booking.price || 0);
+            document.getElementById('detailPrice').textContent = 'NGN ' + (booking.price || 0);
             document.getElementById('detailDate').textContent = booking.booking_date || 'N/A';
-            document.getElementById('detailStatus').textContent = booking.status;
-            document.getElementById('detailStatus').className = 'status-badge ' + booking.status;
             document.getElementById('detailCreated').textContent = booking.createdAt || 'Recently';
-            
-            // Show/hide action buttons based on status
+
+            const statusElement = document.getElementById('detailStatus');
+            const safeStatus = booking.status || 'pending';
+            statusElement.textContent = safeStatus;
+            statusElement.className = 'status-badge ' + safeStatus;
+
             const actionsDiv = document.getElementById('detailActions');
-            if (booking.status === 'pending') {
-                actionsDiv.style.display = 'block';
-                actionsDiv.dataset.bookingId = booking.id;
+            if (safeStatus === 'pending') {
+                actionsDiv.style.display = 'flex';
+                actionsDiv.dataset.bookingId = booking.id || '';
             } else {
                 actionsDiv.style.display = 'none';
+                actionsDiv.dataset.bookingId = '';
             }
-            
+
             document.getElementById('bookingModal').style.display = 'flex';
         }
-        
+
         function closeModal() {
             document.getElementById('bookingModal').style.display = 'none';
         }
-        
+
         function confirmFromModal() {
             const bookingId = document.getElementById('detailActions').dataset.bookingId;
-            if (bookingId) {
-                updateStatus(bookingId, 'confirm');
-                closeModal();
+            if (!bookingId) {
+                return;
             }
+            closeModal();
+            updateStatus(bookingId, 'confirm');
         }
-        
+
         function declineFromModal() {
             const bookingId = document.getElementById('detailActions').dataset.bookingId;
-            if (bookingId) {
-                updateStatus(bookingId, 'cancelled');
+            if (!bookingId) {
+                return;
+            }
+            closeModal();
+            updateStatus(bookingId, 'cancel');
+        }
+
+        window.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
                 closeModal();
             }
-        }
+        });
     </script>
-    
-    <!-- Booking Details Modal -->
-    <div id="bookingModal" class="modal-overlay" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeModal()">✕</button>
-            
-            <div class="modal-header">
-                <h2>BOOKING DETAILS</h2>
-            </div>
-            
-            <div class="modal-body">
-                <div class="detail-row">
-                    <span class="detail-label">Booking ID:</span>
-                    <span class="detail-value" id="detailId"></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Customer:</span>
-                    <span class="detail-value" id="detailCustomer"></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Email:</span>
-                    <span class="detail-value" id="detailEmail"></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Service:</span>
-                    <span class="detail-value" id="detailService"></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Price:</span>
-                    <span class="detail-value" id="detailPrice"></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Booking Date:</span>
-                    <span class="detail-value" id="detailDate"></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Status:</span>
-                    <span class="detail-value"><span id="detailStatus" class="status-badge"></span></span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Created:</span>
-                    <span class="detail-value" id="detailCreated"></span>
-                </div>
-                
-                <div id="detailActions" class="modal-actions" style="display: none;">
-                    <button class="action-btn decline" onclick="declineFromModal()">✕ DECLINE</button>
-                    <button class="action-btn confirm" onclick="confirmFromModal()">✓ CONFIRM</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <style>
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: #1a1a1a;
-            border: 1px solid #d4af37;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 450px;
-            width: 90%;
-            position: relative;
-        }
-        
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #888;
-            font-size: calc(20px * var(--mobile-font-scale, 1));
-            cursor: pointer;
-        }
-        
-        .modal-close:hover {
-            color: #d4af37;
-        }
-        
-        .modal-header h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .detail-label {
-            color: #888;
-        }
-        
-        .detail-value {
-            color: #fff;
-            font-weight: 500;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        .modal-actions .action-btn {
-            flex: 1;
-            padding: 12px;
-            font-size: calc(14px * var(--mobile-font-scale, 1));
-        }
-    </style>
 </body>
 </html>

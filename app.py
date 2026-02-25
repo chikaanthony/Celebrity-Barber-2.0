@@ -16,12 +16,17 @@ app = Flask(__name__,
             static_folder='static')
 app.secret_key = 'your-secret-key-change-in-production'
 
-MOBILE_FONT_SCALE_STYLE = (
-    '<style id="mobile-font-scale">'
-    ':root{--mobile-font-scale:1;}'
-    '@media (max-width:768px){:root{--mobile-font-scale:0.55;}}'
-    '</style>'
-)
+ADMIN_MOBILE_FONT_SCALE = 0.55
+CLIENT_MOBILE_FONT_SCALE = 0.8
+
+
+def build_mobile_font_scale_style(scale):
+    return (
+        '<style id="mobile-font-scale">'
+        ':root{--mobile-font-scale:1;}'
+        f'@media (max-width:768px){{:root{{--mobile-font-scale:{scale};}}}}'
+        '</style>'
+    )
 
 
 @app.after_request
@@ -38,7 +43,14 @@ def inject_mobile_font_scale(response):
     if 'id="mobile-font-scale"' in html or '</head>' not in html:
         return response
 
-    response.set_data(html.replace('</head>', f'{MOBILE_FONT_SCALE_STYLE}</head>', 1))
+    mobile_scale = (
+        ADMIN_MOBILE_FONT_SCALE
+        if request.path.startswith('/admin')
+        else CLIENT_MOBILE_FONT_SCALE
+    )
+    response.set_data(
+        html.replace('</head>', f'{build_mobile_font_scale_style(mobile_scale)}</head>', 1)
+    )
     return response
 
 # Initialize Firebase
@@ -124,8 +136,6 @@ def login():
             email = request.form.get('email')
             password = request.form.get('password')
             
-            print(f"Login attempt - Email: {email}, Password: {password}")
-            
             # Check for admin credentials
             if email == 'chikaanthony896@gmail.com' and password == 'adminFIdelis242':
                 session['user_id'] = 'admin'
@@ -168,7 +178,6 @@ def login():
             return redirect(url_for('login'))
             
         except Exception as e:
-            print(f'Login error: {e}')
             flash(f'Login error: {str(e)}', 'error')
             return redirect(url_for('login'))
     
@@ -1696,7 +1705,7 @@ def api_logout():
 def logout():
     """Logout route that redirects to home page"""
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('index', _external=True))
 
 
 # API Routes for Data
