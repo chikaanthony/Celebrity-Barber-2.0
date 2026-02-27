@@ -386,13 +386,37 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .ledger-container {
+                padding: 12px;
+            }
+
             .revenue-overview {
                 grid-template-columns: 1fr;
             }
 
             .ledger-header {
+                padding: 0;
+                background: transparent;
+                border: none;
+                border-radius: 0;
                 flex-direction: column;
                 gap: 15px;
+                align-items: flex-start;
+            }
+
+            .header-left {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .main-content {
+                background: transparent;
+                border: none;
+                border-radius: 0;
+                padding: 0;
             }
 
             .transaction-item {

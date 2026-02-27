@@ -29,6 +29,21 @@
             font-size: calc(28px * var(--mobile-font-scale, 1));
             margin: 0;
         }
+
+        .admin-nav .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .admin-nav .page-title {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: calc(22px * var(--mobile-font-scale, 1));
+            letter-spacing: 1.2px;
+            line-height: 1.1;
+        }
         
         .broadcast-main {
             display: grid;
@@ -315,6 +330,48 @@
             font-size: calc(50px * var(--mobile-font-scale, 1));
             display: block;
             margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 12px;
+            }
+
+            .admin-nav {
+                background: transparent;
+                border: none;
+                border-radius: 0;
+                padding: 0;
+                margin-bottom: 12px;
+            }
+
+            .admin-nav .page-title {
+                font-size: calc(16px * var(--mobile-font-scale, 1));
+                letter-spacing: 0.8px;
+            }
+
+            .broadcast-container {
+                padding: 0;
+            }
+
+            .broadcast-main {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .composer-section,
+            .preview-section {
+                padding: 14px;
+            }
+
+            .history-section {
+                margin-top: 16px;
+            }
+
+            .history-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
         }
     </style>
 </head>

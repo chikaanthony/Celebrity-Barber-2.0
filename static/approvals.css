@@ -477,6 +477,29 @@ body {
 
 /* Responsive */
 @media (max-width: 600px) {
+    .approvals-nav {
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .page-title {
+        font-size: calc(16px * var(--mobile-font-scale, 1));
+        letter-spacing: 1px;
+    }
+
+    .nav-right {
+        margin-left: auto;
+    }
+
+    .pending-count {
+        padding: 7px 12px;
+        font-size: calc(12px * var(--mobile-font-scale, 1));
+        border-radius: 14px;
+        line-height: 1.1;
+        white-space: nowrap;
+    }
+
     .approval-row {
         flex-direction: column;
         align-items: flex-start;

@@ -505,15 +505,46 @@
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
+            .admin-container {
+                padding: 12px;
+            }
+
             .page-header {
+                padding: 0;
+                background: transparent;
+                border: none;
+                border-radius: 0;
                 flex-direction: column;
                 gap: 15px;
-                text-align: center;
+                text-align: left;
+                align-items: flex-start;
             }
+
+            .header-left {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .main-content {
+                background: transparent;
+                border: none;
+                border-radius: 0;
+                padding: 0;
+                min-height: 0;
+            }
+
             .vip-row {
                 flex-direction: column;
                 gap: 15px;
             }
+
+            .vip-section {
+                padding: 14px;
+            }
+
             .service-row {
                 flex-direction: column;
                 gap: 15px;

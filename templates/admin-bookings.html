@@ -420,8 +420,26 @@
             }
 
             .stats-row {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
                 margin-bottom: 16px;
+            }
+
+            .stat-card {
+                padding: 10px 6px;
+                min-height: 88px;
+            }
+
+            .stat-card .stat-number {
+                font-size: calc(14px * var(--mobile-font-scale, 1));
+                line-height: 1.05;
+            }
+
+            .stat-card .stat-label {
+                margin-top: 4px;
+                font-size: calc(8px * var(--mobile-font-scale, 1));
+                letter-spacing: 0.3px;
+                line-height: 1.2;
             }
 
             .bookings-desktop {
@@ -456,10 +474,6 @@
         }
 
         @media (max-width: 520px) {
-            .stats-row {
-                grid-template-columns: 1fr;
-            }
-
             .card-meta {
                 grid-template-columns: 1fr;
             }

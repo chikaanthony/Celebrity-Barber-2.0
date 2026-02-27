@@ -224,6 +224,47 @@
             padding: 40px;
             color: #888;
         }
+
+        @media (max-width: 700px) {
+            .analytics-container {
+                padding: 12px;
+            }
+
+            .metrics-row {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .metric-card {
+                padding: 10px 6px;
+                min-height: 92px;
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                gap: 6px;
+            }
+
+            .metric-icon {
+                font-size: calc(16px * var(--mobile-font-scale, 1));
+                line-height: 1;
+            }
+
+            .metric-info {
+                align-items: center;
+            }
+
+            .metric-value {
+                font-size: calc(13px * var(--mobile-font-scale, 1));
+                line-height: 1.1;
+            }
+
+            .metric-label {
+                font-size: calc(8px * var(--mobile-font-scale, 1));
+                letter-spacing: 0.4px;
+                line-height: 1.2;
+            }
+        }
     </style>
 </head>
 <body>
