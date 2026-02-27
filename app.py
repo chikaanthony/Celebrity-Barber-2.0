@@ -20,12 +20,154 @@ ADMIN_MOBILE_FONT_SCALE = 0.8
 CLIENT_MOBILE_FONT_SCALE = 0.8
 
 
+def clamp_ui_font_scale(value, fallback=1.0, minimum=0.65, maximum=1.6):
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        numeric = float(fallback)
+    return max(minimum, min(maximum, numeric))
+
+
 def build_mobile_font_scale_style(scale):
+    normalized_scale = clamp_ui_font_scale(scale, fallback=1.0)
     return (
         '<style id="mobile-font-scale">'
         ':root{--mobile-font-scale:1;}'
-        f'@media (max-width:768px){{:root{{--mobile-font-scale:{scale};}}}}'
+        f'@media (max-width:768px){{:root{{--mobile-font-scale:{normalized_scale};}}}}'
         '</style>'
+    )
+
+
+def build_theme_override_style():
+    return (
+        '<style id="ui-theme-style">'
+        'html[data-theme="light"]{'
+        '--dark:#f3f5f9;'
+        '--dark-secondary:#ffffff;'
+        '--dark-tertiary:#edf1f7;'
+        '--light:#111827;'
+        '--gold:#b88915;'
+        '--gold-light:#d4af37;'
+        '--light-panel:#ffffff;'
+        '--light-panel-muted:#f7f9fc;'
+        '--light-border:rgba(15,23,42,0.12);'
+        '--light-text:#111827;'
+        '--light-text-muted:#475569;'
+        'color-scheme:light;'
+        '}'
+        'html[data-theme="light"] body{'
+        'background:linear-gradient(135deg,#f6f8fc 0%,#eef2f7 50%,#e8edf5 100%) !important;'
+        'color:var(--light-text) !important;'
+        '}'
+        'html[data-theme="light"] .admin-nav,'
+        'html[data-theme="light"] .sidebar,'
+        'html[data-theme="light"] .section-content,'
+        'html[data-theme="light"] .analytics-card,'
+        'html[data-theme="light"] .stack-item,'
+        'html[data-theme="light"] .approval-card,'
+        'html[data-theme="light"] .booking-row,'
+        'html[data-theme="light"] .booking-details,'
+        'html[data-theme="light"] .receipt-preview,'
+        'html[data-theme="light"] .messages-list,'
+        'html[data-theme="light"] .message-item,'
+        'html[data-theme="light"] .table-shell,'
+        'html[data-theme="light"] .table-scroll,'
+        'html[data-theme="light"] .metric-card,'
+        'html[data-theme="light"] .stat-card,'
+        'html[data-theme="light"] .service-card,'
+        'html[data-theme="light"] .broadcast-card,'
+        'html[data-theme="light"] .update-card,'
+        'html[data-theme="light"] .ledger-table{'
+        'background:var(--light-panel) !important;'
+        'border-color:var(--light-border) !important;'
+        'box-shadow:0 8px 22px rgba(15,23,42,0.06);'
+        '}'
+        'html[data-theme="light"] .analytics-card.highlight,'
+        'html[data-theme="light"] .metric-card.highlight,'
+        'html[data-theme="light"] .stat-card.highlight{'
+        'border-color:rgba(184,137,21,0.55) !important;'
+        'box-shadow:0 10px 26px rgba(184,137,21,0.18) !important;'
+        '}'
+        'html[data-theme="light"] .stack-item.active{'
+        'background:rgba(212,175,55,0.14) !important;'
+        'border-color:rgba(184,137,21,0.55) !important;'
+        '}'
+        'html[data-theme="light"] .stack-item:hover{'
+        'background:rgba(212,175,55,0.1) !important;'
+        '}'
+        'html[data-theme="light"] h1,'
+        'html[data-theme="light"] h2,'
+        'html[data-theme="light"] h3,'
+        'html[data-theme="light"] h4,'
+        'html[data-theme="light"] .section-title,'
+        'html[data-theme="light"] .admin-name,'
+        'html[data-theme="light"] .stack-label,'
+        'html[data-theme="light"] .card-value,'
+        'html[data-theme="light"] .user-name,'
+        'html[data-theme="light"] .message-user{'
+        'color:var(--light-text) !important;'
+        '}'
+        'html[data-theme="light"] p,'
+        'html[data-theme="light"] span,'
+        'html[data-theme="light"] label,'
+        'html[data-theme="light"] .card-label,'
+        'html[data-theme="light"] .admin-role,'
+        'html[data-theme="light"] .user-email,'
+        'html[data-theme="light"] .message-preview,'
+        'html[data-theme="light"] .message-time,'
+        'html[data-theme="light"] .placeholder-text{'
+        'color:var(--light-text-muted) !important;'
+        '}'
+        'html[data-theme="light"] .logo-text{color:var(--gold) !important;}'
+        'html[data-theme="light"] input,'
+        'html[data-theme="light"] textarea,'
+        'html[data-theme="light"] select{'
+        'background:var(--light-panel) !important;'
+        'color:var(--light-text) !important;'
+        'border:1px solid var(--light-border) !important;'
+        '}'
+        'html[data-theme="light"] input::placeholder,'
+        'html[data-theme="light"] textarea::placeholder{'
+        'color:#94a3b8 !important;'
+        '}'
+        'html[data-theme="light"] .btn-decline,'
+        'html[data-theme="light"] .logout-btn{'
+        'background:#ffffff !important;'
+        'color:#334155 !important;'
+        'border-color:var(--light-border) !important;'
+        '}'
+        'html[data-theme="light"] .btn-approve,'
+        'html[data-theme="light"] .approve-btn,'
+        'html[data-theme="light"] .action-btn,'
+        'html[data-theme="light"] .broadcast-btn.highlight{'
+        'background:linear-gradient(135deg,#d4af37,#f4cf57) !important;'
+        'color:#111827 !important;'
+        'border-color:#c99d2c !important;'
+        '}'
+        '</style>'
+    )
+
+
+def build_ui_preferences_script(default_mobile_scale):
+    safe_default = clamp_ui_font_scale(default_mobile_scale, fallback=1.0)
+    return (
+        '<script id="ui-preferences-script">'
+        '(function(){'
+        'var root=document.documentElement;'
+        "var storedTheme=(localStorage.getItem('ui_theme')||'dark').toLowerCase();"
+        "if(storedTheme!=='light'){storedTheme='dark';}"
+        "root.setAttribute('data-theme',storedTheme);"
+        "var storedScaleRaw=localStorage.getItem('ui_font_scale');"
+        f'var fallbackScale={safe_default};'
+        'if(storedScaleRaw!==null){'
+        'var storedScale=parseFloat(storedScaleRaw);'
+        'if(!Number.isFinite(storedScale)||storedScale<0.65||storedScale>1.6){storedScale=fallbackScale;}'
+        "root.style.setProperty('--mobile-font-scale', String(storedScale));"
+        '}else{'
+        "root.style.removeProperty('--mobile-font-scale');"
+        '}'
+        '})();'
+        '</script>'
     )
 
 
@@ -40,7 +182,13 @@ def inject_mobile_font_scale(response):
     except Exception:
         return response
 
-    if 'id="mobile-font-scale"' in html or '</head>' not in html:
+    if '</head>' not in html:
+        return response
+
+    has_mobile_scale = 'id="mobile-font-scale"' in html
+    has_theme_style = 'id="ui-theme-style"' in html
+    has_prefs_script = 'id="ui-preferences-script"' in html
+    if has_mobile_scale and has_theme_style and has_prefs_script:
         return response
 
     if request.path.startswith('/admin/analytics'):
@@ -52,8 +200,20 @@ def inject_mobile_font_scale(response):
             if request.path.startswith('/admin')
             else CLIENT_MOBILE_FONT_SCALE
         )
+
+    injection = []
+    if not has_mobile_scale:
+        injection.append(build_mobile_font_scale_style(mobile_scale))
+    if not has_theme_style:
+        injection.append(build_theme_override_style())
+    if not has_prefs_script:
+        injection.append(build_ui_preferences_script(mobile_scale))
+
+    if not injection:
+        return response
+
     response.set_data(
-        html.replace('</head>', f'{build_mobile_font_scale_style(mobile_scale)}</head>', 1)
+        html.replace('</head>', f'{"".join(injection)}</head>', 1)
     )
     return response
 
@@ -1508,6 +1668,25 @@ def mark_notification_read():
 @login_required
 def profile():
     return render_template('profile.html')
+
+
+@app.route('/settings')
+def settings_page():
+    user_logged_in = bool(session.get('user_id'))
+    is_admin = bool(session.get('is_admin')) if user_logged_in else False
+    if is_admin:
+        back_url = '/admin'
+    elif user_logged_in:
+        back_url = '/clientdashboard'
+    else:
+        back_url = '/'
+    default_scale = ADMIN_MOBILE_FONT_SCALE if is_admin else CLIENT_MOBILE_FONT_SCALE
+    return render_template(
+        'settings.html',
+        is_admin=is_admin,
+        back_url=back_url,
+        default_scale=clamp_ui_font_scale(default_scale, fallback=1.0),
+    )
 
 
 @app.route('/admin/approvals')

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+    <title>Settings - Celebrity Barber</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100dvh;
+            background: radial-gradient(circle at top, #1b1b1b 0%, #0a0a0a 70%);
+            color: #f4f4f4;
+            padding: 16px;
+        }
+
+        .settings-shell {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 12px 0 32px;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .settings-title {
+            font-family: 'Playfair Display', serif;
+            font-size: calc(28px * var(--mobile-font-scale, 1));
+            color: #d4af37;
+            letter-spacing: 0.4px;
+        }
+
+        .back-link {
+            border: 1px solid rgba(212, 175, 55, 0.7);
+            color: #d4af37;
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
+            font-weight: 600;
+        }
+
+        .settings-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .settings-card h2 {
+            font-size: calc(18px * var(--mobile-font-scale, 1));
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .settings-card p {
+            color: rgba(255, 255, 255, 0.72);
+            font-size: calc(13px * var(--mobile-font-scale, 1));
+            line-height: 1.55;
+            margin-bottom: 14px;
+        }
+
+        .theme-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .theme-btn {
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: #101010;
+            color: #f4f4f4;
+            border-radius: 10px;
+            padding: 12px 10px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .theme-btn.active {
+            background: linear-gradient(145deg, #d4af37, #f3cf57);
+            color: #111;
+            border-color: #d4af37;
+        }
+
+        .font-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .font-slider {
+            width: 100%;
+            accent-color: #d4af37;
+        }
+
+        .font-value {
+            min-width: 66px;
+            text-align: right;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .preview {
+            margin-top: 14px;
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 255, 255, 0.28);
+            padding: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: calc(14px * var(--mobile-font-scale, 1));
+            line-height: 1.45;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .action-btn {
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            background: transparent;
+            color: #d4af37;
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
+            font-weight: 600;
+        }
+
+        .helper {
+            font-size: calc(12px * var(--mobile-font-scale, 1));
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <main class="settings-shell">
+        <header class="settings-header">
+            <h1 class="settings-title">Settings</h1>
+            <a class="back-link" href="{{ back_url }}">Back</a>
+        </header>
+
+        <section class="settings-card">
+            <h2>Theme</h2>
+            <p>Choose your preferred look. Light mode now works across client and admin pages on this device.</p>
+            <div class="theme-row">
+                <button class="theme-btn" id="darkThemeBtn" data-theme-value="dark" type="button">Dark Mode</button>
+                <button class="theme-btn" id="lightThemeBtn" data-theme-value="light" type="button">Light Mode</button>
+            </div>
+        </section>
+
+        <section class="settings-card">
+            <h2>Font Size</h2>
+            <p>Increase or reduce text size for both client and admin interfaces.</p>
+            <div class="font-row">
+                <input
+                    class="font-slider"
+                    id="fontScaleInput"
+                    type="range"
+                    min="0.70"
+                    max="1.40"
+                    step="0.05"
+                    value="{{ default_scale }}"
+                >
+                <span class="font-value" id="fontScaleValue">100%</span>
+            </div>
+            <div class="preview" id="fontPreview">
+                Preview: bookings, approvals, analytics, and chat text will follow this size.
+            </div>
+            <p class="helper">Changes are applied instantly and saved automatically.</p>
+            <div class="actions">
+                <button class="action-btn" id="resetSettingsBtn" type="button">Reset Settings</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            var THEME_KEY = 'ui_theme';
+            var FONT_KEY = 'ui_font_scale';
+            var html = document.documentElement;
+            var darkBtn = document.getElementById('darkThemeBtn');
+            var lightBtn = document.getElementById('lightThemeBtn');
+            var fontInput = document.getElementById('fontScaleInput');
+            var fontValue = document.getElementById('fontScaleValue');
+            var resetBtn = document.getElementById('resetSettingsBtn');
+            var fallbackScale = parseFloat('{{ default_scale }}') || 1;
+
+            function normalizeScale(value, fallback) {
+                var numeric = parseFloat(value);
+                if (!Number.isFinite(numeric)) return fallback;
+                if (numeric < 0.65) return 0.65;
+                if (numeric > 1.6) return 1.6;
+                return numeric;
+            }
+
+            function setTheme(theme, persist) {
+                var appliedTheme = theme === 'light' ? 'light' : 'dark';
+                html.setAttribute('data-theme', appliedTheme);
+                darkBtn.classList.toggle('active', appliedTheme === 'dark');
+                lightBtn.classList.toggle('active', appliedTheme === 'light');
+                if (persist !== false) {
+                    localStorage.setItem(THEME_KEY, appliedTheme);
+                }
+            }
+
+            function setFontScale(value, persist) {
+                var current = normalizeScale(value, parseFloat(fontInput.value) || 1);
+                var rounded = Math.round(current * 100) / 100;
+                fontInput.value = String(rounded);
+                html.style.setProperty('--mobile-font-scale', String(rounded));
+                fontValue.textContent = Math.round(rounded * 100) + '%';
+                if (persist !== false) {
+                    localStorage.setItem(FONT_KEY, String(rounded));
+                }
+            }
+
+            darkBtn.addEventListener('click', function () {
+                setTheme('dark', true);
+            });
+
+            lightBtn.addEventListener('click', function () {
+                setTheme('light', true);
+            });
+
+            fontInput.addEventListener('input', function (event) {
+                setFontScale(event.target.value, true);
+            });
+
+            resetBtn.addEventListener('click', function () {
+                localStorage.removeItem(THEME_KEY);
+                localStorage.removeItem(FONT_KEY);
+                setTheme('dark', false);
+                html.style.removeProperty('--mobile-font-scale');
+                var resetScale = normalizeScale(getComputedStyle(html).getPropertyValue('--mobile-font-scale'), fallbackScale);
+                setFontScale(resetScale, false);
+            });
+
+            var storedTheme = (localStorage.getItem(THEME_KEY) || html.getAttribute('data-theme') || 'dark').toLowerCase();
+            var storedScale = localStorage.getItem(FONT_KEY);
+            var computedScale = normalizeScale(getComputedStyle(html).getPropertyValue('--mobile-font-scale'), fallbackScale);
+
+            setTheme(storedTheme, false);
+            setFontScale(storedScale !== null ? storedScale : computedScale, false);
+        })();
+    </script>
+</body>
+</html>
