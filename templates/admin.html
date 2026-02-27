@@ -571,24 +571,71 @@
         }
 
         @media (max-width: 600px) {
+            .admin-container {
+                padding: 12px;
+            }
+
             .analytics-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+
+            .analytics-card {
+                padding: 10px 6px;
+                gap: 6px;
+                min-height: 92px;
+                justify-content: center;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .card-icon {
+                font-size: calc(16px * var(--mobile-font-scale, 1));
+                line-height: 1;
+            }
+
+            .card-info {
+                align-items: center;
+            }
+
+            .card-value {
+                font-size: calc(13px * var(--mobile-font-scale, 1));
+                line-height: 1.1;
+            }
+
+            .card-label {
+                font-size: calc(8px * var(--mobile-font-scale, 1));
+                letter-spacing: 0.4px;
+                line-height: 1.2;
             }
             
             .admin-nav {
                 flex-direction: column;
                 gap: 15px;
             }
+
+            .sidebar {
+                background: transparent;
+                border: none;
+                padding: 0;
+            }
             
             .management-stack {
-                flex-direction: row;
-                flex-wrap: wrap;
+                display: block;
+                padding: 0;
             }
             
             .stack-item {
-                flex: 1 1 calc(50% - 5px);
-                min-width: unset;
-                padding: 12px;
+                width: 100%;
+                min-width: 0;
+                margin-bottom: 10px;
+                padding: 14px 16px;
+                flex: none;
+            }
+
+            .stack-item:last-child {
+                margin-bottom: 0;
             }
         }
     </style>
@@ -647,11 +694,12 @@
             <div class="stack-item active" onclick="window.location.href='/admin/approvals'">
                 <span class="stack-icon">✅</span>
                 <span class="stack-label">APPROVALS</span>
-                <span class="stack-badge">3</span>
+                <span class="stack-badge" id="approvalBadge" style="display: none;">0</span>
             </div>
             <div class="stack-item" onclick="window.location.href='/admin/bookings'">
                 <span class="stack-icon">🗓️</span>
                 <span class="stack-label">BOOKINGS</span>
+                <span class="stack-badge" id="bookingBadge" style="display: none;">0</span>
             </div>
             <div class="stack-item" onclick="window.location.href='/admin/referrals'">
                 <span class="stack-icon">👥</span>
@@ -696,76 +744,84 @@
         
         <!-- Section Content - Removed - Will be separate pages -->
         </div>
-    </div>
-    <script>
+    </div>    <script>
         // DEBUG MODE - Set to true to always show badge for testing
         const DEBUG_SHOW_BADGE = false;
-        
-        // Fetch unread chat count on page load
-        async function updateChatBadge() {
-            try {
-                const response = await fetch('/api/admin/chat/unread-count');
-                const result = await response.json();
-                
-                console.log('Unread count response:', result);
-                
-                const badge = document.getElementById('chatBadge');
-                const dot = document.getElementById('chatDot');
-                
-                // For testing: use DEBUG_SHOW_BADGE or real count
-                const hasUnread = DEBUG_SHOW_BADGE || (result.success && result.total_unread > 0);
-                
-                if (hasUnread) {
-                    // Show badge with count
-                    const displayCount = DEBUG_SHOW_BADGE ? (result.total_unread || 1) : result.total_unread;
-                    badge.textContent = displayCount > 99 ? '99+' : displayCount;
-                    badge.style.display = 'inline-flex';
-                    badge.classList.add('pulse');
-                    
-                    // Show red dot indicator
-                    dot.style.display = 'block';
-                    console.log('Showing badge with count:', displayCount);
-                } else {
-                    badge.style.display = 'none';
-                    badge.classList.remove('pulse');
-                    dot.style.display = 'none';
-                    console.log('No unread messages');
-                }
-            } catch (error) {
-                console.error('Error fetching unread count:', error);
+
+        function setStackBadge(badgeId, count, options = {}) {
+            const badge = document.getElementById(badgeId);
+            if (!badge) return;
+
+            const dotId = options.dotId || null;
+            const pulse = options.pulse || false;
+            const dot = dotId ? document.getElementById(dotId) : null;
+            const numericCount = Number(count || 0);
+            const hasCount = numericCount > 0;
+
+            if (hasCount) {
+                badge.textContent = numericCount > 99 ? '99+' : numericCount;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (pulse && hasCount) {
+                badge.classList.add('pulse');
+            } else {
+                badge.classList.remove('pulse');
+            }
+
+            if (dot) {
+                dot.style.display = hasCount ? 'block' : 'none';
             }
         }
+
         async function loadDashboardMetrics() {
             try {
-                const [analyticsResponse, pendingResponse] = await Promise.all([
-                    fetch('/api/admin/analytics'),
-                    fetch('/api/admin/pending-approvals')
-                ]);
-
+                const analyticsResponse = await fetch('/api/admin/analytics');
                 const analyticsResult = await analyticsResponse.json();
-                const pendingResult = await pendingResponse.json();
 
                 if (analyticsResult.success) {
                     const data = analyticsResult.data || {};
                     document.getElementById('totalUsers').textContent = data.total_users || 0;
-                    document.getElementById('totalRevenue').textContent = '₦' + Number(data.total_revenue || 0).toLocaleString();
+                    document.getElementById('totalRevenue').textContent = 'NGN ' + Number(data.total_revenue || 0).toLocaleString();
                     document.getElementById('activeVips').textContent = data.active_vips || 0;
-                }
-
-                if (pendingResult.success) {
-                    document.getElementById('pendingCount').textContent = (pendingResult.data || []).length;
                 }
             } catch (error) {
                 console.error('Error loading dashboard metrics:', error);
             }
         }
-        // Update badge on page load
-        updateChatBadge();
+
+        async function loadDashboardCounts() {
+            try {
+                const response = await fetch('/api/admin/dashboard-counts');
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data || {};
+                const approvalCount = Number(data.pending_approvals || 0);
+                const bookingCount = Number(data.pending_bookings || 0);
+                const unreadChats = Number(data.unread_chats || 0);
+                const chatCount = DEBUG_SHOW_BADGE ? Math.max(unreadChats, 1) : unreadChats;
+
+                document.getElementById('pendingCount').textContent = approvalCount;
+
+                setStackBadge('approvalBadge', approvalCount);
+                setStackBadge('bookingBadge', bookingCount);
+                setStackBadge('chatBadge', chatCount, { pulse: true, dotId: 'chatDot' });
+            } catch (error) {
+                console.error('Error loading dashboard counts:', error);
+            }
+        }
+
         loadDashboardMetrics();
-        
-        // Refresh every 30 seconds
-        setInterval(updateChatBadge, 30000);
+        loadDashboardCounts();
+
         setInterval(loadDashboardMetrics, 30000);
+        setInterval(loadDashboardCounts, 30000);
     </script>
 </body>
 </html>
+
+
+

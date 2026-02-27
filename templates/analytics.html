@@ -110,6 +110,40 @@
             font-size: calc(12px * var(--mobile-font-scale, 1));
             margin-top: 4px;
         }
+
+        .daily-pulse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+        }
+
+        .pulse-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .pulse-label {
+            display: block;
+            color: #aaa;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
+            margin-bottom: 6px;
+        }
+
+        .pulse-value {
+            display: block;
+            color: #d4af37;
+            font-family: 'Orbitron', sans-serif;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
+            font-weight: 700;
+        }
+
+        .pulse-note {
+            margin-top: 12px;
+            color: #9a9a9a;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
+        }
         
         .section-card {
             background: rgba(255, 255, 255, 0.03);
@@ -236,6 +270,25 @@
                 </div>
             </div>
         </div>
+
+        <div class="section-card">
+            <h2 class="section-title">DAILY PULSE</h2>
+            <div class="daily-pulse-grid">
+                <div class="pulse-card">
+                    <span class="pulse-label" id="todayLabel">Today</span>
+                    <span class="pulse-value" id="todayRevenue">NGN 0</span>
+                </div>
+                <div class="pulse-card">
+                    <span class="pulse-label" id="yesterdayLabel">Yesterday</span>
+                    <span class="pulse-value" id="yesterdayRevenue">NGN 0</span>
+                </div>
+                <div class="pulse-card">
+                    <span class="pulse-label">Change</span>
+                    <span class="pulse-value" id="dailyDelta">NGN 0</span>
+                </div>
+            </div>
+            <p class="pulse-note" id="dailyInsight">Day-over-day movement will appear here.</p>
+        </div>
         
         <!-- Daily Revenue Tracker -->
         <div class="section-card">
@@ -253,32 +306,47 @@
             </div>
         </div>
     </div>
-    
     <script>
         // Fetch analytics data
         async function loadAnalytics() {
             try {
-                // Get main metrics
                 const response = await fetch('/api/admin/analytics');
                 const result = await response.json();
-                
+
                 if (result.success) {
-                    const data = result.data;
+                    const data = result.data || {};
                     document.getElementById('totalUsers').textContent = data.total_users || 0;
-                    document.getElementById('totalRevenue').textContent = '₦' + (data.total_revenue || 0).toLocaleString();
+                    document.getElementById('totalRevenue').textContent = 'NGN ' + Number(data.total_revenue || 0).toLocaleString();
                     document.getElementById('activeVips').textContent = data.active_vips || 0;
+
+                    const todayRevenue = Number(data.today_revenue || 0);
+                    const yesterdayRevenue = Number(data.yesterday_revenue || 0);
+                    const dailyDelta = Number(data.daily_revenue_delta || 0);
+                    const deltaPrefix = dailyDelta >= 0 ? '+' : '-';
+
+                    document.getElementById('todayLabel').textContent = data.today_label || 'Today';
+                    document.getElementById('yesterdayLabel').textContent = data.yesterday_label || 'Yesterday';
+                    document.getElementById('todayRevenue').textContent = 'NGN ' + todayRevenue.toLocaleString();
+                    document.getElementById('yesterdayRevenue').textContent = 'NGN ' + yesterdayRevenue.toLocaleString();
+                    document.getElementById('dailyDelta').textContent = `${deltaPrefix}NGN ${Math.abs(dailyDelta).toLocaleString()}`;
+
+                    const deltaPct = Number(data.daily_revenue_delta_pct || 0);
+                    const todayTx = Number(data.today_transactions || 0);
+                    const yesterdayTx = Number(data.yesterday_transactions || 0);
+                    document.getElementById('dailyInsight').textContent =
+                        `${data.today_label || 'Today'} has ${todayTx} transaction${todayTx === 1 ? '' : 's'} vs ${yesterdayTx} yesterday (${deltaPct >= 0 ? '+' : ''}${deltaPct}%).`;
                 }
             } catch (error) {
                 console.error('Error loading analytics:', error);
             }
         }
-        
+
         // Fetch pending approvals
         async function loadPending() {
             try {
                 const response = await fetch('/api/admin/pending-approvals');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     document.getElementById('pendingRequests').textContent = result.data.length || 0;
                 }
@@ -286,23 +354,22 @@
                 console.error('Error loading pending:', error);
             }
         }
-        
+
         // Fetch transactions for daily list
         async function loadTransactions() {
             try {
                 const response = await fetch('/api/admin/ledger');
                 const result = await response.json();
-                
+
                 const container = document.getElementById('dailyList');
-                
+
                 if (result.success && result.data && result.data.length > 0) {
-                    // Show last 10 transactions
                     const transactions = result.data.slice(0, 10);
                     container.innerHTML = transactions.map(t => `
                         <div class="daily-row">
-                            <span class="daily-date">${t.type || 'Transaction'}</span>
-                            <span class="daily-transactions">${t.user_name || 'User'}</span>
-                            <span class="daily-amount">₦${(t.amount || 0).toLocaleString()}</span>
+                            <span class="daily-date">${t.createdAtDisplay || t.createdDate || 'Date unavailable'}</span>
+                            <span class="daily-transactions">${(t.type || 'transaction').toUpperCase()} - ${t.user_name || t.user_email || 'System'}</span>
+                            <span class="daily-amount">NGN ${Number(t.amount || 0).toLocaleString()}</span>
                         </div>
                     `).join('');
                 } else {
@@ -313,43 +380,44 @@
                 document.getElementById('dailyList').innerHTML = '<div class="empty-state">Error loading transactions</div>';
             }
         }
-        
+
         // Fetch monthly data
         async function loadMonthlyData() {
             try {
                 const response = await fetch('/api/admin/ledger');
                 const result = await response.json();
-                
+
                 const container = document.getElementById('monthlyList');
-                
+
                 if (result.success && result.data && result.data.length > 0) {
-                    // Group by month
                     const monthly = {};
                     result.data.forEach(t => {
-                        if (t.created_at) {
-                            const date = new Date(t.created_at);
-                            const monthKey = date.toLocaleString('default', { month: 'short', year: 'numeric' });
-                            if (!monthly[monthKey]) {
-                                monthly[monthKey] = 0;
-                            }
-                            monthly[monthKey] += (t.amount || 0);
+                        const rawDate = t.created_at || t.createdAt || t.created_at_iso;
+                        if (!rawDate) return;
+
+                        const date = new Date(rawDate);
+                        if (Number.isNaN(date.getTime())) return;
+
+                        const monthKey = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+                        if (!monthly[monthKey]) {
+                            monthly[monthKey] = 0;
                         }
+                        monthly[monthKey] += Number(t.amount || 0);
                     });
-                    
-                    // Get top 6 months
+
                     const sortedMonths = Object.entries(monthly)
                         .sort((a, b) => b[1] - a[1])
                         .slice(0, 6);
-                    
+
                     const maxAmount = sortedMonths[0]?.[1] || 1;
-                    
+
                     container.innerHTML = sortedMonths.map(([month, amount]) => {
                         const width = Math.max((amount / maxAmount) * 100, 10);
                         return `
                             <div class="monthly-row">
                                 <span class="monthly-date">${month}</span>
                                 <span class="monthly-bar" style="--width: ${width}%"></span>
-                                <span class="monthly-amount">₦${amount.toLocaleString()}</span>
+                                <span class="monthly-amount">NGN ${amount.toLocaleString()}</span>
                             </div>
                         `;
                     }).join('');
@@ -361,12 +429,19 @@
                 document.getElementById('monthlyList').innerHTML = '<div class="empty-state">Error loading data</div>';
             }
         }
-        
-        // Load all data
+
         loadAnalytics();
         loadPending();
         loadTransactions();
         loadMonthlyData();
+
+        setInterval(loadAnalytics, 60000);
+        setInterval(loadPending, 30000);
+        setInterval(loadTransactions, 60000);
+        setInterval(loadMonthlyData, 120000);
     </script>
 </body>
 </html>
+
+
+

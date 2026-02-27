@@ -979,7 +979,7 @@
                         <div class="message-preview">${user.last_message || 'No messages yet'}</div>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
-                        <span class="time-badge">${user.last_time || ''}</span>
+                        <span class="time-badge" title="${user.last_display_time || user.last_time || ''}">${user.last_time || ''}</span>
                         ${user.unread > 0 ? `<span class="unread-count">${user.unread}</span>` : ''}
                     </div>
                 `;
@@ -1068,7 +1068,7 @@
                 bubble.className = `message-bubble ${msg.sender === 'user' ? 'user' : 'admin'}`;
                 bubble.innerHTML = `
                     <p>${msg.message}</p>
-                    <span class="message-time">${msg.time || ''}</span>
+                    <span class="message-time">${msg.display_time || msg.time || ''}</span>
                 `;
                 container.appendChild(bubble);
             });

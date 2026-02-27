@@ -16,7 +16,7 @@ app = Flask(__name__,
             static_folder='static')
 app.secret_key = 'your-secret-key-change-in-production'
 
-ADMIN_MOBILE_FONT_SCALE = 0.55
+ADMIN_MOBILE_FONT_SCALE = 0.8
 CLIENT_MOBILE_FONT_SCALE = 0.8
 
 
@@ -43,11 +43,15 @@ def inject_mobile_font_scale(response):
     if 'id="mobile-font-scale"' in html or '</head>' not in html:
         return response
 
-    mobile_scale = (
-        ADMIN_MOBILE_FONT_SCALE
-        if request.path.startswith('/admin')
-        else CLIENT_MOBILE_FONT_SCALE
-    )
+    if request.path.startswith('/admin/analytics'):
+        # Analytics is data-dense; keep mobile readability aligned with client pages.
+        mobile_scale = CLIENT_MOBILE_FONT_SCALE
+    else:
+        mobile_scale = (
+            ADMIN_MOBILE_FONT_SCALE
+            if request.path.startswith('/admin')
+            else CLIENT_MOBILE_FONT_SCALE
+        )
     response.set_data(
         html.replace('</head>', f'{build_mobile_font_scale_style(mobile_scale)}</head>', 1)
     )
@@ -101,6 +105,210 @@ def parse_amount(value):
         except Exception:
             return 0.0
     return 0.0
+
+
+def to_local_datetime(value):
+    if value is None:
+        return None
+    try:
+        dt = None
+
+        if isinstance(value, datetime):
+            dt = value
+        elif hasattr(value, 'to_datetime'):
+            dt = value.to_datetime()
+        elif isinstance(value, (int, float)):
+            ts = float(value)
+            if ts > 1_000_000_000_000:
+                ts /= 1000.0
+            dt = datetime.fromtimestamp(ts)
+        elif isinstance(value, str):
+            raw = value.strip()
+            if not raw:
+                return None
+
+            if raw.isdigit():
+                ts = float(raw)
+                if ts > 1_000_000_000_000:
+                    ts /= 1000.0
+                dt = datetime.fromtimestamp(ts)
+            else:
+                normalized = raw.replace('Z', '+00:00')
+                try:
+                    dt = datetime.fromisoformat(normalized)
+                except Exception:
+                    for fmt in (
+                        '%Y-%m-%d %H:%M:%S',
+                        '%Y-%m-%d',
+                        '%b %d, %Y',
+                        '%b %d, %Y %I:%M %p',
+                        '%m/%d/%Y',
+                        '%d/%m/%Y'
+                    ):
+                        try:
+                            dt = datetime.strptime(raw, fmt)
+                            break
+                        except Exception:
+                            continue
+
+        if dt and getattr(dt, 'tzinfo', None) is not None:
+            dt = dt.astimezone().replace(tzinfo=None)
+        return dt
+    except Exception:
+        return None
+
+
+def parse_time_parts(value):
+    if value is None:
+        return None
+
+    raw = str(value).strip()
+    if not raw:
+        return None
+
+    for fmt in ('%H:%M', '%H:%M:%S', '%I:%M %p', '%I:%M%p'):
+        try:
+            parsed = datetime.strptime(raw, fmt)
+            return parsed.hour, parsed.minute
+        except Exception:
+            continue
+
+    return None
+
+
+def format_date_label(value):
+    dt = value if isinstance(value, datetime) else to_local_datetime(value)
+    if not dt:
+        return ''
+    return dt.strftime('%b %d, %Y')
+
+
+def format_time_label(value):
+    dt = value if isinstance(value, datetime) else to_local_datetime(value)
+    if not dt:
+        return ''
+    return dt.strftime('%I:%M %p').lstrip('0')
+
+
+def format_datetime_label(value):
+    dt = value if isinstance(value, datetime) else to_local_datetime(value)
+    if not dt:
+        return ''
+    return f"{format_date_label(dt)} {format_time_label(dt)}"
+
+
+def format_datetime_iso(value):
+    dt = value if isinstance(value, datetime) else to_local_datetime(value)
+    if not dt:
+        return ''
+    return dt.isoformat()
+
+
+def format_relative_time(value):
+    dt = value if isinstance(value, datetime) else to_local_datetime(value)
+    if not dt:
+        return ''
+
+    now = datetime.now()
+    delta_seconds = max(int((now - dt).total_seconds()), 0)
+
+    if delta_seconds < 60:
+        return 'now'
+    if delta_seconds < 3600:
+        return f'{delta_seconds // 60}m ago'
+    if delta_seconds < 86400:
+        return f'{delta_seconds // 3600}h ago'
+    if delta_seconds < 604800:
+        return f'{delta_seconds // 86400}d ago'
+    return format_date_label(dt)
+
+
+def build_chat_time_payload(value):
+    dt = to_local_datetime(value)
+    if not dt:
+        return {
+            'time': '',
+            'display_time': '',
+            'date': '',
+            'clock': '',
+            'created_at_ts': 0,
+            'created_at_iso': ''
+        }
+
+    relative = format_relative_time(dt)
+    absolute = format_datetime_label(dt)
+    display = f'{relative} - {absolute}' if relative else absolute
+
+    return {
+        'time': relative or absolute,
+        'display_time': display,
+        'date': format_date_label(dt),
+        'clock': format_time_label(dt),
+        'created_at_ts': int(dt.timestamp()),
+        'created_at_iso': format_datetime_iso(dt)
+    }
+
+
+def enrich_booking_display_fields(booking):
+    booking = booking or {}
+
+    booking_dt = to_local_datetime(booking.get('date') or booking.get('booking_date'))
+    created_dt = to_local_datetime(booking.get('created_at') or booking.get('createdAt'))
+    raw_time = booking.get('time') or booking.get('booking_time')
+    time_parts = parse_time_parts(raw_time)
+
+    if booking_dt and time_parts:
+        booking_dt = booking_dt.replace(
+            hour=time_parts[0],
+            minute=time_parts[1],
+            second=0,
+            microsecond=0
+        )
+
+    display_dt = booking_dt or created_dt
+
+    booking['booking_date'] = (
+        format_date_label(display_dt)
+        or str(booking.get('date') or booking.get('booking_date') or 'Not set')
+    )
+
+    if booking_dt and time_parts:
+        booking['booking_time'] = format_time_label(booking_dt)
+    elif created_dt:
+        booking['booking_time'] = format_time_label(created_dt)
+    else:
+        booking['booking_time'] = str(raw_time or 'Not set')
+
+    booking['createdAt'] = format_datetime_label(created_dt) or str(booking.get('createdAt') or 'Unknown')
+    booking['created_at_iso'] = format_datetime_iso(created_dt)
+    return booking
+
+
+def compute_unread_chat_counts():
+    if not db:
+        return 0, 0
+
+    total_unread = 0
+    users_with_unread = set()
+
+    blocked_users = set()
+    try:
+        blocked_users = {doc.id for doc in db.collection('blocked_users').get()}
+    except Exception:
+        blocked_users = set()
+
+    all_messages = db.collection('chats').get()
+    for doc in all_messages:
+        data = doc.to_dict() or {}
+        if data.get('sender') != 'user' or data.get('status') == 'read':
+            continue
+        user_id = data.get('user_id')
+        if not user_id or user_id in blocked_users:
+            continue
+        total_unread += 1
+        users_with_unread.add(user_id)
+
+    return total_unread, len(users_with_unread)
 
 
 
@@ -688,25 +896,16 @@ def get_chat_messages():
             for doc in messages_ref:
                 data = doc.to_dict()
                 data['id'] = doc.id
-                
-                # Convert timestamp
-                if data.get('created_at'):
-                    try:
-                        from datetime import datetime
-                        import time
-                        if hasattr(data['created_at'], 'timestamp'):
-                            diff = time.time() - data['created_at'].timestamp()
-                            if diff < 60:
-                                data['time'] = 'now'
-                            elif diff < 3600:
-                                data['time'] = f'{int(diff/60)}m ago'
-                            elif diff < 86400:
-                                data['time'] = f'{int(diff/3600)}h ago'
-                            else:
-                                data['time'] = 'earlier'
-                    except:
-                        data['time'] = 'recently'
-                
+
+                chat_time = build_chat_time_payload(data.get('created_at') or data.get('createdAt'))
+                if chat_time.get('display_time'):
+                    data['time'] = chat_time.get('time', '')
+                    data['display_time'] = chat_time.get('display_time', '')
+                    data['date'] = chat_time.get('date', '')
+                    data['clock'] = chat_time.get('clock', '')
+                    data['created_at_iso'] = chat_time.get('created_at_iso', '')
+                    data['created_at_ts'] = chat_time.get('created_at_ts', 0)
+
                 message_list.append(data)
             
             return {'success': True, 'data': message_list}
@@ -739,25 +938,16 @@ def get_all_chat_messages():
             for doc in messages_ref:
                 data = doc.to_dict()
                 data['id'] = doc.id
-                
-                # Convert timestamp
-                if data.get('created_at'):
-                    try:
-                        from datetime import datetime
-                        import time
-                        if hasattr(data['created_at'], 'timestamp'):
-                            diff = time.time() - data['created_at'].timestamp()
-                            if diff < 60:
-                                data['time'] = 'now'
-                            elif diff < 3600:
-                                data['time'] = f'{int(diff/60)}m ago'
-                            elif diff < 86400:
-                                data['time'] = f'{int(diff/3600)}h ago'
-                            else:
-                                data['time'] = 'earlier'
-                    except:
-                        data['time'] = 'recently'
-                
+
+                chat_time = build_chat_time_payload(data.get('created_at') or data.get('createdAt'))
+                if chat_time.get('display_time'):
+                    data['time'] = chat_time.get('time', '')
+                    data['display_time'] = chat_time.get('display_time', '')
+                    data['date'] = chat_time.get('date', '')
+                    data['clock'] = chat_time.get('clock', '')
+                    data['created_at_iso'] = chat_time.get('created_at_iso', '')
+                    data['created_at_ts'] = chat_time.get('created_at_ts', 0)
+
                 message_list.append(data)
             
             return {'success': True, 'data': message_list}
@@ -909,35 +1099,41 @@ def get_chat_users():
     
     if db:
         try:
-            import time
-            
             # Get all chat messages
             all_messages = db.collection('chats').order_by('created_at', direction=firestore.Query.DESCENDING).get()
-            
+
+            blocked_users = set()
+            try:
+                blocked_users = {doc.id for doc in db.collection('blocked_users').get()}
+            except Exception:
+                blocked_users = set()
+
             # Group by user
             users_dict = {}
             for doc in all_messages:
                 data = doc.to_dict()
                 user_id = data.get('user_id')
-                
+                if not user_id:
+                    continue
+
                 if user_id not in users_dict:
                     # Get user info from users collection
                     user_name = data.get('user_name', 'Unknown')
                     user_email = data.get('user_email', '')
                     is_vip = False
                     photo_url = ''
-                    
+
                     try:
                         user_doc = db.collection('users').document(user_id).get()
                         if user_doc.exists:
-                            user_data = user_doc.to_dict()
+                            user_data = user_doc.to_dict() or {}
                             user_name = user_data.get('full_name', user_name)
                             user_email = user_data.get('email', user_email)
                             is_vip = user_data.get('is_vip', False) or user_data.get('isVIP', False)
                             photo_url = user_data.get('photo_url', '')
-                    except:
+                    except Exception:
                         pass
-                    
+
                     users_dict[user_id] = {
                         'user_id': user_id,
                         'user_name': user_name,
@@ -945,53 +1141,32 @@ def get_chat_users():
                         'is_vip': is_vip,
                         'isVIP': is_vip,
                         'photo_url': photo_url,
-                        'last_message': data.get('message', ''),
+                        'last_message': '',
                         'last_time': '',
+                        'last_display_time': '',
+                        'last_ts': 0,
                         'unread': 0,
-                        'blocked': False
+                        'blocked': user_id in blocked_users
                     }
-                    
-                    # Check if blocked
-                    try:
-                        blocked_doc = db.collection('blocked_users').document(user_id).get()
-                        if blocked_doc.exists:
-                            users_dict[user_id]['blocked'] = True
-                    except:
-                        pass
-                
-                # Update last message and time
-                if data.get('message'):
-                    users_dict[user_id]['last_message'] = data.get('message')
-                    
-                    # Format time
-                    if data.get('created_at'):
-                        try:
-                            if hasattr(data['created_at'], 'timestamp'):
-                                diff = time.time() - data['created_at'].timestamp()
-                                if diff < 60:
-                                    users_dict[user_id]['last_time'] = 'now'
-                                elif diff < 3600:
-                                    users_dict[user_id]['last_time'] = f'{int(diff/60)}m ago'
-                                elif diff < 86400:
-                                    users_dict[user_id]['last_time'] = f'{int(diff/3600)}h ago'
-                                else:
-                                    users_dict[user_id]['last_time'] = f'{int(diff/86400)}d ago'
-                        except:
-                            pass
-                
+
+                chat_time = build_chat_time_payload(data.get('created_at') or data.get('createdAt'))
+                created_ts = chat_time.get('created_at_ts', 0)
+
+                # Keep the latest message metadata per user.
+                if created_ts >= users_dict[user_id].get('last_ts', 0):
+                    users_dict[user_id]['last_message'] = data.get('message', '') or users_dict[user_id]['last_message']
+                    users_dict[user_id]['last_time'] = chat_time.get('time', '')
+                    users_dict[user_id]['last_display_time'] = chat_time.get('display_time', '')
+                    users_dict[user_id]['last_ts'] = created_ts
+
                 # Count unread (messages from user that aren't read)
                 if data.get('sender') == 'user' and data.get('status') != 'read':
                     users_dict[user_id]['unread'] = users_dict[user_id].get('unread', 0) + 1
-            
-            # Convert to list and sort by last message time
-            users_list = list(users_dict.values())
-            
-            # Sort: unread first, then by time
-            users_list.sort(key=lambda x: (-x['unread'], x['last_time']))
-            
-            # Filter out blocked users
-            users_list = [u for u in users_list if not u.get('blocked', False)]
-            
+
+            # Convert to list and sort
+            users_list = [u for u in users_dict.values() if not u.get('blocked', False)]
+            users_list.sort(key=lambda x: (-x.get('unread', 0), -x.get('last_ts', 0)))
+
             return {'success': True, 'data': users_list}
         except Exception as e:
             print(f"Error fetching chat users: {e}")
@@ -1010,31 +1185,8 @@ def get_total_unread_count():
     
     if db:
         try:
-            # Get all chat messages
-            all_messages = db.collection('chats').get()
-            
-            total_unread = 0
-            users_with_unread = set()
-            
-            for doc in all_messages:
-                data = doc.to_dict()
-                # Count unread messages from users
-                if data.get('sender') == 'user' and data.get('status') != 'read':
-                    user_id = data.get('user_id')
-                    # Check if user is not blocked
-                    blocked = False
-                    try:
-                        blocked_doc = db.collection('blocked_users').document(user_id).get()
-                        if blocked_doc.exists:
-                            blocked = True
-                    except:
-                        pass
-                    
-                    if not blocked:
-                        total_unread += 1
-                        users_with_unread.add(user_id)
-            
-            return {'success': True, 'total_unread': total_unread, 'users_with_unread': len(users_with_unread)}
+            total_unread, users_with_unread = compute_unread_chat_counts()
+            return {'success': True, 'total_unread': total_unread, 'users_with_unread': users_with_unread}
         except Exception as e:
             print(f"Error fetching unread count: {e}")
             return {'success': False, 'message': str(e)}, 500
@@ -1055,37 +1207,28 @@ def get_user_messages(user_id):
     
     if db:
         try:
-            import time
-            
             # Get messages for this user (without order_by to avoid index issues)
             messages_ref = db.collection('chats').where('user_id', '==', user_id).limit(100).get()
-            
+
             message_list = []
             for doc in messages_ref:
                 data = doc.to_dict()
                 data['id'] = doc.id
-                
-                # Convert timestamp
-                if data.get('created_at'):
-                    try:
-                        if hasattr(data['created_at'], 'timestamp'):
-                            diff = time.time() - data['created_at'].timestamp()
-                            if diff < 60:
-                                data['time'] = 'now'
-                            elif diff < 3600:
-                                data['time'] = f'{int(diff/60)}m ago'
-                            elif diff < 86400:
-                                data['time'] = f'{int(diff/3600)}h ago'
-                            else:
-                                data['time'] = 'earlier'
-                    except:
-                        data['time'] = 'recently'
-                
+
+                chat_time = build_chat_time_payload(data.get('created_at') or data.get('createdAt'))
+                if chat_time.get('display_time'):
+                    data['time'] = chat_time.get('time', '')
+                    data['display_time'] = chat_time.get('display_time', '')
+                    data['date'] = chat_time.get('date', '')
+                    data['clock'] = chat_time.get('clock', '')
+                    data['created_at_iso'] = chat_time.get('created_at_iso', '')
+                    data['created_at_ts'] = chat_time.get('created_at_ts', 0)
+
                 message_list.append(data)
-            
-            # Sort by created_at manually
-            message_list.sort(key=lambda x: x.get('created_at', 0))
-            
+
+            # Sort by timestamp manually
+            message_list.sort(key=lambda x: x.get('created_at_ts', 0))
+
             return {'success': True, 'data': message_list}
         except Exception as e:
             print(f"Error fetching user messages: {e}")
@@ -1392,6 +1535,7 @@ def admin_bookings():
             for doc in all_bookings:
                 booking = doc.to_dict()
                 booking['id'] = doc.id
+                booking = enrich_booking_display_fields(booking)
                 status = booking.get('status')
 
                 # Self-heal: if booking is pending_approval but approval doc is missing,
@@ -1410,6 +1554,8 @@ def admin_bookings():
                 # Show pending and pending_approval bookings
                 if status in ['pending', 'pending_approval']:
                     bookings.append(booking)
+
+            bookings.sort(key=lambda item: item.get('created_at_iso', '') or '', reverse=True)
         except Exception as e:
             print(f"Error loading bookings: {e}")
     
@@ -1523,6 +1669,14 @@ def get_ledger_api():
             for doc in all_ledger:
                 data = doc.to_dict()
                 data['id'] = doc.id
+                created_payload = build_chat_time_payload(data.get('created_at') or data.get('createdAt'))
+                if created_payload.get('created_at_iso'):
+                    data['created_at'] = created_payload.get('created_at_iso')
+                    data['createdAt'] = created_payload.get('created_at_iso')
+                    data['createdAtDisplay'] = created_payload.get('display_time')
+                    data['createdDate'] = created_payload.get('date')
+                    data['createdTime'] = created_payload.get('clock')
+                    data['createdAtTs'] = created_payload.get('created_at_ts')
                 ledger.append(data)
             return jsonify({'success': True, 'data': ledger})
         except Exception as e:
@@ -1915,6 +2069,20 @@ def get_analytics():
 
             # Revenue sources: ledger first, then canonical collections, then legacy transactions
             ledger_revenue = 0.0
+            daily_revenue = {}
+            daily_transactions = {}
+
+            def add_daily_rollup(created_value, amount_value):
+                amount_float = parse_amount(amount_value)
+                if amount_float <= 0:
+                    return
+                dt = to_local_datetime(created_value)
+                if not dt:
+                    return
+                day_key = dt.date().isoformat()
+                daily_revenue[day_key] = daily_revenue.get(day_key, 0.0) + amount_float
+                daily_transactions[day_key] = daily_transactions.get(day_key, 0) + 1
+
             ledger_entries = db.collection('ledger').get()
             for doc in ledger_entries:
                 data = doc.to_dict() or {}
@@ -1927,6 +2095,7 @@ def get_analytics():
                 amount = parse_amount(data.get('amount', 0))
                 if amount > 0:
                     ledger_revenue += amount
+                    add_daily_rollup(data.get('created_at') or data.get('createdAt'), amount)
 
             canonical_revenue = 0.0
             if ledger_revenue <= 0:
@@ -1938,6 +2107,7 @@ def get_analytics():
                         continue
                     amount = b.get('price') if b.get('price') is not None else b.get('amount')
                     canonical_revenue += parse_amount(amount)
+                    add_daily_rollup(b.get('created_at') or b.get('createdAt'), amount)
 
                 vip_approvals = db.collection('approvals').where('type', '==', 'vip').get()
                 for doc in vip_approvals:
@@ -1946,6 +2116,7 @@ def get_analytics():
                     if status not in ['confirmed', 'approved', 'completed']:
                         continue
                     canonical_revenue += parse_amount(a.get('amount', 0))
+                    add_daily_rollup(a.get('created_at') or a.get('createdAt'), a.get('amount', 0))
 
             legacy_revenue = 0.0
             if ledger_revenue <= 0 and canonical_revenue <= 0:
@@ -1954,6 +2125,7 @@ def get_analytics():
                     t = doc.to_dict() or {}
                     if str(t.get('type', '')).lower() == 'income':
                         legacy_revenue += parse_amount(t.get('amount', 0))
+                        add_daily_rollup(t.get('created_at') or t.get('createdAt'), t.get('amount', 0))
 
             if ledger_revenue > 0:
                 total_revenue = int(ledger_revenue)
@@ -1969,13 +2141,51 @@ def get_analytics():
             for u in db.collection('users').where('isVIP', '==', True).get():
                 vip_ids.add(u.id)
             vip_users = len(vip_ids)
+
+            today = datetime.now().date()
+            yesterday = today - timedelta(days=1)
+            today_key = today.isoformat()
+            yesterday_key = yesterday.isoformat()
+
+            today_revenue = round(daily_revenue.get(today_key, 0.0), 2)
+            yesterday_revenue = round(daily_revenue.get(yesterday_key, 0.0), 2)
+            today_transactions = int(daily_transactions.get(today_key, 0))
+            yesterday_transactions = int(daily_transactions.get(yesterday_key, 0))
+            revenue_delta = round(today_revenue - yesterday_revenue, 2)
+
+            if yesterday_revenue > 0:
+                revenue_delta_pct = round((revenue_delta / yesterday_revenue) * 100, 1)
+            elif today_revenue > 0:
+                revenue_delta_pct = 100.0
+            else:
+                revenue_delta_pct = 0.0
+
+            recent_daily = sorted(daily_revenue.items(), key=lambda x: x[0], reverse=True)[:7]
+            recent_daily_rollup = []
+            for day_key, amount in recent_daily:
+                day_dt = to_local_datetime(day_key)
+                recent_daily_rollup.append({
+                    'day_key': day_key,
+                    'day_label': format_date_label(day_dt) if day_dt else day_key,
+                    'amount': round(amount, 2),
+                    'transactions': int(daily_transactions.get(day_key, 0))
+                })
             
             return {
                 'success': True,
                 'data': {
                     'total_users': total_users,
                     'total_revenue': total_revenue,
-                    'active_vips': vip_users
+                    'active_vips': vip_users,
+                    'today_revenue': today_revenue,
+                    'yesterday_revenue': yesterday_revenue,
+                    'today_transactions': today_transactions,
+                    'yesterday_transactions': yesterday_transactions,
+                    'daily_revenue_delta': revenue_delta,
+                    'daily_revenue_delta_pct': revenue_delta_pct,
+                    'today_label': format_date_label(today_key),
+                    'yesterday_label': format_date_label(yesterday_key),
+                    'recent_daily_rollup': recent_daily_rollup
                 }
             }
         except Exception as e:
@@ -2013,6 +2223,49 @@ def get_pending_approvals():
             return {'success': False, 'data': [], 'message': str(e)}, 200
 
     return {'success': True, 'data': []}
+
+
+@app.route('/api/admin/dashboard-counts')
+@login_required
+def get_dashboard_counts():
+    if not session.get('is_admin'):
+        return {'success': False, 'message': 'Access denied'}, 403
+
+    counts = {
+        'total_bookings': 0,
+        'pending_bookings': 0,
+        'pending_approvals': 0,
+        'unread_chats': 0,
+        'users_with_unread': 0
+    }
+
+    if db:
+        try:
+            bookings = db.collection('bookings').get()
+            for doc in bookings:
+                data = doc.to_dict() or {}
+                counts['total_bookings'] += 1
+                status = str(data.get('status', '')).lower()
+                if status in ['pending', 'pending_approval']:
+                    counts['pending_bookings'] += 1
+        except Exception as e:
+            print(f"Error loading booking counts: {e}")
+
+        try:
+            counts['pending_approvals'] = len(
+                db.collection('approvals').where('status', '==', 'pending').get()
+            )
+        except Exception as e:
+            print(f"Error loading approval counts: {e}")
+
+        try:
+            unread_count, users_with_unread = compute_unread_chat_counts()
+            counts['unread_chats'] = unread_count
+            counts['users_with_unread'] = users_with_unread
+        except Exception as e:
+            print(f"Error loading unread chat counts: {e}")
+
+    return {'success': True, 'data': counts}
 
 
 @app.route('/api/admin/approve', methods=['POST'])

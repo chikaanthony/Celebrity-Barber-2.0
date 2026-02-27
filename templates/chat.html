@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <title>Chat - Celebrity Barber</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -110,7 +110,7 @@
                         messageDiv.innerHTML = `
                             <div class="message-bubble">
                                 <p>${msg.message}</p>
-                                <span class="message-time">${msg.time || 'recently'}</span>
+                                <span class="message-time">${msg.display_time || msg.time || 'recently'}</span>
                             </div>
                         `;
                         container.appendChild(messageDiv);
@@ -198,6 +198,29 @@
         
         // Send heartbeat every minute to keep user active
         setInterval(sendHeartbeat, 60000);
+
+        // Fallback for browsers that do not resize content when keyboard opens
+        (function setupKeyboardViewportFallback() {
+            if (!window.visualViewport) {
+                return;
+            }
+
+            const root = document.documentElement;
+            const viewport = window.visualViewport;
+
+            const updateKeyboardOffset = () => {
+                const keyboardOffset = Math.max(
+                    0,
+                    window.innerHeight - viewport.height - viewport.offsetTop
+                );
+                root.style.setProperty('--keyboard-offset', `${keyboardOffset}px`);
+            };
+
+            viewport.addEventListener('resize', updateKeyboardOffset);
+            viewport.addEventListener('scroll', updateKeyboardOffset);
+            window.addEventListener('resize', updateKeyboardOffset);
+            updateKeyboardOffset();
+        })();
     </script>
 </body>
 </html>

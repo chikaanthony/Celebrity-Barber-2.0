@@ -511,7 +511,7 @@
                         <tbody>
                             {% for booking in bookings %}
                             <tr onclick='showBookingDetails({{ booking | tojson }})'>
-                                <td>{{ booking.booking_date or 'N/A' }}</td>
+                                <td>{{ booking.booking_date }} <span class="muted"> - {{ booking.booking_time }}</span></td>
                                 <td>
                                     {% if booking.user_name %}
                                     {{ booking.user_name }}
@@ -526,7 +526,7 @@
                                 <td>
                                     <span class="status-badge {{ booking.status }}">{{ booking.status }}</span>
                                 </td>
-                                <td>{{ booking.createdAt or 'Recently' }}</td>
+                                <td>{{ booking.createdAt }}</td>
                                 <td>
                                     {% if booking.status == 'pending' %}
                                     <button class="action-btn confirm" onclick="event.stopPropagation(); updateStatus('{{ booking.id }}', 'confirm')">Confirm</button>
@@ -573,11 +573,11 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-key">Booking Date</span>
-                        <span class="meta-value">{{ booking.booking_date or 'N/A' }}</span>
+                        <span class="meta-value">{{ booking.booking_date }} - {{ booking.booking_time }}</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-key">Created</span>
-                        <span class="meta-value">{{ booking.createdAt or 'Recently' }}</span>
+                        <span class="meta-value">{{ booking.createdAt }}</span>
                     </div>
                 </div>
 
@@ -679,13 +679,13 @@
         }
 
         function showBookingDetails(booking) {
-            document.getElementById('detailId').textContent = booking.id || 'N/A';
-            document.getElementById('detailCustomer').textContent = booking.user_name || booking.name || 'N/A';
-            document.getElementById('detailEmail').textContent = booking.user_email || 'N/A';
+            document.getElementById('detailId').textContent = booking.id || 'Not set';
+            document.getElementById('detailCustomer').textContent = booking.user_name || booking.name || 'Not set';
+            document.getElementById('detailEmail').textContent = booking.user_email || 'Not set';
             document.getElementById('detailService').textContent = booking.requests || booking.service || 'Haircut';
             document.getElementById('detailPrice').textContent = 'NGN ' + (booking.price || 0);
-            document.getElementById('detailDate').textContent = booking.booking_date || 'N/A';
-            document.getElementById('detailCreated').textContent = booking.createdAt || 'Recently';
+            document.getElementById('detailDate').textContent = `${booking.booking_date || 'Not set'} - ${booking.booking_time || 'Not set'}`;
+            document.getElementById('detailCreated').textContent = booking.createdAt || 'Unknown';
 
             const statusElement = document.getElementById('detailStatus');
             const safeStatus = booking.status || 'pending';
