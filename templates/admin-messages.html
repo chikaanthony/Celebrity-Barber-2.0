@@ -908,49 +908,8 @@
                 preselectedUserHandled = true;
                 return;
             }
-
-            if (usersData[requestedUserId]) {
-                preselectedUserHandled = true;
-                await selectUser(requestedUserId);
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/admin/users');
-                const result = await response.json();
-                if (!result.success) {
-                    return;
-                }
-
-                const users = result.data || [];
-                const matched = users.find(u => (u.user_id || u.id) === requestedUserId);
-                if (!matched) {
-                    return;
-                }
-
-                const synthesizedUser = {
-                    user_id: requestedUserId,
-                    user_name: matched.full_name || matched.user_name || matched.email || 'User',
-                    user_email: matched.email || '',
-                    is_vip: !!(matched.is_vip || matched.isVIP),
-                    isVIP: !!(matched.is_vip || matched.isVIP),
-                    photo_url: matched.photo_url || '',
-                    last_message: 'Start a conversation...',
-                    last_time: '',
-                    unread: 0
-                };
-
-                usersData[requestedUserId] = synthesizedUser;
-                if (!allUsersCache.some(u => u.user_id === requestedUserId)) {
-                    allUsersCache = [synthesizedUser, ...allUsersCache];
-                }
-
-                renderChatList(allUsersCache);
-                preselectedUserHandled = true;
-                await selectUser(requestedUserId);
-            } catch (error) {
-                console.error('Error opening user from query:', error);
-            }
+            preselectedUserHandled = true;
+            openUserChat(requestedUserId);
         }
 
         function renderChatList(users) {
@@ -965,7 +924,7 @@
                 const initials = getInitials(user.user_name);
                 const item = document.createElement('div');
                 item.className = `chat-user-item ${user.unread > 0 ? 'unread' : ''}`;
-                item.onclick = function() { selectUser(user.user_id); };
+                item.onclick = function() { openUserChat(user.user_id); };
 
                 item.innerHTML = `
                     <div class="user-avatar">
@@ -987,6 +946,11 @@
             });
 
             document.getElementById('totalUnread').textContent = `${totalUnread} unread message${totalUnread !== 1 ? 's' : ''}`;
+        }
+
+        function openUserChat(userId) {
+            if (!userId || userId === 'undefined') return;
+            window.location.href = `/admin/chat/user/${encodeURIComponent(userId)}`;
         }
 
         function getInitials(name) {
@@ -1260,30 +1224,9 @@
         }
 
         async function startChatWithUser(userId, userName, userEmail, isVip) {
-            if (usersData[userId]) {
-                // User exists - show only them
-                renderChatList([usersData[userId]]);
-                selectUserById(userId);
-            } else {
-                // New user - add and show only them
-                usersData[userId] = {
-                    user_id: userId,
-                    user_name: userName,
-                    user_email: userEmail,
-                    is_vip: isVip,
-                    isVIP: isVip,
-                    photo_url: '',
-                    last_message: 'Start a conversation...',
-                    last_time: '',
-                    unread: 0
-                };
-                allUsersCache.push(usersData[userId]);
-                renderChatList([usersData[userId]]);
-                selectUserById(userId);
-            }
-            
             document.getElementById('searchInput').value = '';
             document.getElementById('searchResults').classList.remove('show');
+            openUserChat(userId);
         }
 
         function selectUserById(userId) {

@@ -33,6 +33,30 @@
                 <strong>PRIORITY CUTTING:</strong> 2 prior cuts in a month plus unlimited lining.
             </p>
         </div>
+
+        <!-- Payment Details -->
+        <div class="payment-details-section">
+            <h2 class="payment-title">Payment Details</h2>
+            <div class="payment-card">
+                <div class="payment-row">
+                    <span class="payment-label">Account Number</span>
+                    <div class="payment-value-wrap">
+                        <span class="payment-value" id="vipAccountNumber">9161312015</span>
+                        <button type="button" class="copy-btn" onclick="copyVipField('vipAccountNumber', 'Account number')">Copy</button>
+                    </div>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Bank Name</span>
+                    <span class="payment-value" id="vipBankName">opay</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Account Name</span>
+                    <span class="payment-value" id="vipAccountName">chika bright anthony</span>
+                </div>
+                <button type="button" class="copy-all-btn" onclick="copyVipPaymentDetails()">Copy Full Details</button>
+                <div class="copy-status" id="vipCopyStatus" aria-live="polite"></div>
+            </div>
+        </div>
         
         <!-- Payment Verification / Receipt Upload -->
         <div class="upload-section">
@@ -68,6 +92,58 @@
     <script>
         let receiptFile = null;
         let currentVipPrice = 2500;
+
+        async function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return;
+            }
+
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            document.execCommand('copy');
+            textArea.remove();
+        }
+
+        function showVipCopyStatus(message, isError = false) {
+            const status = document.getElementById('vipCopyStatus');
+            if (!status) return;
+            status.textContent = message;
+            status.classList.toggle('error', isError);
+        }
+
+        async function copyVipField(elementId, label) {
+            const field = document.getElementById(elementId);
+            if (!field) return;
+
+            try {
+                await copyTextToClipboard(field.textContent.trim());
+                showVipCopyStatus(`${label} copied.`);
+            } catch (error) {
+                console.error('Copy failed:', error);
+                showVipCopyStatus(`Unable to copy ${label.toLowerCase()}.`, true);
+            }
+        }
+
+        async function copyVipPaymentDetails() {
+            const accountNumber = document.getElementById('vipAccountNumber')?.textContent.trim() || '';
+            const bankName = document.getElementById('vipBankName')?.textContent.trim() || '';
+            const accountName = document.getElementById('vipAccountName')?.textContent.trim() || '';
+            const details = `Acct No: ${accountNumber}\nBank Name: ${bankName}\nAcct Name: ${accountName}`;
+
+            try {
+                await copyTextToClipboard(details);
+                showVipCopyStatus('Full payment details copied.');
+            } catch (error) {
+                console.error('Copy failed:', error);
+                showVipCopyStatus('Unable to copy payment details.', true);
+            }
+        }
         
         function handleFileSelect(event) {
             const file = event.target.files[0];
@@ -183,7 +259,6 @@
                 handleFileSelect({ target: { files: dataTransfer.files } });
             }
         });
-    </script>
     </script>
 </body>
 </html>

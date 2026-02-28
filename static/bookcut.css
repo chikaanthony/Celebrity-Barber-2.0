@@ -1,5 +1,31 @@
 /* ==================== BOOK A CUT PAGE STYLES ==================== */
 
+:root {
+    --bookcut-payment-card-bg: #111;
+    --bookcut-payment-card-border: #222;
+    --bookcut-payment-label: #999;
+    --bookcut-payment-value: #fff;
+    --bookcut-copy-btn-border: rgba(212, 175, 55, 0.5);
+    --bookcut-copy-btn-bg: rgba(212, 175, 55, 0.08);
+    --bookcut-copy-btn-hover-bg: rgba(212, 175, 55, 0.15);
+    --bookcut-copy-btn-text: gold;
+    --bookcut-copy-ok: #6dff95;
+    --bookcut-copy-error: #ff8d8d;
+}
+
+html[data-theme="light"] {
+    --bookcut-payment-card-bg: #ffffff;
+    --bookcut-payment-card-border: rgba(15, 23, 42, 0.12);
+    --bookcut-payment-label: #64748b;
+    --bookcut-payment-value: #0f172a;
+    --bookcut-copy-btn-border: rgba(184, 137, 21, 0.38);
+    --bookcut-copy-btn-bg: rgba(212, 175, 55, 0.12);
+    --bookcut-copy-btn-hover-bg: rgba(212, 175, 55, 0.2);
+    --bookcut-copy-btn-text: #8f6b0f;
+    --bookcut-copy-ok: #0f766e;
+    --bookcut-copy-error: #b91c1c;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -68,12 +94,83 @@ body {
 /* Section Titles */
 .service-section h2,
 .date-section h2,
-.requests-section h2 {
+.requests-section h2,
+.payment-details-section h2 {
     font-family: 'Orbitron', sans-serif;
     font-size: calc(14px * var(--mobile-font-scale, 1));
     color: gold;
     margin-bottom: 15px;
     letter-spacing: 1px;
+}
+
+/* Payment Details */
+.payment-details-section {
+    margin-bottom: 25px;
+}
+
+.payment-card {
+    background: var(--bookcut-payment-card-bg);
+    border: 2px solid var(--bookcut-payment-card-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.payment-label {
+    color: var(--bookcut-payment-label);
+    font-size: calc(12px * var(--mobile-font-scale, 1));
+}
+
+.payment-value {
+    color: var(--bookcut-payment-value);
+    font-size: calc(14px * var(--mobile-font-scale, 1));
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.payment-value-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.copy-btn,
+.copy-all-btn {
+    border: 1px solid var(--bookcut-copy-btn-border);
+    background: var(--bookcut-copy-btn-bg);
+    color: var(--bookcut-copy-btn-text);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
+    cursor: pointer;
+}
+
+.copy-all-btn {
+    align-self: flex-start;
+}
+
+.copy-btn:hover,
+.copy-all-btn:hover {
+    background: var(--bookcut-copy-btn-hover-bg);
+}
+
+.copy-status {
+    min-height: 18px;
+    color: var(--bookcut-copy-ok);
+    font-size: calc(12px * var(--mobile-font-scale, 1));
+}
+
+.copy-status.error {
+    color: var(--bookcut-copy-error);
 }
 
 /* Service Grid */

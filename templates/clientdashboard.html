@@ -1,4 +1,4 @@
-be<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,9 +48,9 @@ be<!DOCTYPE html>
                 <button class="change-pic">📷</button>
             </div>
             <h1>WELCOME BACK CELEB <span class="user-name">{{ user.full_name if user else 'User' }}</span></h1>
-            <div class="vip-indicator" id="vipIndicator">
+            <div class="vip-indicator" id="vipIndicator" style="{{ '' if user and user.is_vip else 'display:none;' }}">
                 <span class="vip-badge" id="vipBadge">👑 VIP</span>
-                <span class="vip-status" id="vipStatus">{{ 'Active' if user.is_vip else 'Regular' }}</span>
+                <span class="vip-status" id="vipStatus">{{ 'Active' if user and user.is_vip else '' }}</span>
             </div>
             <p class="user-email">{{ user.email if user else 'user@example.com' }}</p>
         </div>
@@ -390,15 +390,23 @@ be<!DOCTYPE html>
         }
         
         function updateVIPStatus(isVIP) {
+            const vipIndicator = document.getElementById('vipIndicator');
             const vipBadge = document.getElementById('vipBadge');
             const vipStatus = document.getElementById('vipStatus');
             
             if (isVIP) {
+                if (vipIndicator) vipIndicator.style.display = 'inline-flex';
                 if (vipBadge) vipBadge.textContent = '👑 VIP';
-                if (vipStatus) vipStatus.textContent = 'VIP';
+                if (vipStatus) {
+                    vipStatus.textContent = 'Active';
+                    vipStatus.style.display = 'inline';
+                }
             } else {
-                if (vipBadge) vipBadge.textContent = 'Regular';
-                if (vipStatus) vipStatus.textContent = 'Regular';
+                if (vipIndicator) vipIndicator.style.display = 'none';
+                if (vipStatus) {
+                    vipStatus.textContent = '';
+                    vipStatus.style.display = 'none';
+                }
             }
         }
         

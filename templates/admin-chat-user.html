@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Chat - Celebrity Barber Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .chat-page {
+            max-width: 900px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            gap: 12px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, #111 0%, #1a1a1a 100%);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: calc(13px * var(--mobile-font-scale, 1));
+            white-space: nowrap;
+        }
+
+        .page-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #d4af37;
+            font-size: calc(15px * var(--mobile-font-scale, 1));
+            letter-spacing: 1px;
+        }
+
+        .admin-badge {
+            background: #d4af37;
+            color: #000;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: calc(11px * var(--mobile-font-scale, 1));
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .chat-shell {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.26);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.28);
+            gap: 10px;
+        }
+
+        .chat-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #333 0%, #222 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4af37;
+            font-size: calc(16px * var(--mobile-font-scale, 1));
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-meta {
+            min-width: 0;
+        }
+
+        .user-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: calc(15px * var(--mobile-font-scale, 1));
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .vip-badge {
+            background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: calc(10px * var(--mobile-font-scale, 1));
+            font-weight: 700;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .user-email {
+            font-size: calc(12px * var(--mobile-font-scale, 1));
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            border-radius: 8px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: calc(12px * var(--mobile-font-scale, 1));
+        }
+
+        .action-btn.danger {
+            border-color: rgba(255, 68, 68, 0.5);
+            color: #ff7777;
+        }
+
+        .messages-area {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 10px 12px;
+            border-radius: 14px;
+        }
+
+        .message-bubble.user {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.12);
+            border-bottom-left-radius: 3px;
+        }
+
+        .message-bubble.admin {
+            align-self: flex-end;
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-bottom-right-radius: 3px;
+        }
+
+        .message-bubble p {
+            font-size: calc(14px * var(--mobile-font-scale, 1));
+            line-height: 1.45;
+            margin-bottom: 4px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .message-time {
+            font-size: calc(11px * var(--mobile-font-scale, 1));
+            color: #777;
+            display: block;
+            text-align: right;
+        }
+
+        .message-bubble.admin .message-time {
+            color: #d4af37;
+        }
+
+        .empty-state {
+            margin: auto;
+            color: #777;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
+            text-align: center;
+            padding: 24px;
+        }
+
+        .input-area {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-textarea {
+            flex: 1;
+            min-height: 48px;
+            max-height: 120px;
+            resize: none;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            padding: 12px 14px;
+            font-size: calc(14px * var(--mobile-font-scale, 1));
+            line-height: 1.35;
+        }
+
+        .message-textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+            color: #000;
+            font-size: calc(18px * var(--mobile-font-scale, 1));
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .send-btn:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 600px) {
+            .chat-page {
+                padding: 0;
+                gap: 0;
+            }
+
+            .top-bar {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                padding: 10px;
+            }
+
+            .chat-shell {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+            }
+
+            .chat-header {
+                padding: 10px;
+            }
+
+            .chat-actions {
+                gap: 6px;
+            }
+
+            .action-btn {
+                padding: 7px 8px;
+                font-size: calc(11px * var(--mobile-font-scale, 1));
+            }
+
+            .messages-area {
+                padding: 12px 10px;
+            }
+
+            .message-bubble {
+                max-width: 86%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-page">
+        <div class="top-bar">
+            <div class="top-left">
+                <a href="/admin/chat" class="back-btn">Back to Chats</a>
+                <div class="page-title">CUSTOMER CHAT</div>
+            </div>
+            <div class="admin-badge">ADMIN</div>
+        </div>
+
+        <div class="chat-shell">
+            <div class="chat-header">
+                <div class="chat-user">
+                    <div class="avatar" id="selectedUserAvatar">U</div>
+                    <div class="user-meta">
+                        <div class="user-name-row">
+                            <span class="user-name" id="selectedUserName">Loading...</span>
+                        </div>
+                        <div class="user-email" id="selectedUserEmail"></div>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button type="button" class="action-btn" onclick="clearChat()">Clear</button>
+                    <button type="button" class="action-btn danger" onclick="blockUser()">Block</button>
+                </div>
+            </div>
+
+            <div class="messages-area" id="messagesArea">
+                <div class="empty-state">Loading messages...</div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea class="message-textarea" id="messageInput" placeholder="Type your reply..." rows="1"></textarea>
+                    <button type="button" class="send-btn" id="sendBtn" onclick="sendReply()">&#10148;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const selectedUserId = {{ user_id | tojson }};
+        let selectedUserName = '';
+
+        function getInitials(name) {
+            if (!name) return 'U';
+            const parts = String(name).trim().split(/\s+/);
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return parts[0].slice(0, 2).toUpperCase();
+        }
+
+        function setUserHeader(user) {
+            const name = user.user_name || user.full_name || 'Customer';
+            const email = user.user_email || user.email || '';
+            const vip = !!(user.is_vip || user.isVIP);
+
+            selectedUserName = name;
+            const avatar = document.getElementById('selectedUserAvatar');
+            if (user.photo_url) {
+                avatar.innerHTML = `<img src="${user.photo_url}" alt="${name}">`;
+            } else {
+                avatar.textContent = getInitials(name);
+            }
+
+            const nameHolder = document.getElementById('selectedUserName');
+            nameHolder.textContent = name;
+            const row = nameHolder.parentElement;
+            const existingVip = row.querySelector('.vip-badge');
+            if (existingVip) existingVip.remove();
+            if (vip) {
+                const vipBadge = document.createElement('span');
+                vipBadge.className = 'vip-badge';
+                vipBadge.textContent = 'VIP';
+                row.appendChild(vipBadge);
+            }
+
+            document.getElementById('selectedUserEmail').textContent = email;
+        }
+
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/api/admin/chat/users');
+                const result = await response.json();
+                if (result.success && Array.isArray(result.data)) {
+                    const user = result.data.find(item => item.user_id === selectedUserId);
+                    if (user) {
+                        setUserHeader(user);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user list:', error);
+            }
+
+            try {
+                const response = await fetch('/api/admin/users');
+                const result = await response.json();
+                if (result.success && Array.isArray(result.data)) {
+                    const user = result.data.find(item => (item.user_id || item.id) === selectedUserId);
+                    if (user) {
+                        setUserHeader(user);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading fallback user list:', error);
+            }
+
+            setUserHeader({ user_name: `Customer ${selectedUserId}` });
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messagesArea');
+            container.innerHTML = '';
+
+            if (!Array.isArray(messages) || messages.length === 0) {
+                container.innerHTML = '<div class="empty-state">No messages yet.</div>';
+                return;
+            }
+
+            messages.forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = `message-bubble ${msg.sender === 'admin' ? 'admin' : 'user'}`;
+
+                const text = document.createElement('p');
+                text.textContent = msg.message || '';
+
+                const time = document.createElement('span');
+                time.className = 'message-time';
+                time.textContent = msg.display_time || msg.time || '';
+
+                bubble.appendChild(text);
+                bubble.appendChild(time);
+                container.appendChild(bubble);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function loadMessages() {
+            try {
+                const response = await fetch(`/api/admin/chat/messages/${encodeURIComponent(selectedUserId)}`);
+                const result = await response.json();
+                if (result.success) {
+                    renderMessages(result.data || []);
+                } else {
+                    document.getElementById('messagesArea').innerHTML = '<div class="empty-state">Unable to load messages.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('messagesArea').innerHTML = '<div class="empty-state">Error loading messages.</div>';
+            }
+        }
+
+        async function markAsRead() {
+            try {
+                await fetch('/api/admin/chat/mark-read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: selectedUserId })
+                });
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        }
+
+        async function sendReply() {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            sendBtn.disabled = true;
+            try {
+                const response = await fetch('/api/admin/chat/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: selectedUserId,
+                        message: message
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    input.value = '';
+                    input.style.height = '48px';
+                    await loadMessages();
+                } else {
+                    alert('Error sending message: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error sending message.');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        async function clearChat() {
+            if (!confirm('Are you sure you want to clear chat history with this user?')) return;
+            try {
+                const response = await fetch('/api/admin/chat/clear', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: selectedUserId })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    await loadMessages();
+                } else {
+                    alert('Error clearing chat: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+            }
+        }
+
+        async function blockUser() {
+            const userLabel = selectedUserName || 'this user';
+            if (!confirm(`Are you sure you want to block ${userLabel}?`)) return;
+
+            try {
+                const response = await fetch('/api/admin/chat/block', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: selectedUserId })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('User has been blocked.');
+                    window.location.href = '/admin/chat';
+                } else {
+                    alert('Error blocking user: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error blocking user:', error);
+            }
+        }
+
+        function initAutoResize() {
+            const input = document.getElementById('messageInput');
+            input.addEventListener('input', () => {
+                input.style.height = '48px';
+                input.style.height = `${Math.min(input.scrollHeight, 120)}px`;
+            });
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendReply();
+                }
+            });
+        }
+
+        async function init() {
+            initAutoResize();
+            await loadUserInfo();
+            await loadMessages();
+            await markAsRead();
+            setInterval(loadMessages, 15000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

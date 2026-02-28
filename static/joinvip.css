@@ -133,6 +133,83 @@ body {
     color: #d4af37;
 }
 
+/* Payment Details */
+.payment-details-section {
+    margin-bottom: 28px;
+}
+
+.payment-title {
+    font-size: calc(14px * var(--mobile-font-scale, 1));
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.payment-card {
+    background: rgba(212, 175, 55, 0.06);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: calc(12px * var(--mobile-font-scale, 1));
+}
+
+.payment-value {
+    color: #fff;
+    font-size: calc(14px * var(--mobile-font-scale, 1));
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.payment-value-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.copy-btn,
+.copy-all-btn {
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    background: rgba(212, 175, 55, 0.08);
+    color: #d4af37;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
+    cursor: pointer;
+}
+
+.copy-all-btn {
+    align-self: flex-start;
+}
+
+.copy-btn:hover,
+.copy-all-btn:hover {
+    background: rgba(212, 175, 55, 0.15);
+}
+
+.copy-status {
+    min-height: 18px;
+    color: #6dff95;
+    font-size: calc(12px * var(--mobile-font-scale, 1));
+}
+
+.copy-status.error {
+    color: #ff8d8d;
+}
+
 /* Upload Section */
 .upload-section {
     margin-bottom: 30px;

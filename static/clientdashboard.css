@@ -222,6 +222,10 @@ body {
     font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
+.vip-status:empty {
+    display: none;
+}
+
 .user-email {
     color: #666;
     font-size: calc(14px * var(--mobile-font-scale, 1));

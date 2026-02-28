@@ -24,6 +24,30 @@
             <h1>Book a <span class="gold-accent">Session</span></h1>
         </div>
 
+        <!-- Payment Details -->
+        <div class="payment-details-section">
+            <h2>Payment Details</h2>
+            <div class="payment-card">
+                <div class="payment-row">
+                    <span class="payment-label">Account Number</span>
+                    <div class="payment-value-wrap">
+                        <span class="payment-value" id="bookcutAccountNumber">9161312015</span>
+                        <button type="button" class="copy-btn" onclick="copyPaymentField('bookcutAccountNumber', 'Account number')">Copy</button>
+                    </div>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Bank Name</span>
+                    <span class="payment-value" id="bookcutBankName">opay</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Account Name</span>
+                    <span class="payment-value" id="bookcutAccountName">chika bright anthony</span>
+                </div>
+                <button type="button" class="copy-all-btn" onclick="copyBookcutPaymentDetails()">Copy Full Details</button>
+                <div class="copy-status" id="bookcutCopyStatus" aria-live="polite"></div>
+            </div>
+        </div>
+
         <!-- Service Selection -->
         <div class="service-section">
             <h2>Select Service</h2>
@@ -73,6 +97,59 @@
     <script>
         let selectedService = null;
         let selectedPrice = 0;
+
+        async function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return;
+            }
+
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            document.execCommand('copy');
+            textArea.remove();
+        }
+
+        function showCopyStatus(message, isError = false) {
+            const status = document.getElementById('bookcutCopyStatus');
+            if (!status) return;
+
+            status.textContent = message;
+            status.classList.toggle('error', isError);
+        }
+
+        async function copyPaymentField(elementId, label) {
+            const field = document.getElementById(elementId);
+            if (!field) return;
+
+            try {
+                await copyTextToClipboard(field.textContent.trim());
+                showCopyStatus(`${label} copied.`);
+            } catch (error) {
+                console.error('Copy failed:', error);
+                showCopyStatus(`Unable to copy ${label.toLowerCase()}.`, true);
+            }
+        }
+
+        async function copyBookcutPaymentDetails() {
+            const accountNumber = document.getElementById('bookcutAccountNumber')?.textContent.trim() || '';
+            const bankName = document.getElementById('bookcutBankName')?.textContent.trim() || '';
+            const accountName = document.getElementById('bookcutAccountName')?.textContent.trim() || '';
+            const details = `Acct No: ${accountNumber}\nBank Name: ${bankName}\nAcct Name: ${accountName}`;
+
+            try {
+                await copyTextToClipboard(details);
+                showCopyStatus('Full payment details copied.');
+            } catch (error) {
+                console.error('Copy failed:', error);
+                showCopyStatus('Unable to copy payment details.', true);
+            }
+        }
 
         // Load services from API on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -186,8 +263,6 @@
             
             processBooking();
         }
-    </script>
-
     </script>
 </body>
 </html>

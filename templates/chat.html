@@ -110,7 +110,7 @@
                         messageDiv.innerHTML = `
                             <div class="message-bubble">
                                 <p>${msg.message}</p>
-                                <span class="message-time">${msg.display_time || msg.time || 'recently'}</span>
+                                <span class="message-time">${msg.display_time || msg.time || ''}</span>
                             </div>
                         `;
                         container.appendChild(messageDiv);

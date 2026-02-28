@@ -39,113 +39,380 @@ def build_mobile_font_scale_style(scale):
 
 
 def build_theme_override_style():
-    return (
-        '<style id="ui-theme-style">'
-        'html[data-theme="light"]{'
-        '--dark:#f3f5f9;'
-        '--dark-secondary:#ffffff;'
-        '--dark-tertiary:#edf1f7;'
-        '--light:#111827;'
-        '--gold:#b88915;'
-        '--gold-light:#d4af37;'
-        '--light-panel:#ffffff;'
-        '--light-panel-muted:#f7f9fc;'
-        '--light-border:rgba(15,23,42,0.12);'
-        '--light-text:#111827;'
-        '--light-text-muted:#475569;'
-        'color-scheme:light;'
-        '}'
-        'html[data-theme="light"] body{'
-        'background:linear-gradient(135deg,#f6f8fc 0%,#eef2f7 50%,#e8edf5 100%) !important;'
-        'color:var(--light-text) !important;'
-        '}'
-        'html[data-theme="light"] .admin-nav,'
-        'html[data-theme="light"] .sidebar,'
-        'html[data-theme="light"] .section-content,'
-        'html[data-theme="light"] .analytics-card,'
-        'html[data-theme="light"] .stack-item,'
-        'html[data-theme="light"] .approval-card,'
-        'html[data-theme="light"] .booking-row,'
-        'html[data-theme="light"] .booking-details,'
-        'html[data-theme="light"] .receipt-preview,'
-        'html[data-theme="light"] .messages-list,'
-        'html[data-theme="light"] .message-item,'
-        'html[data-theme="light"] .table-shell,'
-        'html[data-theme="light"] .table-scroll,'
-        'html[data-theme="light"] .metric-card,'
-        'html[data-theme="light"] .stat-card,'
-        'html[data-theme="light"] .service-card,'
-        'html[data-theme="light"] .broadcast-card,'
-        'html[data-theme="light"] .update-card,'
-        'html[data-theme="light"] .ledger-table{'
-        'background:var(--light-panel) !important;'
-        'border-color:var(--light-border) !important;'
-        'box-shadow:0 8px 22px rgba(15,23,42,0.06);'
-        '}'
-        'html[data-theme="light"] .analytics-card.highlight,'
-        'html[data-theme="light"] .metric-card.highlight,'
-        'html[data-theme="light"] .stat-card.highlight{'
-        'border-color:rgba(184,137,21,0.55) !important;'
-        'box-shadow:0 10px 26px rgba(184,137,21,0.18) !important;'
-        '}'
-        'html[data-theme="light"] .stack-item.active{'
-        'background:rgba(212,175,55,0.14) !important;'
-        'border-color:rgba(184,137,21,0.55) !important;'
-        '}'
-        'html[data-theme="light"] .stack-item:hover{'
-        'background:rgba(212,175,55,0.1) !important;'
-        '}'
-        'html[data-theme="light"] h1,'
-        'html[data-theme="light"] h2,'
-        'html[data-theme="light"] h3,'
-        'html[data-theme="light"] h4,'
-        'html[data-theme="light"] .section-title,'
-        'html[data-theme="light"] .admin-name,'
-        'html[data-theme="light"] .stack-label,'
-        'html[data-theme="light"] .card-value,'
-        'html[data-theme="light"] .user-name,'
-        'html[data-theme="light"] .message-user{'
-        'color:var(--light-text) !important;'
-        '}'
-        'html[data-theme="light"] p,'
-        'html[data-theme="light"] span,'
-        'html[data-theme="light"] label,'
-        'html[data-theme="light"] .card-label,'
-        'html[data-theme="light"] .admin-role,'
-        'html[data-theme="light"] .user-email,'
-        'html[data-theme="light"] .message-preview,'
-        'html[data-theme="light"] .message-time,'
-        'html[data-theme="light"] .placeholder-text{'
-        'color:var(--light-text-muted) !important;'
-        '}'
-        'html[data-theme="light"] .logo-text{color:var(--gold) !important;}'
-        'html[data-theme="light"] input,'
-        'html[data-theme="light"] textarea,'
-        'html[data-theme="light"] select{'
-        'background:var(--light-panel) !important;'
-        'color:var(--light-text) !important;'
-        'border:1px solid var(--light-border) !important;'
-        '}'
-        'html[data-theme="light"] input::placeholder,'
-        'html[data-theme="light"] textarea::placeholder{'
-        'color:#94a3b8 !important;'
-        '}'
-        'html[data-theme="light"] .btn-decline,'
-        'html[data-theme="light"] .logout-btn{'
-        'background:#ffffff !important;'
-        'color:#334155 !important;'
-        'border-color:var(--light-border) !important;'
-        '}'
-        'html[data-theme="light"] .btn-approve,'
-        'html[data-theme="light"] .approve-btn,'
-        'html[data-theme="light"] .action-btn,'
-        'html[data-theme="light"] .broadcast-btn.highlight{'
-        'background:linear-gradient(135deg,#d4af37,#f4cf57) !important;'
-        'color:#111827 !important;'
-        'border-color:#c99d2c !important;'
-        '}'
-        '</style>'
-    )
+    return """
+<style id="ui-theme-style">
+html[data-theme="light"] {
+    --dark: #f3f5f9;
+    --dark-secondary: #ffffff;
+    --dark-tertiary: #edf1f7;
+    --light: #111827;
+    --gold: #b88915;
+    --gold-light: #d4af37;
+    --light-panel: #ffffff;
+    --light-panel-muted: #f7f9fc;
+    --light-border: rgba(15, 23, 42, 0.12);
+    --light-border-strong: rgba(15, 23, 42, 0.2);
+    --light-text: #111827;
+    --light-text-muted: #475569;
+    --light-text-soft: #64748b;
+    color-scheme: light;
+}
+
+html[data-theme="light"] body {
+    background: linear-gradient(135deg, #f6f8fc 0%, #eef2f7 50%, #e8edf5 100%) !important;
+    color: var(--light-text) !important;
+}
+
+/* Shared surface cards (admin + client) */
+html[data-theme="light"] .admin-nav,
+html[data-theme="light"] .sidebar,
+html[data-theme="light"] .section-content,
+html[data-theme="light"] .analytics-card,
+html[data-theme="light"] .stack-item,
+html[data-theme="light"] .approval-card,
+html[data-theme="light"] .booking-row,
+html[data-theme="light"] .booking-details,
+html[data-theme="light"] .receipt-preview,
+html[data-theme="light"] .messages-list,
+html[data-theme="light"] .message-item,
+html[data-theme="light"] .table-shell,
+html[data-theme="light"] .table-scroll,
+html[data-theme="light"] .metric-card,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .service-card,
+html[data-theme="light"] .broadcast-card,
+html[data-theme="light"] .update-card,
+html[data-theme="light"] .ledger-table,
+html[data-theme="light"] .client-nav,
+html[data-theme="light"] .mobile-menu,
+html[data-theme="light"] .dashboard-card,
+html[data-theme="light"] .history-item,
+html[data-theme="light"] .updates-ticker,
+html[data-theme="light"] .popup-content,
+html[data-theme="light"] .history-detail,
+html[data-theme="light"] .booking-card,
+html[data-theme="light"] .transaction-card,
+html[data-theme="light"] .referral-item,
+html[data-theme="light"] .progress-section,
+html[data-theme="light"] .review-box,
+html[data-theme="light"] .write-review-section,
+html[data-theme="light"] .membership-box,
+html[data-theme="light"] .privilege-section,
+html[data-theme="light"] .upload-box,
+html[data-theme="light"] .referral-history,
+html[data-theme="light"] .ranking-row,
+html[data-theme="light"] .podium-spot,
+html[data-theme="light"] .chat-view,
+html[data-theme="light"] .chat-view-header,
+html[data-theme="light"] .user-status-bar,
+html[data-theme="light"] .message-input-area,
+html[data-theme="light"] .message.them .message-bubble,
+html[data-theme="light"] .notification-item,
+html[data-theme="light"] .profile-container,
+html[data-theme="light"] .preview-content,
+html[data-theme="light"] .page-container {
+    background: var(--light-panel) !important;
+    border-color: var(--light-border) !important;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme="light"] .analytics-card.highlight,
+html[data-theme="light"] .metric-card.highlight,
+html[data-theme="light"] .stat-card.highlight {
+    border-color: rgba(184, 137, 21, 0.55) !important;
+    box-shadow: 0 10px 26px rgba(184, 137, 21, 0.18) !important;
+}
+
+html[data-theme="light"] .stack-item.active {
+    background: rgba(212, 175, 55, 0.14) !important;
+    border-color: rgba(184, 137, 21, 0.55) !important;
+}
+
+html[data-theme="light"] .stack-item:hover,
+html[data-theme="light"] .history-item:hover,
+html[data-theme="light"] .notification-item:hover,
+html[data-theme="light"] .ranking-row:hover {
+    background: rgba(212, 175, 55, 0.1) !important;
+}
+
+/* Strong text */
+html[data-theme="light"] .admin-name,
+html[data-theme="light"] .stack-label,
+html[data-theme="light"] .card-value,
+html[data-theme="light"] .user-name,
+html[data-theme="light"] .message-user,
+html[data-theme="light"] .chat-header,
+html[data-theme="light"] .notifications-header,
+html[data-theme="light"] .page-title,
+html[data-theme="light"] .booking-service,
+html[data-theme="light"] .trans-type,
+html[data-theme="light"] .rank-name,
+html[data-theme="light"] .thread-name,
+html[data-theme="light"] .chat-view-name,
+html[data-theme="light"] .notif-title,
+html[data-theme="light"] .history-info h4,
+html[data-theme="light"] .popup-body h3,
+html[data-theme="light"] .review-content,
+html[data-theme="light"] .review-content p {
+    color: var(--light-text) !important;
+}
+
+/* Accent text */
+html[data-theme="light"] .logo-text,
+html[data-theme="light"] .dashboard-card h3,
+html[data-theme="light"] .booking-header h1,
+html[data-theme="light"] .page-header h1,
+html[data-theme="light"] .reviews-header,
+html[data-theme="light"] .leaderboard-header,
+html[data-theme="light"] .referral-header,
+html[data-theme="light"] .privilege-title,
+html[data-theme="light"] .progress-title,
+html[data-theme="light"] .tier-label,
+html[data-theme="light"] .price,
+html[data-theme="light"] .booking-id,
+html[data-theme="light"] .spend-amount,
+html[data-theme="light"] .rank-spend,
+html[data-theme="light"] .referral-code-value,
+html[data-theme="light"] .code-value,
+html[data-theme="light"] .stat-num,
+html[data-theme="light"] .section-title {
+    color: var(--gold) !important;
+}
+
+/* Muted/supporting text */
+html[data-theme="light"] .card-label,
+html[data-theme="light"] .admin-role,
+html[data-theme="light"] .user-email,
+html[data-theme="light"] .message-preview,
+html[data-theme="light"] .message-time,
+html[data-theme="light"] .placeholder-text,
+html[data-theme="light"] .history-info p,
+html[data-theme="light"] .spending-hint,
+html[data-theme="light"] .booking-date,
+html[data-theme="light"] .trans-date,
+html[data-theme="light"] .stat-label,
+html[data-theme="light"] .milestone-label,
+html[data-theme="light"] .notif-message,
+html[data-theme="light"] .notif-time,
+html[data-theme="light"] .thread-time,
+html[data-theme="light"] .last-message,
+html[data-theme="light"] .form-group label,
+html[data-theme="light"] .code-label,
+html[data-theme="light"] .copy-hint,
+html[data-theme="light"] .upload-text,
+html[data-theme="light"] .duration,
+html[data-theme="light"] .popup-date,
+html[data-theme="light"] .review-date,
+html[data-theme="light"] .empty-state,
+html[data-theme="light"] .loading {
+    color: var(--light-text-muted) !important;
+}
+
+/* Inputs */
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] select,
+html[data-theme="light"] .message-input,
+html[data-theme="light"] .review-input,
+html[data-theme="light"] .refer-input,
+html[data-theme="light"] .date-input,
+html[data-theme="light"] .textarea-wrapper textarea {
+    background: var(--light-panel) !important;
+    color: var(--light-text) !important;
+    border: 1px solid var(--light-border) !important;
+}
+
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder {
+    color: var(--light-text-soft) !important;
+}
+
+html[data-theme="light"] input:focus,
+html[data-theme="light"] textarea:focus,
+html[data-theme="light"] select:focus {
+    border-color: var(--gold) !important;
+    background: var(--light-panel-muted) !important;
+}
+
+/* Secondary buttons */
+html[data-theme="light"] .btn-decline,
+html[data-theme="light"] .logout-btn,
+html[data-theme="light"] .close-btn,
+html[data-theme="light"] .back-btn,
+html[data-theme="light"] .delete-btn,
+html[data-theme="light"] .btn-cancel,
+html[data-theme="light"] .mark-all-btn {
+    background: #ffffff !important;
+    color: #334155 !important;
+    border-color: var(--light-border) !important;
+}
+
+html[data-theme="light"] .close-btn:hover,
+html[data-theme="light"] .back-btn:hover,
+html[data-theme="light"] .logout-btn:hover,
+html[data-theme="light"] .btn-decline:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+}
+
+/* Primary CTA buttons */
+html[data-theme="light"] .btn-approve,
+html[data-theme="light"] .approve-btn,
+html[data-theme="light"] .action-btn,
+html[data-theme="light"] .broadcast-btn.highlight,
+html[data-theme="light"] .become-vip-btn,
+html[data-theme="light"] .book-now-btn,
+html[data-theme="light"] .refer-btn,
+html[data-theme="light"] .submit-review-btn,
+html[data-theme="light"] .save-btn,
+html[data-theme="light"] .btn-save,
+html[data-theme="light"] .success-btn,
+html[data-theme="light"] .change-btn,
+html[data-theme="light"] .send-btn,
+html[data-theme="light"] .message-btn,
+html[data-theme="light"] .share-code-btn {
+    background: linear-gradient(135deg, #d4af37, #f4cf57) !important;
+    color: #111827 !important;
+    border-color: #c99d2c !important;
+}
+
+/* Client nav + mobile shell */
+html[data-theme="light"] .menu-dots span {
+    background: var(--light-text) !important;
+}
+
+html[data-theme="light"] .mobile-menu a {
+    color: var(--light-text) !important;
+    border-bottom-color: var(--light-border) !important;
+}
+
+html[data-theme="light"] .mobile-menu a:hover {
+    color: var(--gold) !important;
+}
+
+html[data-theme="light"] .close-menu,
+html[data-theme="light"] .notif-icon {
+    color: var(--light-text) !important;
+}
+
+html[data-theme="light"] .bottom-nav,
+html[data-theme="light"] .input-bar {
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96)) !important;
+    border-top: 1px solid var(--light-border) !important;
+}
+
+html[data-theme="light"] .nav-item {
+    color: var(--light-text-soft) !important;
+}
+
+html[data-theme="light"] .nav-item:active,
+html[data-theme="light"] .nav-item:hover {
+    color: var(--gold) !important;
+}
+
+/* Client chat bubble contrast */
+html[data-theme="light"] .message.me .message-bubble {
+    color: #111827 !important;
+}
+
+html[data-theme="light"] .message.them .message-bubble,
+html[data-theme="light"] .message.them .message-bubble p {
+    color: var(--light-text) !important;
+}
+
+html[data-theme="light"] .message.them .message-time {
+    color: var(--light-text-soft) !important;
+}
+
+/* Popup overlays keep contrast in light mode */
+html[data-theme="light"] .popup-overlay,
+html[data-theme="light"] .success-overlay,
+html[data-theme="light"] .preview-modal {
+    background: rgba(15, 23, 42, 0.45) !important;
+}
+
+/* Client dashboard inline referral card cleanup */
+html[data-theme="light"] .dashboard-card[onclick*="/referrals"] {
+    background: var(--light-panel) !important;
+    border-color: var(--light-border) !important;
+}
+
+html[data-theme="light"] #dash-m1-circle,
+html[data-theme="light"] #dash-m2-circle,
+html[data-theme="light"] #dash-m3-circle {
+    background: rgba(15, 23, 42, 0.06) !important;
+    border-color: var(--light-border) !important;
+}
+
+html[data-theme="light"] #dash-m1-label,
+html[data-theme="light"] #dash-m2-label,
+html[data-theme="light"] #dash-m3-label,
+html[data-theme="light"] #referralStreakHint {
+    color: var(--light-text-muted) !important;
+}
+
+html[data-theme="light"] .profile-section {
+    background: linear-gradient(180deg, #f7f9fd 0%, #eff4fb 100%) !important;
+    border-bottom: 1px solid var(--light-border) !important;
+}
+
+html[data-theme="light"] .profile-section h1,
+html[data-theme="light"] .user-name,
+html[data-theme="light"] .spending-goal,
+html[data-theme="light"] .detail-service,
+html[data-theme="light"] .service-name {
+    color: var(--light-text) !important;
+}
+
+html[data-theme="light"] .profile-section h1,
+html[data-theme="light"] .profile-section .user-name {
+    color: var(--light-text) !important;
+}
+
+html[data-theme="light"] .profile-section h1 {
+    color: var(--gold) !important;
+}
+
+html[data-theme="light"] .vip-status {
+    color: #0f766e !important;
+}
+
+html[data-theme="light"] .ticker-track span,
+html[data-theme="light"] .popup-body p,
+html[data-theme="light"] .popup-body ul li {
+    color: var(--light-text-muted) !important;
+}
+
+html[data-theme="light"] .popup-close {
+    color: var(--gold) !important;
+    border-bottom-color: var(--light-border) !important;
+}
+
+html[data-theme="light"] .popup-body ul li {
+    border-bottom-color: var(--light-border) !important;
+}
+
+html[data-theme="light"] .pie-text {
+    fill: var(--light-text) !important;
+}
+
+html[data-theme="light"] .pie-subtext {
+    fill: var(--light-text-soft) !important;
+}
+
+html[data-theme="light"] .pie-bg {
+    stroke: #dbe3ef !important;
+}
+
+html[data-theme="light"] .progress-bar {
+    background: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .history-arrow {
+    color: #94a3b8 !important;
+}
+</style>
+"""
 
 
 def build_ui_preferences_script(default_mobile_scale):
@@ -1049,35 +1316,37 @@ def get_chat_messages():
     
     if db:
         try:
-            # Get messages sent by user
-            messages_ref = db.collection('chats').where('user_id', '==', user_id).order_by('created_at').limit(50).get()
-            
+            # Match admin-side behavior: avoid index-sensitive ordering, enrich with
+            # consistent display_time payload, then sort locally by timestamp.
+            messages_ref = db.collection('chats').where('user_id', '==', user_id).limit(100).get()
+
             message_list = []
             for doc in messages_ref:
-                data = doc.to_dict()
+                data = doc.to_dict() or {}
                 data['id'] = doc.id
 
-                chat_time = build_chat_time_payload(data.get('created_at') or data.get('createdAt'))
-                if chat_time.get('display_time'):
-                    data['time'] = chat_time.get('time', '')
-                    data['display_time'] = chat_time.get('display_time', '')
-                    data['date'] = chat_time.get('date', '')
-                    data['clock'] = chat_time.get('clock', '')
-                    data['created_at_iso'] = chat_time.get('created_at_iso', '')
-                    data['created_at_ts'] = chat_time.get('created_at_ts', 0)
+                timestamp_source = (
+                    data.get('created_at')
+                    or data.get('createdAt')
+                    or getattr(doc, 'create_time', None)
+                )
+                chat_time = build_chat_time_payload(timestamp_source)
+                data['time'] = chat_time.get('time', '')
+                data['display_time'] = chat_time.get('display_time', '')
+                data['date'] = chat_time.get('date', '')
+                data['clock'] = chat_time.get('clock', '')
+                data['created_at_iso'] = chat_time.get('created_at_iso', '')
+                data['created_at_ts'] = chat_time.get('created_at_ts', 0)
 
                 message_list.append(data)
-            
+
+            # Same sorting strategy as admin user chat endpoint.
+            message_list.sort(key=lambda x: x.get('created_at_ts', 0))
+
             return {'success': True, 'data': message_list}
         except Exception as e:
             print(f"Error fetching chat messages: {e}")
-            # Fallback without ordering
-            try:
-                messages_ref = db.collection('chats').where('user_id', '==', user_id).limit(50).get()
-                message_list = [doc.to_dict() | {'id': doc.id} for doc in messages_ref]
-                return {'success': True, 'data': message_list}
-            except:
-                return {'success': True, 'data': []}
+            return {'success': True, 'data': []}
     
     return {'success': True, 'data': []}
 
@@ -3121,6 +3390,19 @@ def admin_chat():
     return render_template('admin-messages.html')
 
 
+@app.route('/admin/chat/user/<user_id>')
+@login_required
+def admin_chat_user(user_id):
+    if not session.get('is_admin'):
+        flash('Access denied', 'error')
+        return redirect(url_for('index'))
+
+    if not user_id:
+        return redirect(url_for('admin_chat'))
+
+    return render_template('admin-chat-user.html', user_id=user_id)
+
+
 @app.route('/admin/messages')
 @login_required
 def admin_messages_legacy():
@@ -3130,7 +3412,7 @@ def admin_messages_legacy():
 
     requested_user = request.args.get('user')
     if requested_user:
-        return redirect(url_for('admin_chat', user=requested_user))
+        return redirect(url_for('admin_chat_user', user_id=requested_user))
     return redirect(url_for('admin_chat'))
 
 
