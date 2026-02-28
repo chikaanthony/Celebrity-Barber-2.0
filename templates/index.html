@@ -52,7 +52,7 @@
 
         <!-- Hero Section -->
         <header class="hero">
-            <video class="hero-video" autoplay muted loop playsinline preload="metadata">
+            <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="none" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%231a1a1a' width='1920' height='1080'/%3E%3C/svg%3E">
                 <source src="{{ url_for('static', filename='29916-378294445.mp4') }}" type="video/mp4">
             </video>
             <div class="hero-overlay" aria-hidden="true"></div>
@@ -320,8 +320,17 @@
     </div>
 
     <script>
-        // Load services and reviews on page load
+        // Lazy load video after page loads for faster initial render
         document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('heroVideo');
+            if (video) {
+                // Start loading video after a short delay
+                setTimeout(() => {
+                    video.load();
+                }, 500);
+            }
+            
+            // Load services and reviews on page load
             loadLandingServices();
             loadReviews();
         });

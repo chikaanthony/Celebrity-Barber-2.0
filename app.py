@@ -1480,6 +1480,16 @@ def get_chat_pending_replies():
 
     if db:
         try:
+            # Get the user's last viewed timestamp
+            last_viewed_ts = 0
+            try:
+                user_chat_meta = db.collection('user_chat_meta').document(user_id).get()
+                if user_chat_meta.exists:
+                    data = user_chat_meta.to_dict()
+                    last_viewed_ts = data.get('last_viewed_at', 0)
+            except Exception:
+                pass
+
             messages_ref = db.collection('chats').where('user_id', '==', user_id).limit(200).get()
 
             message_list = []
@@ -1503,11 +1513,15 @@ def get_chat_pending_replies():
                 if item.get('sender') == 'admin':
                     last_admin_ts = max(last_admin_ts, item.get('created_at_ts', 0))
 
+            # Only count user messages that are:
+            # 1. After the last admin message (unreplied), AND
+            # 2. After the last time user viewed the chat
             pending_count = sum(
                 1
                 for item in message_list
                 if item.get('sender') == 'user'
                 and item.get('created_at_ts', 0) > last_admin_ts
+                and item.get('created_at_ts', 0) > last_viewed_ts
             )
 
             return {
@@ -1520,6 +1534,61 @@ def get_chat_pending_replies():
             return {'success': True, 'pending_count': 0, 'has_unreplied': False}
 
     return {'success': True, 'pending_count': 0, 'has_unreplied': False}
+
+
+@app.route('/api/chat/mark-viewed', methods=['POST'])
+@login_required
+def mark_chat_viewed():
+    """Mark the chat as viewed by the user."""
+    user_id = session.get('user_id')
+
+    if db:
+        try:
+            import time
+            current_ts = int(time.time())
+            
+            # Store the last viewed timestamp
+            db.collection('user_chat_meta').document(user_id).set({
+                'last_viewed_at': current_ts,
+                'user_id': user_id
+            }, merge=True)
+
+            return {'success': True}
+        except Exception as e:
+            print(f"Error marking chat as viewed: {e}")
+            return {'success': False, 'message': str(e)}, 500
+
+    return {'success': False, 'message': 'Database not available'}, 500
+
+
+@app.route('/api/chat/unread-count')
+@login_required
+def get_chat_unread_count():
+    """Return unread admin messages for the current user."""
+    user_id = session.get('user_id')
+
+    if db:
+        try:
+            # Get messages from admin to this user that are unread
+            messages_ref = db.collection('chats').where('user_id', '==', user_id).get()
+            
+            unread_count = 0
+            for doc in messages_ref:
+                data = doc.to_dict() or {}
+                # Count admin messages that are not read by the user
+                if data.get('sender') == 'admin' and data.get('status') != 'read':
+                    unread_count += 1
+
+            return {
+                'success': True,
+                'unread_count': unread_count,
+                'has_unread': unread_count > 0
+            }
+        except Exception as e:
+            print(f"Error fetching unread chat count: {e}")
+            return {'success': True, 'unread_count': 0, 'has_unread': False}
+
+    return {'success': True, 'unread_count': 0, 'has_unread': False}
 
 
 # Admin API - Get all chat messages (admin only)
@@ -3601,6 +3670,14 @@ def revoke_vip(user_id):
     
     if db:
         try:
+            print(f"Revoking VIP for user: {user_id}")
+            
+            # Check if user exists
+            user_doc = db.collection('users').document(user_id).get()
+            if not user_doc.exists:
+                return {'success': False, 'message': 'User not found'}, 404
+            
+            # Update user VIP status
             db.collection('users').document(user_id).update({
                 'is_vip': False,
                 'isVIP': False,
@@ -3609,11 +3686,13 @@ def revoke_vip(user_id):
                 'vip_revoked_at': firestore.SERVER_TIMESTAMP
             })
             
+            print(f"Successfully revoked VIP for user: {user_id}")
             return {'success': True, 'message': 'VIP status revoked'}
         except Exception as e:
+            print(f"Error revoking VIP: {e}")
             return {'success': False, 'message': str(e)}, 500
     
-    return {'success': False, 'message': 'Error'}, 500
+    return {'success': False, 'message': 'Database not available'}, 500
 
 
 @app.route('/admin/chat')

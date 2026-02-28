@@ -734,7 +734,10 @@
         }
 
         async function revokeVip() {
-            if (!selectedVipId) return;
+            if (!selectedVipId) {
+                alert('No VIP user selected');
+                return;
+            }
 
             try {
                 const response = await fetch(`/api/admin/vips/${selectedVipId}/revoke`, {
@@ -742,14 +745,17 @@
                 });
                 
                 const result = await response.json();
+                console.log('Revoke result:', result);
+                
                 if (result.success) {
                     closeConfirmModal();
                     loadVips();
                 } else {
-                    alert('Error: ' + result.message);
+                    alert('Error: ' + (result.message || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error revoking VIP:', error);
+                alert('Error revoking VIP. Check console for details.');
             }
         }
 

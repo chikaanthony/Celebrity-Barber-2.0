@@ -144,6 +144,15 @@
             }
         }
         
+        // Mark chat as viewed when page loads
+        async function markChatViewed() {
+            try {
+                await fetch('/api/chat/mark-viewed', { method: 'POST' });
+            } catch (error) {
+                console.error('Error marking chat as viewed:', error);
+            }
+        }
+        
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
@@ -189,6 +198,7 @@
         loadMessages();
         checkAdminStatus();
         sendHeartbeat();
+        markChatViewed();
         
         // Refresh messages every 10 seconds
         setInterval(loadMessages, 10000);
