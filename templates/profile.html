@@ -80,20 +80,59 @@
         </div>
     </div>
     
-    <script>
-        // Initialize profile photo from sessionStorage or use default
-        let currentPhoto = sessionStorage.getItem('profilePhoto') || null;
+        <script>
+        let currentPhoto = null;
         let pendingPhoto = null;
-        
-        // Initialize on load
-        window.onload = function() {
-            updateAvatarDisplay();
-        };
-        
+
+        window.addEventListener('DOMContentLoaded', async function() {
+            await loadProfileFromServer();
+        });
+
+        async function loadProfileFromServer() {
+            try {
+                const response = await fetch('/api/user/profile');
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    const data = result.data;
+                    const fullName = document.getElementById('fullName');
+                    const phone = document.getElementById('phone');
+                    const address = document.getElementById('address');
+
+                    if (fullName && data.full_name) fullName.value = data.full_name;
+                    if (phone) phone.value = data.phone || '';
+                    if (address) address.value = data.address || '';
+
+                    currentPhoto =
+                        data.photo_url ||
+                        data.profile_photo ||
+                        data.profilePhoto ||
+                        data.photo ||
+                        data.avatar ||
+                        null;
+
+                    if (currentPhoto) {
+                        sessionStorage.setItem('profilePhoto', currentPhoto);
+                    } else {
+                        sessionStorage.removeItem('profilePhoto');
+                    }
+
+                    updateAvatarDisplay();
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                const fallback = sessionStorage.getItem('profilePhoto');
+                currentPhoto = fallback || null;
+                updateAvatarDisplay();
+            }
+        }
+
         function updateAvatarDisplay() {
             const avatarImage = document.getElementById('avatarImage');
             const avatarEmoji = document.getElementById('avatarEmoji');
-            
+
+            if (!avatarImage || !avatarEmoji) return;
+
             if (currentPhoto) {
                 avatarImage.src = currentPhoto;
                 avatarImage.style.display = 'block';
@@ -103,24 +142,21 @@
                 avatarEmoji.style.display = 'flex';
             }
         }
-        
+
         function handlePhotoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
-            // Validate file type
+
             if (!file.type.startsWith('image/')) {
                 alert('Please select an image file');
                 return;
             }
-            
-            // Validate file size (max 5MB)
+
             if (file.size > 5 * 1024 * 1024) {
                 alert('Image must be less than 5MB');
                 return;
             }
-            
-            // Read and preview the image
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 pendingPhoto = e.target.result;
@@ -128,64 +164,101 @@
             };
             reader.readAsDataURL(file);
         }
-        
+
         function showPreview(photoData) {
             const modal = document.getElementById('previewModal');
             const previewImage = document.getElementById('previewImage');
-            
             previewImage.src = photoData;
             modal.style.display = 'flex';
         }
-        
+
         function cancelUpload() {
             document.getElementById('previewModal').style.display = 'none';
             document.getElementById('photoInput').value = '';
             pendingPhoto = null;
         }
-        
-        function savePhoto() {
+
+        async function savePhoto() {
+            if (!pendingPhoto) return;
+
+            const success = await persistProfile({ photo_url: pendingPhoto });
+            if (!success) return;
+
             currentPhoto = pendingPhoto;
             sessionStorage.setItem('profilePhoto', currentPhoto);
             updateAvatarDisplay();
-            
+
             document.getElementById('previewModal').style.display = 'none';
             document.getElementById('photoInput').value = '';
             pendingPhoto = null;
-            
+
             showSuccessToast('Profile photo updated!');
         }
-        
-        function deletePhoto() {
+
+        async function deletePhoto() {
             if (!currentPhoto) {
                 alert('No photo to delete');
                 return;
             }
-            
-            if (confirm('Are you sure you want to delete your profile photo?')) {
-                currentPhoto = null;
-                sessionStorage.removeItem('profilePhoto');
-                updateAvatarDisplay();
-                showSuccessToast('Profile photo deleted');
+
+            if (!confirm('Are you sure you want to delete your profile photo?')) {
+                return;
             }
+
+            const success = await persistProfile({ photo_url: '' });
+            if (!success) return;
+
+            currentPhoto = null;
+            sessionStorage.removeItem('profilePhoto');
+            updateAvatarDisplay();
+            showSuccessToast('Profile photo deleted');
         }
-        
-        function updateProfile(event) {
+
+        async function updateProfile(event) {
             event.preventDefault();
-            
+
             const fullName = document.getElementById('fullName').value;
             const phone = document.getElementById('phone').value;
             const address = document.getElementById('address').value;
-            
-            // Here you would typically save to database
-            // For now, we show success
-            showSuccessToast('Profile updated successfully!');
+
+            const success = await persistProfile({
+                full_name: fullName,
+                phone: phone,
+                address: address
+            });
+
+            if (success) {
+                showSuccessToast('Profile updated successfully!');
+            }
         }
-        
+
+        async function persistProfile(payload) {
+            try {
+                const response = await fetch('/api/user/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (!result.success) {
+                    alert(result.message || 'Unable to save profile changes.');
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('Error saving profile changes. Please try again.');
+                return false;
+            }
+        }
+
         function showSuccessToast(message) {
             const toast = document.getElementById('successToast');
-            toast.textContent = '✓ ' + message;
+            toast.textContent = '\u2713 ' + message;
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
@@ -193,3 +266,4 @@
     </script>
 </body>
 </html>
+

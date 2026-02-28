@@ -58,20 +58,23 @@
 
     <!-- Main Content -->
     <div class="dashboard-content">
-        
         <!-- Latest Updates -->
         <div class="dashboard-card updates-card">
-            <h3>📢 LATEST UPDATES</h3>
-            <div class="updates-ticker">
-                <div class="ticker-track">
-                    <span>🎉 New VIP perks available! Get priority queueing and 2 free haircuts monthly.</span>
-                    <span>🔥 Refer a friend and earn free cuts!</span>
-                    <span>💈 Weekend special: 20% off all services!</span>
-                    <span>✨ New style available - Ask our barbers!</span>
+            <h3>LATEST UPDATES</h3>
+            <div class="updates-ticker" id="updatesTicker">
+                <div class="ticker-track" id="updatesTrack">
+                    <article class="update-slide active">
+                        <div class="update-media update-media-placeholder">NEWS</div>
+                        <div class="update-content">
+                            <h4>Welcome</h4>
+                            <p>Latest announcements will appear here.</p>
+                            <span class="update-time">Just now</span>
+                        </div>
+                    </article>
                 </div>
+                <div class="update-dots" id="updateDots"></div>
             </div>
         </div>
-
         <!-- Spending Streak - loads from database -->
         <div class="dashboard-card spending-card">
             <h3>💰 SPENDING STREAK BONUS</h3>
@@ -103,12 +106,12 @@
                         <div id="dash-m1-circle" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: calc(18px * var(--mobile-font-scale, 1)); border: 2px solid rgba(255,255,255,0.2); margin-bottom: 5px; transition: all 0.3s;">🎟️</div>
                         <span id="dash-m1-label" style="color: #aaa; font-size: calc(10px * var(--mobile-font-scale, 1)); text-align: center;">30% OFF</span>
                     </div>
-                    <div style="flex: 1; height: 2px; background: rgba(255,255,255,0.2); margin: 0 5px; margin-bottom: 20px;"></div>
+                    <div class="dash-m-line"></div>
                     <div id="dash-m2" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
                         <div id="dash-m2-circle" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: calc(18px * var(--mobile-font-scale, 1)); border: 2px solid rgba(255,255,255,0.2); margin-bottom: 5px; transition: all 0.3s;">🎟️</div>
                         <span id="dash-m2-label" style="color: #aaa; font-size: calc(10px * var(--mobile-font-scale, 1)); text-align: center;">60% OFF</span>
                     </div>
-                    <div style="flex: 1; height: 2px; background: rgba(255,255,255,0.2); margin: 0 5px; margin-bottom: 20px;"></div>
+                    <div class="dash-m-line"></div>
                     <div id="dash-m3" style="display: flex; flex-direction: column; align-items: center; flex: 1;">
                         <div id="dash-m3-circle" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: calc(18px * var(--mobile-font-scale, 1)); border: 2px solid rgba(255,255,255,0.2); margin-bottom: 5px; transition: all 0.3s;">✂️</div>
                         <span id="dash-m3-label" style="color: #aaa; font-size: calc(10px * var(--mobile-font-scale, 1)); text-align: center;">FREE CUT</span>
@@ -149,14 +152,13 @@
             </div>
         </div>
     </div>
-
     <!-- Floating Message Button -->
     <div class="floating-message">
         <button class="message-btn" onclick="window.location.href='/chat'">
-            <span>💬</span>
+            <span>&#128172;</span>
         </button>
+        <span class="message-badge" id="chatPendingBadge" style="display:none;">0</span>
     </div>
-
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <button class="nav-item" onclick="window.location.href='/bookcut'">
@@ -194,15 +196,18 @@
         </div>
     </div>
 
-    <script>
-        // Load notification count on page load
+        <script>
+        let currentReferralCount = 0;
+        let updatesTimer = null;
+        let currentUpdateIndex = 0;
+        window.broadcastsData = [];
+
         async function loadNotificationCount() {
             try {
                 const response = await fetch('/api/user/notifications');
                 const result = await response.json();
-                
-                if (result.success && result.data) {
-                    // Count unread notifications
+
+                if (result.success && Array.isArray(result.data)) {
                     const unreadCount = result.data.filter(n => n.unread === true).length;
                     const badge = document.getElementById('notifBadge');
                     if (badge) {
@@ -214,15 +219,34 @@
                 console.error('Error loading notifications:', error);
             }
         }
-        
-        // Send heartbeat to keep user online
+
+        async function loadPendingChatReplies() {
+            try {
+                const response = await fetch('/api/chat/pending-replies');
+                const result = await response.json();
+                const badge = document.getElementById('chatPendingBadge');
+                if (!badge) return;
+
+                if (result.success && Number(result.pending_count || 0) > 0) {
+                    const count = Number(result.pending_count || 0);
+                    badge.textContent = count > 99 ? '99+' : String(count);
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading pending chat replies:', error);
+            }
+        }
+
         async function sendHeartbeat() {
             try {
                 await fetch('/api/user/heartbeat', { method: 'POST' });
-            } catch (e) {}
+            } catch (e) {
+                // no-op
+            }
         }
-        
-        // Expose function for notifications page to call
+
         window.updateNotificationBadge = function(count) {
             const badge = document.getElementById('notifBadge');
             if (badge) {
@@ -230,13 +254,12 @@
                 badge.style.display = count > 0 ? 'flex' : 'none';
             }
         };
-        
-        // Load user spending on page load
+
         async function loadUserSpending() {
             try {
                 const response = await fetch('/api/user/spending');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     updateSpendingDisplay(result.total_spent);
                 }
@@ -244,26 +267,71 @@
                 console.error('Error loading spending:', error);
             }
         }
-        
-        // Load user profile to get VIP status and referral count
+
+        function applyProfilePhoto(photoUrl) {
+            const avatarEl = document.getElementById('dashboardAvatar');
+            if (!avatarEl) return;
+
+            let img = document.getElementById('dashboardAvatarImg');
+
+            if (photoUrl) {
+                if (!img) {
+                    img = document.createElement('img');
+                    img.id = 'dashboardAvatarImg';
+                    img.alt = 'Profile photo';
+                    img.style.cssText = 'width: 100%; height: 100%; object-fit: cover; border-radius: 50%;';
+                    avatarEl.parentNode.appendChild(img);
+                }
+                img.src = photoUrl;
+                img.style.display = 'block';
+                avatarEl.style.display = 'none';
+            } else {
+                if (img) {
+                    img.style.display = 'none';
+                }
+                avatarEl.style.display = 'flex';
+            }
+        }
+
         async function loadUserProfile() {
             try {
                 const response = await fetch('/api/user/profile');
                 const result = await response.json();
-                
+
                 if (result.success && result.data) {
                     const isVIP = result.data.is_vip === true || result.data.isVIP === true;
                     updateVIPStatus(isVIP);
-                    
-                    // Update referral streak
-                    const referralCount = result.data.referral_count || 0;
-                    updateReferralStreak(referralCount);
+
+                    currentReferralCount = Number(result.data.referral_count || 0);
+                    updateReferralStreak(currentReferralCount);
+
+                    const photoUrl =
+                        result.data.photo_url ||
+                        result.data.profile_photo ||
+                        result.data.profilePhoto ||
+                        result.data.photo ||
+                        result.data.avatar ||
+                        sessionStorage.getItem('profilePhoto') ||
+                        '';
+                    applyProfilePhoto(photoUrl);
                 }
             } catch (error) {
                 console.error('Error loading profile:', error);
             }
         }
-        
+
+        function getReferralThemePalette() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            return {
+                inactiveBg: isLight ? 'rgba(15, 23, 42, 0.06)' : 'rgba(255,255,255,0.1)',
+                inactiveBorder: isLight ? 'rgba(15, 23, 42, 0.16)' : 'rgba(255,255,255,0.2)',
+                inactiveLabel: isLight ? '#64748b' : '#aaa',
+                activeBg: 'rgba(212, 175, 55, 0.28)',
+                activeBorder: '#d4af37',
+                activeLabel: isLight ? '#8a6a15' : '#d4af37'
+            };
+        }
+
         function updateReferralStreak(count) {
             const m1Circle = document.getElementById('dash-m1-circle');
             const m1Label = document.getElementById('dash-m1-label');
@@ -272,31 +340,31 @@
             const m3Circle = document.getElementById('dash-m3-circle');
             const m3Label = document.getElementById('dash-m3-label');
             const hint = document.getElementById('referralStreakHint');
-            
-            // Reset all
-            if(m1Circle) { m1Circle.style.background = 'rgba(255,255,255,0.1)'; m1Circle.style.borderColor = 'rgba(255,255,255,0.2)'; }
-            if(m1Label) m1Label.style.color = '#aaa';
-            if(m2Circle) { m2Circle.style.background = 'rgba(255,255,255,0.1)'; m2Circle.style.borderColor = 'rgba(255,255,255,0.2)'; }
-            if(m2Label) m2Label.style.color = '#aaa';
-            if(m3Circle) { m3Circle.style.background = 'rgba(255,255,255,0.1)'; m3Circle.style.borderColor = 'rgba(255,255,255,0.2)'; }
-            if(m3Label) m3Label.style.color = '#aaa';
-            
+            const palette = getReferralThemePalette();
+
+            if (m1Circle) { m1Circle.style.background = palette.inactiveBg; m1Circle.style.borderColor = palette.inactiveBorder; }
+            if (m1Label) m1Label.style.color = palette.inactiveLabel;
+            if (m2Circle) { m2Circle.style.background = palette.inactiveBg; m2Circle.style.borderColor = palette.inactiveBorder; }
+            if (m2Label) m2Label.style.color = palette.inactiveLabel;
+            if (m3Circle) { m3Circle.style.background = palette.inactiveBg; m3Circle.style.borderColor = palette.inactiveBorder; }
+            if (m3Label) m3Label.style.color = palette.inactiveLabel;
+
             if (count >= 1) {
-                if(m1Circle) { m1Circle.style.background = 'rgba(212, 175, 55, 0.3)'; m1Circle.style.borderColor = '#d4af37'; }
-                if(m1Label) m1Label.style.color = '#d4af37';
+                if (m1Circle) { m1Circle.style.background = palette.activeBg; m1Circle.style.borderColor = palette.activeBorder; }
+                if (m1Label) m1Label.style.color = palette.activeLabel;
             }
             if (count >= 2) {
-                if(m2Circle) { m2Circle.style.background = 'rgba(212, 175, 55, 0.3)'; m2Circle.style.borderColor = '#d4af37'; }
-                if(m2Label) m2Label.style.color = '#d4af37';
+                if (m2Circle) { m2Circle.style.background = palette.activeBg; m2Circle.style.borderColor = palette.activeBorder; }
+                if (m2Label) m2Label.style.color = palette.activeLabel;
             }
             if (count >= 3) {
-                if(m3Circle) { m3Circle.style.background = 'rgba(212, 175, 55, 0.3)'; m3Circle.style.borderColor = '#d4af37'; }
-                if(m3Label) m3Label.style.color = '#d4af37';
+                if (m3Circle) { m3Circle.style.background = palette.activeBg; m3Circle.style.borderColor = palette.activeBorder; }
+                if (m3Label) m3Label.style.color = palette.activeLabel;
             }
-            
-            if(hint) {
+
+            if (hint) {
                 if (count >= 3) {
-                    hint.textContent = '🎉 You unlocked a FREE CUT! Great job!';
+                    hint.textContent = 'You unlocked a FREE CUT. Great job!';
                 } else if (count >= 1) {
                     hint.textContent = `${3 - count} more referral(s) to get a FREE CUT!`;
                 } else {
@@ -304,99 +372,193 @@
                 }
             }
         }
-        
-        // Load broadcasts for Latest Updates
+
+        function observeThemeChanges() {
+            const observer = new MutationObserver(() => {
+                updateReferralStreak(currentReferralCount);
+            });
+            observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme']
+            });
+        }
+
         async function loadBroadcasts() {
             try {
                 const response = await fetch('/api/broadcasts');
                 const result = await response.json();
-                
-                if (result.success && result.data && result.data.length > 0) {
+
+                if (result.success && Array.isArray(result.data) && result.data.length > 0) {
                     updateLatestUpdates(result.data);
+                } else {
+                    updateLatestUpdates([]);
                 }
             } catch (error) {
                 console.error('Error loading broadcasts:', error);
+                updateLatestUpdates([]);
             }
         }
-        
+
+        function parseBroadcastDate(value) {
+            if (!value) return null;
+
+            if (typeof value === 'number') {
+                const ms = value > 1_000_000_000_000 ? value : value * 1000;
+                const date = new Date(ms);
+                return Number.isNaN(date.getTime()) ? null : date;
+            }
+
+            if (typeof value === 'string') {
+                const date = new Date(value);
+                return Number.isNaN(date.getTime()) ? null : date;
+            }
+
+            if (typeof value === 'object') {
+                if (typeof value.toDate === 'function') {
+                    const date = value.toDate();
+                    return Number.isNaN(date.getTime()) ? null : date;
+                }
+                const seconds = value._seconds || value.seconds;
+                if (typeof seconds === 'number') {
+                    const date = new Date(seconds * 1000);
+                    return Number.isNaN(date.getTime()) ? null : date;
+                }
+            }
+
+            return null;
+        }
+
+        function formatBroadcastDate(value) {
+            const date = parseBroadcastDate(value);
+            if (!date) return 'Recent';
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
         function updateLatestUpdates(broadcasts) {
-            const ticker = document.querySelector('.ticker-track');
-            // Store broadcasts globally for popup access
-            window.broadcastsData = broadcasts;
-            
-            if (ticker && broadcasts.length > 0) {
-                ticker.innerHTML = '';
-                
-                // Create content twice for seamless infinite scroll
-                const createItems = () => {
-                    broadcasts.forEach((broadcast, index) => {
-                        const span = document.createElement('span');
-                        span.style.cursor = 'pointer';
-                        span.style.display = 'inline-flex';
-                        span.style.alignItems = 'center';
-                        span.style.marginRight = '30px';
-                        span.onclick = () => showBroadcastPopup(index);
-                        
-                        // Add image if available
-                        if (broadcast.image) {
-                            const img = document.createElement('img');
-                            img.src = broadcast.image;
-                            img.alt = 'Update';
-                            img.style.width = '40px';
-                            img.style.height = '40px';
-                            img.style.objectFit = 'cover';
-                            img.style.marginRight = '8px';
-                            img.style.borderRadius = '4px';
-                            span.appendChild(img);
-                        }
-                        
-                        const textNode = document.createTextNode('📢 ' + broadcast.title + ': ' + broadcast.content);
-                        span.appendChild(textNode);
-                        ticker.appendChild(span);
-                    });
-                };
-                
-                createItems(); // First set
-                createItems(); // Duplicate for seamless loop
-                
-                // Restart scrolling with new content
-                startTickerScroll();
+            const track = document.getElementById('updatesTrack');
+            const dots = document.getElementById('updateDots');
+            if (!track || !dots) return;
+
+            if (updatesTimer) {
+                clearInterval(updatesTimer);
+                updatesTimer = null;
+            }
+
+            const cleanBroadcasts = Array.isArray(broadcasts) ? broadcasts.filter(Boolean) : [];
+            window.broadcastsData = cleanBroadcasts;
+
+            if (cleanBroadcasts.length === 0) {
+                track.innerHTML = `
+                    <article class="update-slide active">
+                        <div class="update-media update-media-placeholder">NEWS</div>
+                        <div class="update-content">
+                            <h4>No Updates Yet</h4>
+                            <p>Announcements from the team will appear here.</p>
+                            <span class="update-time">Now</span>
+                        </div>
+                    </article>
+                `;
+                dots.innerHTML = '';
+                return;
+            }
+
+            track.innerHTML = cleanBroadcasts.map((broadcast, index) => {
+                const title = String(broadcast.title || 'Announcement');
+                const content = String(broadcast.content || '');
+                const timeLabel = formatBroadcastDate(broadcast.createdAt || broadcast.created_at || broadcast.created_at_iso);
+                const media = broadcast.image
+                    ? `<img class="update-media" src="${broadcast.image}" alt="Announcement image">`
+                    : '<div class="update-media update-media-placeholder">NEWS</div>';
+
+                return `
+                    <article class="update-slide ${index === 0 ? 'active' : ''}" data-index="${index}" onclick="showBroadcastPopup(${index})">
+                        ${media}
+                        <div class="update-content">
+                            <h4>${title}</h4>
+                            <p>${content}</p>
+                            <span class="update-time">${timeLabel}</span>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            dots.innerHTML = cleanBroadcasts.map((_, index) => `
+                <button type="button" class="update-dot ${index === 0 ? 'active' : ''}" onclick="event.stopPropagation(); activateUpdateSlide(${index}, true)"></button>
+            `).join('');
+
+            currentUpdateIndex = 0;
+            startUpdatesCarousel();
+        }
+
+        function activateUpdateSlide(index, restartTimer = false) {
+            const slides = document.querySelectorAll('#updatesTrack .update-slide');
+            const dots = document.querySelectorAll('#updateDots .update-dot');
+            if (!slides.length) return;
+
+            const max = slides.length;
+            const nextIndex = ((index % max) + max) % max;
+            currentUpdateIndex = nextIndex;
+
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === nextIndex);
+            });
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === nextIndex);
+            });
+
+            if (restartTimer) {
+                startUpdatesCarousel();
             }
         }
-        
+
+        function startUpdatesCarousel() {
+            if (updatesTimer) {
+                clearInterval(updatesTimer);
+                updatesTimer = null;
+            }
+
+            const slides = document.querySelectorAll('#updatesTrack .update-slide');
+            if (slides.length <= 1) return;
+
+            updatesTimer = setInterval(() => {
+                activateUpdateSlide(currentUpdateIndex + 1);
+            }, 6500);
+        }
+
         function showBroadcastPopup(index) {
             const broadcast = window.broadcastsData[index];
             if (!broadcast) return;
-            
+
             const popupBody = document.getElementById('update-popup-body');
             let html = '';
-            
-            // Add image if available
+
             if (broadcast.image) {
-                html += `<img src="${broadcast.image}" alt="Update Image" style="max-width: 100%; border-radius: 10px; margin-bottom: 15px;">`;
+                html += `<img src="${broadcast.image}" alt="Update Image" style="width:100%;max-height:360px;object-fit:cover;border-radius:12px;margin-bottom:15px;">`;
             }
-            
-            html += `<h3>${broadcast.title}</h3>`;
-            html += `<p>${broadcast.content}</p>`;
-            
-            // Add date if available
-            if (broadcast.createdAt) {
-                const date = new Date(broadcast.createdAt * 1000);
-                html += `<p class="popup-date">Posted: ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>`;
-            }
-            
+
+            html += `<h3>${broadcast.title || 'Announcement'}</h3>`;
+            html += `<p>${broadcast.content || ''}</p>`;
+
+            const dateLabel = formatBroadcastDate(broadcast.createdAt || broadcast.created_at || broadcast.created_at_iso);
+            html += `<p class="popup-date">Posted: ${dateLabel}</p>`;
+
             popupBody.innerHTML = html;
             showPopup('update-popup');
         }
-        
+
         function updateVIPStatus(isVIP) {
             const vipIndicator = document.getElementById('vipIndicator');
             const vipBadge = document.getElementById('vipBadge');
             const vipStatus = document.getElementById('vipStatus');
-            
+
             if (isVIP) {
                 if (vipIndicator) vipIndicator.style.display = 'inline-flex';
-                if (vipBadge) vipBadge.textContent = '👑 VIP';
+                if (vipBadge) vipBadge.textContent = 'VIP';
                 if (vipStatus) {
                     vipStatus.textContent = 'Active';
                     vipStatus.style.display = 'inline';
@@ -409,67 +571,48 @@
                 }
             }
         }
-        
+
         function updateSpendingDisplay(totalSpent) {
             const goal = 5000;
             const bonusAmount = 500;
-            
-            // Calculate current streak (modulo) and bonuses earned
             const currentStreak = totalSpent % goal;
             const bonusesEarned = Math.floor(totalSpent / goal);
-            
             const percentage = Math.min((currentStreak / goal) * 100, 100);
             const remaining = Math.max(goal - currentStreak, 0);
-            
-            // Update pie chart
+
             const pie = document.getElementById('spendingPie');
             if (pie) {
                 const dashValue = (percentage / 100) * 251.2;
                 pie.setAttribute('stroke-dasharray', dashValue + ' 251.2');
             }
-            
-            // Update amount text
+
             const amountText = document.getElementById('spendingAmount');
             if (amountText) {
-                amountText.textContent = '₦' + currentStreak.toLocaleString();
+                amountText.textContent = 'NGN ' + currentStreak.toLocaleString();
             }
-            
-            // Update progress bar
+
             const progress = document.getElementById('spendingProgress');
             if (progress) {
                 progress.style.width = percentage + '%';
             }
-            
-            // Update hint
+
             const hint = document.getElementById('spendingHint');
             if (hint) {
                 if (bonusesEarned > 0) {
-                    hint.textContent = `🔥 ${bonusesEarned} bonus${bonusesEarned > 1 ? 'es' : ''} earned (₦${(bonusesEarned * bonusAmount).toLocaleString()})!`;
+                    hint.textContent = `${bonusesEarned} bonus${bonusesEarned > 1 ? 'es' : ''} earned (NGN ${(bonusesEarned * bonusAmount).toLocaleString()})`;
                 } else if (currentStreak >= goal) {
-                    hint.textContent = '🎉 Bonus unlocked!';
+                    hint.textContent = 'Bonus unlocked!';
                 } else {
-                    hint.textContent = '₦' + remaining.toLocaleString() + ' more to unlock bonus';
+                    hint.textContent = 'NGN ' + remaining.toLocaleString() + ' more to unlock bonus';
                 }
             }
         }
-        
-        // Load spending on page load
-        loadUserSpending();
-        loadUserProfile();
-        loadNotificationCount();
-        sendHeartbeat();
-        
-        // Send heartbeat every minute to keep user online
-        setInterval(sendHeartbeat, 60000);
-        loadBroadcasts();
-        
-        // Mobile Menu Toggle
+
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('active');
         }
 
-        // Popup Functions
         function showPopup(popupId) {
             document.getElementById(popupId).classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -480,31 +623,17 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Auto-scrolling updates
-        let tickerInterval = null;
-        
-        function startTickerScroll() {
-            const tickerTrack = document.querySelector('.ticker-track');
-            if (!tickerTrack) return;
-            
-            // Clear any existing interval
-            if (tickerInterval) clearInterval(tickerInterval);
-            
-            let scrollPos = 0;
-            tickerInterval = setInterval(() => {
-                const trackWidth = tickerTrack.scrollWidth / 2; // Width of one set of items
-                scrollPos -= 1;
-                if (scrollPos < -trackWidth) {
-                    scrollPos = 0;
-                }
-                tickerTrack.style.transform = `translateX(${scrollPos}px)`;
-            }, 30);
-        }
-        
-        // Start scroll after content loads
-        startTickerScroll();
+        loadUserSpending();
+        loadUserProfile();
+        loadNotificationCount();
+        loadPendingChatReplies();
+        sendHeartbeat();
+        loadBroadcasts();
+        observeThemeChanges();
 
-        // Close popup when clicking outside
+        setInterval(sendHeartbeat, 60000);
+        setInterval(loadPendingChatReplies, 15000);
+
         document.querySelectorAll('.popup-overlay').forEach(popup => {
             popup.addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -513,20 +642,8 @@
                 }
             });
         });
-        
-        // Load profile photo from session storage
-        const savedPhoto = sessionStorage.getItem('profilePhoto');
-        if (savedPhoto) {
-            const avatarEl = document.getElementById('dashboardAvatar');
-            if (avatarEl) {
-                avatarEl.style.display = 'none';
-                const img = document.createElement('img');
-                img.src = savedPhoto;
-                img.style.cssText = 'width: 100%; height: 100%; object-fit: cover; border-radius: 50%;';
-                avatarEl.parentNode.appendChild(img);
-            }
-        }
     </script>
-
 </body>
 </html>
+
+

@@ -1,3 +1,30 @@
+/* Payment card theme tokens (match Bookcut card style) */
+:root {
+    --vip-payment-card-bg: #111;
+    --vip-payment-card-border: #222;
+    --vip-payment-label: #999;
+    --vip-payment-value: #fff;
+    --vip-copy-btn-border: rgba(212, 175, 55, 0.5);
+    --vip-copy-btn-bg: rgba(212, 175, 55, 0.08);
+    --vip-copy-btn-hover-bg: rgba(212, 175, 55, 0.15);
+    --vip-copy-btn-text: #d4af37;
+    --vip-copy-ok: #6dff95;
+    --vip-copy-error: #ff8d8d;
+}
+
+html[data-theme="light"] {
+    --vip-payment-card-bg: #ffffff;
+    --vip-payment-card-border: rgba(15, 23, 42, 0.12);
+    --vip-payment-label: #64748b;
+    --vip-payment-value: #0f172a;
+    --vip-copy-btn-border: rgba(184, 137, 21, 0.38);
+    --vip-copy-btn-bg: rgba(212, 175, 55, 0.12);
+    --vip-copy-btn-hover-bg: rgba(212, 175, 55, 0.2);
+    --vip-copy-btn-text: #8f6b0f;
+    --vip-copy-ok: #0f766e;
+    --vip-copy-error: #b91c1c;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -140,19 +167,20 @@ body {
 
 .payment-title {
     font-size: calc(14px * var(--mobile-font-scale, 1));
-    color: rgba(255, 255, 255, 0.8);
+    color: #d4af37;
     margin-bottom: 12px;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 1px;
 }
 
 .payment-card {
-    background: rgba(212, 175, 55, 0.06);
-    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: var(--vip-payment-card-bg);
+    border: 2px solid var(--vip-payment-card-border);
     border-radius: 12px;
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .payment-row {
@@ -163,12 +191,12 @@ body {
 }
 
 .payment-label {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--vip-payment-label);
     font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .payment-value {
-    color: #fff;
+    color: var(--vip-payment-value);
     font-size: calc(14px * var(--mobile-font-scale, 1));
     font-weight: 600;
     text-transform: capitalize;
@@ -182,9 +210,9 @@ body {
 
 .copy-btn,
 .copy-all-btn {
-    border: 1px solid rgba(212, 175, 55, 0.5);
-    background: rgba(212, 175, 55, 0.08);
-    color: #d4af37;
+    border: 1px solid var(--vip-copy-btn-border);
+    background: var(--vip-copy-btn-bg);
+    color: var(--vip-copy-btn-text);
     border-radius: 8px;
     padding: 7px 12px;
     font-size: calc(12px * var(--mobile-font-scale, 1));
@@ -197,17 +225,17 @@ body {
 
 .copy-btn:hover,
 .copy-all-btn:hover {
-    background: rgba(212, 175, 55, 0.15);
+    background: var(--vip-copy-btn-hover-bg);
 }
 
 .copy-status {
     min-height: 18px;
-    color: #6dff95;
+    color: var(--vip-copy-ok);
     font-size: calc(12px * var(--mobile-font-scale, 1));
 }
 
 .copy-status.error {
-    color: #ff8d8d;
+    color: var(--vip-copy-error);
 }
 
 /* Upload Section */

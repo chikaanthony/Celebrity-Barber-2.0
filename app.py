@@ -110,7 +110,8 @@ html[data-theme="light"] .message.them .message-bubble,
 html[data-theme="light"] .notification-item,
 html[data-theme="light"] .profile-container,
 html[data-theme="light"] .preview-content,
-html[data-theme="light"] .page-container {
+html[data-theme="light"] .page-container,
+html[data-theme="light"] .settings-card {
     background: var(--light-panel) !important;
     border-color: var(--light-border) !important;
     box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
@@ -153,7 +154,11 @@ html[data-theme="light"] .notif-title,
 html[data-theme="light"] .history-info h4,
 html[data-theme="light"] .popup-body h3,
 html[data-theme="light"] .review-content,
-html[data-theme="light"] .review-content p {
+html[data-theme="light"] .review-content p,
+html[data-theme="light"] .settings-title,
+html[data-theme="light"] .settings-card h2,
+html[data-theme="light"] .referral-name,
+html[data-theme="light"] .history-name {
     color: var(--light-text) !important;
 }
 
@@ -204,7 +209,13 @@ html[data-theme="light"] .duration,
 html[data-theme="light"] .popup-date,
 html[data-theme="light"] .review-date,
 html[data-theme="light"] .empty-state,
-html[data-theme="light"] .loading {
+html[data-theme="light"] .loading,
+html[data-theme="light"] .settings-card p,
+html[data-theme="light"] .helper,
+html[data-theme="light"] .referral-email,
+html[data-theme="light"] .progress-hint,
+html[data-theme="light"] .history-title,
+html[data-theme="light"] .history-empty {
     color: var(--light-text-muted) !important;
 }
 
@@ -351,6 +362,10 @@ html[data-theme="light"] #referralStreakHint {
     color: var(--light-text-muted) !important;
 }
 
+html[data-theme="light"] .dash-m-line {
+    background: rgba(15, 23, 42, 0.16) !important;
+}
+
 html[data-theme="light"] .profile-section {
     background: linear-gradient(180deg, #f7f9fd 0%, #eff4fb 100%) !important;
     border-bottom: 1px solid var(--light-border) !important;
@@ -378,9 +393,33 @@ html[data-theme="light"] .vip-status {
 }
 
 html[data-theme="light"] .ticker-track span,
+html[data-theme="light"] .update-content p,
+html[data-theme="light"] .update-time,
 html[data-theme="light"] .popup-body p,
 html[data-theme="light"] .popup-body ul li {
     color: var(--light-text-muted) !important;
+}
+
+html[data-theme="light"] .update-content h4 {
+    color: var(--light-text) !important;
+}
+
+html[data-theme="light"] .update-media-placeholder {
+    background: linear-gradient(135deg, #eef3fa 0%, #e6edf6 100%) !important;
+    color: var(--gold) !important;
+    border-color: var(--light-border) !important;
+}
+
+html[data-theme="light"] .update-dot {
+    background: rgba(15, 23, 42, 0.26) !important;
+}
+
+html[data-theme="light"] .update-dot.active {
+    background: var(--gold) !important;
+}
+
+html[data-theme="light"] .message-badge {
+    box-shadow: 0 0 0 2px #ffffff !important;
 }
 
 html[data-theme="light"] .popup-close {
@@ -532,6 +571,38 @@ def parse_amount(value):
         except Exception:
             return 0.0
     return 0.0
+
+
+def resolve_user_photo(user_data):
+    if not isinstance(user_data, dict):
+        return ''
+
+    candidates = [
+        user_data.get('photo_url'),
+        user_data.get('profile_photo'),
+        user_data.get('profilePhoto'),
+        user_data.get('photo'),
+        user_data.get('avatar')
+    ]
+
+    for candidate in candidates:
+        if not isinstance(candidate, str):
+            continue
+
+        value = candidate.strip()
+        if not value:
+            continue
+
+        # Keep only likely image sources.
+        if (
+            value.startswith('data:image/')
+            or value.startswith('http://')
+            or value.startswith('https://')
+            or value.startswith('/')
+        ):
+            return value
+
+    return ''
 
 
 def to_local_datetime(value):
@@ -1222,15 +1293,15 @@ def get_leaderboard():
                 user_id = doc.id
                 total_spent = user_spending.get(user_id, 0)
                 
-                # Try different field names for profile photo
-                avatar = user_data.get('photo') or user_data.get('avatar') or user_data.get('profile_photo') or user_data.get('profilePhoto')
+                avatar = resolve_user_photo(user_data)
                 
                 users_list.append({
                     'user_id': user_id,
                     'name': user_data.get('full_name') or user_data.get('name') or user_data.get('email', '').split('@')[0],
                     'email': user_data.get('email', ''),
                     'total_spent': total_spent,
-                    'avatar': avatar
+                    'avatar': avatar,
+                    'photo_url': avatar
                 })
             
             # Sort by total_spent descending
@@ -1349,6 +1420,56 @@ def get_chat_messages():
             return {'success': True, 'data': []}
     
     return {'success': True, 'data': []}
+
+
+@app.route('/api/chat/pending-replies')
+@login_required
+def get_chat_pending_replies():
+    """Return pending user messages that have not received an admin reply yet."""
+    user_id = session.get('user_id')
+
+    if db:
+        try:
+            messages_ref = db.collection('chats').where('user_id', '==', user_id).limit(200).get()
+
+            message_list = []
+            for doc in messages_ref:
+                data = doc.to_dict() or {}
+                timestamp_source = (
+                    data.get('created_at')
+                    or data.get('createdAt')
+                    or getattr(doc, 'create_time', None)
+                )
+                chat_time = build_chat_time_payload(timestamp_source)
+                message_list.append({
+                    'sender': data.get('sender'),
+                    'created_at_ts': chat_time.get('created_at_ts', 0)
+                })
+
+            message_list.sort(key=lambda item: item.get('created_at_ts', 0))
+
+            last_admin_ts = 0
+            for item in message_list:
+                if item.get('sender') == 'admin':
+                    last_admin_ts = max(last_admin_ts, item.get('created_at_ts', 0))
+
+            pending_count = sum(
+                1
+                for item in message_list
+                if item.get('sender') == 'user'
+                and item.get('created_at_ts', 0) > last_admin_ts
+            )
+
+            return {
+                'success': True,
+                'pending_count': pending_count,
+                'has_unreplied': pending_count > 0
+            }
+        except Exception as e:
+            print(f"Error fetching pending chat replies: {e}")
+            return {'success': True, 'pending_count': 0, 'has_unreplied': False}
+
+    return {'success': True, 'pending_count': 0, 'has_unreplied': False}
 
 
 # Admin API - Get all chat messages (admin only)
@@ -1559,7 +1680,7 @@ def get_chat_users():
                             user_name = user_data.get('full_name', user_name)
                             user_email = user_data.get('email', user_email)
                             is_vip = user_data.get('is_vip', False) or user_data.get('isVIP', False)
-                            photo_url = user_data.get('photo_url', '')
+                            photo_url = resolve_user_photo(user_data)
                     except Exception:
                         pass
 
@@ -1790,7 +1911,7 @@ def search_users():
                         'email': data.get('email', ''),
                         'is_vip': data.get('is_vip', False) or data.get('isVIP', False),
                         'isVIP': data.get('is_vip', False) or data.get('isVIP', False),
-                        'photo_url': data.get('photo_url', '')
+                        'photo_url': resolve_user_photo(data)
                     })
             
             return {'success': True, 'data': results[:10]}  # Return max 10 results
@@ -2326,11 +2447,74 @@ def get_user_profile():
                 profile['isVIP'] = is_vip
                 if not profile.get('vip_expires') and profile.get('vipExpires'):
                     profile['vip_expires'] = profile.get('vipExpires')
+                profile['photo_url'] = resolve_user_photo(profile)
                 return {'success': True, 'data': profile}
         except Exception as e:
             return {'success': False, 'message': str(e)}, 500
     
     return {'success': False, 'message': 'User not found'}, 404
+
+
+@app.route('/api/user/profile', methods=['POST'])
+@login_required
+def update_user_profile():
+    user_id = session.get('user_id')
+    data = request.get_json() or {}
+
+    if not db:
+        return {'success': False, 'message': 'Database not available'}, 500
+
+    try:
+        updates = {}
+
+        if 'full_name' in data:
+            full_name = str(data.get('full_name') or '').strip()
+            if full_name:
+                updates['full_name'] = full_name
+                updates['name'] = full_name
+                session['user_name'] = full_name
+
+        if 'phone' in data:
+            updates['phone'] = str(data.get('phone') or '').strip()
+
+        if 'address' in data:
+            updates['address'] = str(data.get('address') or '').strip()
+
+        if 'photo_url' in data:
+            incoming_photo = str(data.get('photo_url') or '').strip()
+            normalized_photo = (
+                incoming_photo
+                if (
+                    incoming_photo.startswith('data:image/')
+                    or incoming_photo.startswith('http://')
+                    or incoming_photo.startswith('https://')
+                    or incoming_photo.startswith('/')
+                )
+                else ''
+            )
+            updates['photo_url'] = normalized_photo
+            # Keep legacy aliases in sync for older screens/endpoints.
+            updates['photo'] = normalized_photo
+            updates['avatar'] = normalized_photo
+            updates['profile_photo'] = normalized_photo
+            updates['profilePhoto'] = normalized_photo
+
+        if not updates:
+            return {'success': False, 'message': 'No valid updates provided'}, 400
+
+        db.collection('users').document(user_id).set(updates, merge=True)
+
+        refreshed_doc = db.collection('users').document(user_id).get()
+        refreshed = refreshed_doc.to_dict() if refreshed_doc.exists else {}
+        refreshed = refreshed or {}
+        refreshed['photo_url'] = resolve_user_photo(refreshed)
+        refreshed['is_vip'] = refreshed.get('is_vip', False) or refreshed.get('isVIP', False)
+        refreshed['isVIP'] = refreshed['is_vip']
+
+        return {'success': True, 'data': refreshed}
+    except Exception as e:
+        print(f"Error updating profile: {e}")
+        return {'success': False, 'message': str(e)}, 500
 
 
 @app.route('/api/user/bookings')
@@ -2377,8 +2561,9 @@ def get_all_users():
             users = db.collection('users').get()
             user_list = []
             for doc in users:
-                data = doc.to_dict()
+                data = doc.to_dict() or {}
                 data['user_id'] = doc.id
+                data['photo_url'] = resolve_user_photo(data)
                 user_list.append(data)
             return {'success': True, 'data': user_list}
         except Exception as e:
@@ -2892,7 +3077,7 @@ def get_all_referrals():
                     for referrer in referrers:
                         ref_data = referrer.to_dict()
                         referrer_name = ref_data.get('full_name', 'Unknown')
-                        referrer_photo = ref_data.get('photo_url', '')
+                        referrer_photo = resolve_user_photo(ref_data)
                         referral_count = ref_data.get('referral_count', 0)
                         break
 

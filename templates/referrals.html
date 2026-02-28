@@ -8,8 +8,40 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='clientdashboard.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ref-bg: #0a0a12;
+            --ref-card-bg: rgba(255, 255, 255, 0.05);
+            --ref-card-border: rgba(255, 255, 255, 0.1);
+            --ref-text: #ffffff;
+            --ref-muted: #aaaaaa;
+            --ref-soft: #666666;
+            --ref-gold: #d4af37;
+            --ref-btn-bg: rgba(212, 175, 55, 0.2);
+            --ref-btn-text: #d4af37;
+            --ref-btn-border: #d4af37;
+            --ref-progress-bg: rgba(255, 255, 255, 0.1);
+            --ref-progress-border: rgba(255, 255, 255, 0.2);
+            --ref-progress-line: rgba(255, 255, 255, 0.2);
+        }
+
+        html[data-theme="light"] {
+            --ref-bg: #f3f6fb;
+            --ref-card-bg: #ffffff;
+            --ref-card-border: rgba(15, 23, 42, 0.12);
+            --ref-text: #0f172a;
+            --ref-muted: #475569;
+            --ref-soft: #64748b;
+            --ref-gold: #b88915;
+            --ref-btn-bg: rgba(184, 137, 21, 0.08);
+            --ref-btn-text: #8a6a15;
+            --ref-btn-border: rgba(184, 137, 21, 0.45);
+            --ref-progress-bg: rgba(15, 23, 42, 0.06);
+            --ref-progress-border: rgba(15, 23, 42, 0.16);
+            --ref-progress-line: rgba(15, 23, 42, 0.16);
+        }
+
         body {
-            background: #0a0a12;
+            background: var(--ref-bg);
             min-height: 100vh;
             padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
         }
@@ -31,15 +63,15 @@
         
         .page-header h1 {
             font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
+            color: var(--ref-gold);
             font-size: calc(24px * var(--mobile-font-scale, 1));
             margin: 0;
         }
-        
+
         .back-btn {
-            background: rgba(212, 175, 55, 0.2);
-            color: #d4af37;
-            border: 1px solid #d4af37;
+            background: var(--ref-btn-bg);
+            color: var(--ref-btn-text);
+            border: 1px solid var(--ref-btn-border);
             padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
@@ -50,7 +82,7 @@
         }
         
         .back-btn:hover {
-            background: #d4af37;
+            background: var(--ref-gold);
             color: #0a0a12;
         }
         
@@ -62,51 +94,64 @@
         }
         
         .stat-box {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--ref-card-bg);
             border-radius: 15px;
             padding: 20px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--ref-card-border);
         }
         
         .stat-num {
             font-family: 'Orbitron', sans-serif;
             font-size: calc(36px * var(--mobile-font-scale, 1));
-            color: #d4af37;
+            color: var(--ref-gold);
             display: block;
         }
-        
+
         .stat-label {
-            color: #aaa;
+            color: var(--ref-muted);
             font-size: calc(14px * var(--mobile-font-scale, 1));
             margin-top: 5px;
         }
         
         .referral-section h2 {
             font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
+            color: var(--ref-gold);
             font-size: calc(18px * var(--mobile-font-scale, 1));
             margin-bottom: 15px;
         }
-        
+
         .referral-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--ref-card-bg);
             border-radius: 12px;
             padding: 15px 20px;
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--ref-card-border);
+            gap: 12px;
         }
         
         .referral-item:hover {
             border-color: rgba(212, 175, 55, 0.5);
         }
+
+        .referral-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
         
         .referral-name {
-            color: #fff;
+            color: var(--ref-text);
             font-weight: 600;
+        }
+
+        .referral-email {
+            color: var(--ref-muted);
+            font-size: calc(12px * var(--mobile-font-scale, 1));
         }
         
         .reward-earned {
@@ -140,18 +185,18 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #666;
+            color: var(--ref-soft);
         }
-        
+
         .empty-state h2 {
             font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
+            color: var(--ref-gold);
             margin-bottom: 10px;
         }
-        
+
         .referral-code-display {
             background: rgba(212, 175, 55, 0.1);
-            border: 1px solid #d4af37;
+            border: 1px solid var(--ref-gold);
             border-radius: 10px;
             padding: 15px;
             text-align: center;
@@ -164,29 +209,29 @@
         }
         
         .referral-code-label {
-            color: #aaa;
+            color: var(--ref-muted);
             font-size: calc(12px * var(--mobile-font-scale, 1));
             margin-bottom: 5px;
         }
-        
+
         .referral-code-value {
             font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
+            color: var(--ref-gold);
             font-size: calc(24px * var(--mobile-font-scale, 1));
         }
         
         /* Milestones */
         .progress-section {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--ref-card-bg);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--ref-card-border);
         }
         
         .progress-title {
             font-family: 'Orbitron', sans-serif;
-            color: #d4af37;
+            color: var(--ref-gold);
             font-size: calc(16px * var(--mobile-font-scale, 1));
             text-align: center;
             margin-bottom: 20px;
@@ -209,32 +254,38 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--ref-progress-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: calc(24px * var(--mobile-font-scale, 1));
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--ref-progress-border);
         }
-        
+
         .milestone-circle.active {
             background: rgba(212, 175, 55, 0.3);
-            border-color: #d4af37;
+            border-color: var(--ref-gold);
         }
-        
+
         .milestone-label {
-            color: #aaa;
+            color: var(--ref-muted);
             font-size: calc(11px * var(--mobile-font-scale, 1));
             margin-top: 8px;
             text-align: center;
         }
-        
+
         .milestone-line {
             flex: 1;
             height: 2px;
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--ref-progress-line);
             margin: 0 5px;
             margin-bottom: 20px;
+        }
+
+        .progress-hint {
+            text-align: center;
+            color: var(--ref-muted);
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -275,7 +326,7 @@
                     <span class="milestone-label">FREE CUT</span>
                 </div>
             </div>
-            <p style="text-align: center; color: #aaa; margin-top: 10px;">Refer friends to unlock rewards!</p>
+            <p class="progress-hint">Refer friends to unlock rewards!</p>
         </div>
         
         <div class="referral-stats">

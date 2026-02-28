@@ -127,6 +127,12 @@ body {
     gap: 5px;
     cursor: pointer;
     padding: 5px;
+    flex-shrink: 0;
+    width: 34px;
+    min-width: 34px;
+    align-items: center;
+    justify-content: center;
+    z-index: 1002;
 }
 
 .menu-icon span {
@@ -527,15 +533,47 @@ section {
 
 @media (max-width: 900px) {
     .navbar {
-        padding: 15px 20px;
+        padding: 15px 16px;
+        padding-right: 64px; /* Reserve icon space so large text cannot push it out */
+        gap: 8px;
+        position: fixed;
+        overflow: visible;
+    }
+
+    .logo {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .logo-text {
+        font-size: clamp(12px, calc(15px * var(--mobile-font-scale, 1)), 18px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .nav-links.desktop-only {
         display: none;
     }
+
+    .nav-auth {
+        gap: 8px;
+        flex: 0 0 auto;
+    }
+
+    .btn-login,
+    .btn-signup {
+        font-size: clamp(11px, calc(12px * var(--mobile-font-scale, 1)), 14px);
+        padding: 7px 12px;
+        white-space: nowrap;
+    }
     
     .menu-icon {
-        display: flex;
+        display: flex !important;
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
     }
     
     .brand-name {
@@ -557,13 +595,21 @@ section {
 }
 
 @media (max-width: 500px) {
+    .navbar {
+        padding-right: 56px;
+    }
+
     .nav-auth {
-        gap: 10px;
+        gap: 6px;
     }
     
+    .btn-login,
     .btn-signup {
-        padding: 8px 15px;
-        font-size: calc(12px * var(--mobile-font-scale, 1));
+        display: none;
+    }
+
+    .menu-icon {
+        right: 12px;
     }
     
     .btn-admin {

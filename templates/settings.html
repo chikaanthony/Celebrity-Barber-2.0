@@ -13,10 +13,38 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        :root {
+            --settings-bg: radial-gradient(circle at top, #1b1b1b 0%, #0a0a0a 70%);
+            --settings-text: #f4f4f4;
+            --settings-card-bg: rgba(255, 255, 255, 0.03);
+            --settings-card-border: rgba(212, 175, 55, 0.2);
+            --settings-heading: #ffffff;
+            --settings-muted: rgba(255, 255, 255, 0.72);
+            --settings-soft: rgba(255, 255, 255, 0.6);
+            --settings-btn-bg: #101010;
+            --settings-btn-text: #f4f4f4;
+            --settings-preview-border: rgba(255, 255, 255, 0.28);
+            --settings-preview-text: rgba(255, 255, 255, 0.9);
+        }
+
+        html[data-theme="light"] {
+            --settings-bg: radial-gradient(circle at top, #f8fafc 0%, #edf2f8 75%);
+            --settings-text: #0f172a;
+            --settings-card-bg: #ffffff;
+            --settings-card-border: rgba(15, 23, 42, 0.12);
+            --settings-heading: #0f172a;
+            --settings-muted: #334155;
+            --settings-soft: #475569;
+            --settings-btn-bg: #f8fafc;
+            --settings-btn-text: #0f172a;
+            --settings-preview-border: rgba(15, 23, 42, 0.2);
+            --settings-preview-text: #1e293b;
+        }
+
         body {
             min-height: 100dvh;
-            background: radial-gradient(circle at top, #1b1b1b 0%, #0a0a0a 70%);
-            color: #f4f4f4;
+            background: var(--settings-bg);
+            color: var(--settings-text);
             padding: 16px;
         }
 
@@ -52,8 +80,8 @@
         }
 
         .settings-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: var(--settings-card-bg);
+            border: 1px solid var(--settings-card-border);
             border-radius: 14px;
             padding: 18px;
             margin-bottom: 14px;
@@ -62,11 +90,11 @@
         .settings-card h2 {
             font-size: calc(18px * var(--mobile-font-scale, 1));
             margin-bottom: 8px;
-            color: #fff;
+            color: var(--settings-heading);
         }
 
         .settings-card p {
-            color: rgba(255, 255, 255, 0.72);
+            color: var(--settings-muted);
             font-size: calc(13px * var(--mobile-font-scale, 1));
             line-height: 1.55;
             margin-bottom: 14px;
@@ -80,8 +108,8 @@
 
         .theme-btn {
             border: 1px solid rgba(212, 175, 55, 0.3);
-            background: #101010;
-            color: #f4f4f4;
+            background: var(--settings-btn-bg);
+            color: var(--settings-btn-text);
             border-radius: 10px;
             padding: 12px 10px;
             font-size: calc(14px * var(--mobile-font-scale, 1));
@@ -117,9 +145,9 @@
         .preview {
             margin-top: 14px;
             border-radius: 12px;
-            border: 1px dashed rgba(255, 255, 255, 0.28);
+            border: 1px dashed var(--settings-preview-border);
             padding: 12px;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--settings-preview-text);
             font-size: calc(14px * var(--mobile-font-scale, 1));
             line-height: 1.45;
         }
@@ -144,7 +172,7 @@
 
         .helper {
             font-size: calc(12px * var(--mobile-font-scale, 1));
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--settings-soft);
             margin-top: 2px;
         }
     </style>
