@@ -272,11 +272,17 @@ body {
     position: relative;
     min-height: 300px;
     border: 1px solid transparent;
+    touch-action: pan-y;
+    user-select: none;
 }
 
 .updates-ticker:hover {
     border-color: gold;
     box-shadow: 0 8px 24px rgba(212, 175, 55, 0.22);
+}
+
+.updates-ticker.is-grabbing {
+    cursor: grabbing;
 }
 
 .ticker-track {

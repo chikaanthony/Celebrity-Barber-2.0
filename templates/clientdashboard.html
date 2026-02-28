@@ -50,7 +50,7 @@
             <h1>WELCOME BACK CELEB <span class="user-name">{{ user.full_name if user else 'User' }}</span></h1>
             <div class="vip-indicator" id="vipIndicator" style="{{ '' if user and user.is_vip else 'display:none;' }}">
                 <span class="vip-badge" id="vipBadge">👑 VIP</span>
-                <span class="vip-status" id="vipStatus">{{ 'Active' if user and user.is_vip else '' }}</span>
+                <span class="vip-status" id="vipStatus">{{ 'Active VIP' if user and user.is_vip else '' }}</span>
             </div>
             <p class="user-email">{{ user.email if user else 'user@example.com' }}</p>
         </div>
@@ -196,10 +196,13 @@
         </div>
     </div>
 
-        <script>
+    <script>
         let currentReferralCount = 0;
         let updatesTimer = null;
         let currentUpdateIndex = 0;
+        let vipCounterTimer = null;
+        let suppressNextUpdateTap = false;
+        let updatesGestureBound = false;
         window.broadcastsData = [];
 
         async function loadNotificationCount() {
@@ -295,29 +298,117 @@
 
         async function loadUserProfile() {
             try {
-                const response = await fetch('/api/user/profile');
-                const result = await response.json();
+                const [profileResponse, referralsResponse] = await Promise.all([
+                    fetch('/api/user/profile'),
+                    fetch('/api/user/referrals')
+                ]);
 
-                if (result.success && result.data) {
-                    const isVIP = result.data.is_vip === true || result.data.isVIP === true;
-                    updateVIPStatus(isVIP);
+                const profileResult = await profileResponse.json();
+                const referralsResult = await referralsResponse.json();
+                let profileReferralCount = 0;
+                let historyReferralCount = 0;
 
-                    currentReferralCount = Number(result.data.referral_count || 0);
-                    updateReferralStreak(currentReferralCount);
+                if (profileResult.success && profileResult.data) {
+                    const isVIP = profileResult.data.is_vip === true || profileResult.data.isVIP === true;
+                    const vipExpiresAt =
+                        profileResult.data.vip_expires ||
+                        profileResult.data.vipExpires ||
+                        profileResult.data.vip_expires_at ||
+                        null;
+                    updateVIPStatus(isVIP, vipExpiresAt);
+                    const rawProfileCount =
+                        profileResult.data.referral_count ??
+                        profileResult.data.referrals_count ??
+                        profileResult.data.total_referrals ??
+                        profileResult.data.referral_streak ??
+                        0;
+                    profileReferralCount = Number(rawProfileCount) || 0;
 
                     const photoUrl =
-                        result.data.photo_url ||
-                        result.data.profile_photo ||
-                        result.data.profilePhoto ||
-                        result.data.photo ||
-                        result.data.avatar ||
+                        profileResult.data.photo_url ||
+                        profileResult.data.profile_photo ||
+                        profileResult.data.profilePhoto ||
+                        profileResult.data.photo ||
+                        profileResult.data.avatar ||
                         sessionStorage.getItem('profilePhoto') ||
                         '';
                     applyProfilePhoto(photoUrl);
                 }
+
+                if (referralsResult.success && Array.isArray(referralsResult.data)) {
+                    historyReferralCount = referralsResult.data.length;
+                }
+
+                currentReferralCount = Math.max(profileReferralCount, historyReferralCount, 0);
+                updateReferralStreak(currentReferralCount);
             } catch (error) {
                 console.error('Error loading profile:', error);
             }
+        }
+
+        function parseDateValue(value) {
+            if (!value) return null;
+
+            if (value instanceof Date) {
+                return Number.isNaN(value.getTime()) ? null : value;
+            }
+
+            if (typeof value === 'string' || typeof value === 'number') {
+                const parsed = new Date(value);
+                return Number.isNaN(parsed.getTime()) ? null : parsed;
+            }
+
+            if (typeof value === 'object') {
+                if (typeof value.toDate === 'function') {
+                    const converted = value.toDate();
+                    return Number.isNaN(converted.getTime()) ? null : converted;
+                }
+                const seconds = value._seconds ?? value.seconds;
+                if (typeof seconds === 'number') {
+                    const converted = new Date(seconds * 1000);
+                    return Number.isNaN(converted.getTime()) ? null : converted;
+                }
+            }
+
+            return null;
+        }
+
+        function buildVipCounterText(vipExpiresAt) {
+            const expiryDate = parseDateValue(vipExpiresAt);
+            if (!expiryDate) return 'Active VIP';
+
+            const now = new Date();
+            const msDiff = expiryDate.getTime() - now.getTime();
+            const dateLabel = expiryDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+
+            if (msDiff <= 0) {
+                return `Active VIP - Expired ${dateLabel}`;
+            }
+
+            const dayMs = 24 * 60 * 60 * 1000;
+            const daysLeft = Math.ceil(msDiff / dayMs);
+            return `Active VIP - ${daysLeft}d left (${dateLabel})`;
+        }
+
+        function startVipCounter(vipExpiresAt) {
+            if (vipCounterTimer) {
+                clearInterval(vipCounterTimer);
+                vipCounterTimer = null;
+            }
+
+            const render = () => {
+                const vipStatus = document.getElementById('vipStatus');
+                if (vipStatus) {
+                    vipStatus.textContent = buildVipCounterText(vipExpiresAt);
+                }
+            };
+
+            render();
+            vipCounterTimer = setInterval(render, 60 * 1000);
         }
 
         function getReferralThemePalette() {
@@ -341,6 +432,9 @@
             const m3Label = document.getElementById('dash-m3-label');
             const hint = document.getElementById('referralStreakHint');
             const palette = getReferralThemePalette();
+            const total = Math.max(0, Number(count) || 0);
+            const cycleProgress = total % 3;
+            const completedCycles = Math.floor(total / 3);
 
             if (m1Circle) { m1Circle.style.background = palette.inactiveBg; m1Circle.style.borderColor = palette.inactiveBorder; }
             if (m1Label) m1Label.style.color = palette.inactiveLabel;
@@ -349,24 +443,19 @@
             if (m3Circle) { m3Circle.style.background = palette.inactiveBg; m3Circle.style.borderColor = palette.inactiveBorder; }
             if (m3Label) m3Label.style.color = palette.inactiveLabel;
 
-            if (count >= 1) {
+            if (cycleProgress >= 1) {
                 if (m1Circle) { m1Circle.style.background = palette.activeBg; m1Circle.style.borderColor = palette.activeBorder; }
                 if (m1Label) m1Label.style.color = palette.activeLabel;
             }
-            if (count >= 2) {
+            if (cycleProgress >= 2) {
                 if (m2Circle) { m2Circle.style.background = palette.activeBg; m2Circle.style.borderColor = palette.activeBorder; }
                 if (m2Label) m2Label.style.color = palette.activeLabel;
             }
-            if (count >= 3) {
-                if (m3Circle) { m3Circle.style.background = palette.activeBg; m3Circle.style.borderColor = palette.activeBorder; }
-                if (m3Label) m3Label.style.color = palette.activeLabel;
-            }
-
             if (hint) {
-                if (count >= 3) {
-                    hint.textContent = 'You unlocked a FREE CUT. Great job!';
-                } else if (count >= 1) {
-                    hint.textContent = `${3 - count} more referral(s) to get a FREE CUT!`;
+                if (total > 0 && cycleProgress === 0) {
+                    hint.textContent = `${completedCycles} FREE CUT reward${completedCycles > 1 ? 's' : ''} unlocked. New cycle started.`;
+                } else if (cycleProgress >= 1) {
+                    hint.textContent = `${3 - cycleProgress} more referral(s) to get a FREE CUT!`;
                 } else {
                     hint.textContent = 'Refer friends to unlock rewards!';
                 }
@@ -380,6 +469,125 @@
             observer.observe(document.documentElement, {
                 attributes: true,
                 attributeFilter: ['data-theme']
+            });
+        }
+
+        function bindUpdatesSwipe() {
+            if (updatesGestureBound) return;
+
+            const ticker = document.getElementById('updatesTicker');
+            if (!ticker) return;
+
+            updatesGestureBound = true;
+            const SWIPE_THRESHOLD = 48;
+            const TAP_MOVE_LIMIT = 10;
+            let tracking = false;
+            let startX = 0;
+            let startY = 0;
+            let deltaX = 0;
+            let deltaY = 0;
+
+            const pauseAutoplay = () => {
+                if (updatesTimer) {
+                    clearInterval(updatesTimer);
+                    updatesTimer = null;
+                }
+            };
+
+            const begin = (x, y) => {
+                tracking = true;
+                startX = x;
+                startY = y;
+                deltaX = 0;
+                deltaY = 0;
+                ticker.classList.add('is-grabbing');
+                pauseAutoplay();
+            };
+
+            const move = (x, y) => {
+                if (!tracking) return;
+                deltaX = x - startX;
+                deltaY = y - startY;
+                if (Math.abs(deltaX) > TAP_MOVE_LIMIT || Math.abs(deltaY) > TAP_MOVE_LIMIT) {
+                    suppressNextUpdateTap = true;
+                }
+            };
+
+            const end = () => {
+                if (!tracking) return;
+                tracking = false;
+                ticker.classList.remove('is-grabbing');
+
+                const horizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) >= SWIPE_THRESHOLD;
+                if (horizontalSwipe && Array.isArray(window.broadcastsData) && window.broadcastsData.length > 1) {
+                    if (deltaX < 0) {
+                        activateUpdateSlide(currentUpdateIndex + 1, true);
+                    } else {
+                        activateUpdateSlide(currentUpdateIndex - 1, true);
+                    }
+                    setTimeout(() => {
+                        suppressNextUpdateTap = false;
+                    }, 180);
+                } else {
+                    startUpdatesCarousel();
+                    if (Math.abs(deltaX) <= TAP_MOVE_LIMIT && Math.abs(deltaY) <= TAP_MOVE_LIMIT) {
+                        suppressNextUpdateTap = false;
+                    }
+                }
+
+                deltaX = 0;
+                deltaY = 0;
+            };
+
+            ticker.addEventListener('touchstart', (event) => {
+                if (!event.touches || event.touches.length !== 1) return;
+                const touch = event.touches[0];
+                begin(touch.clientX, touch.clientY);
+            }, { passive: true });
+
+            ticker.addEventListener('touchmove', (event) => {
+                if (!tracking || !event.touches || event.touches.length !== 1) return;
+                const touch = event.touches[0];
+                move(touch.clientX, touch.clientY);
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+
+            ticker.addEventListener('touchend', () => {
+                end();
+            }, { passive: true });
+
+            ticker.addEventListener('touchcancel', () => {
+                end();
+            }, { passive: true });
+
+            ticker.addEventListener('mousedown', (event) => {
+                if (event.button !== 0) return;
+                begin(event.clientX, event.clientY);
+            });
+
+            window.addEventListener('mousemove', (event) => {
+                move(event.clientX, event.clientY);
+            });
+
+            window.addEventListener('mouseup', () => {
+                end();
+            });
+
+            ticker.addEventListener('click', (event) => {
+                if (suppressNextUpdateTap) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    suppressNextUpdateTap = false;
+                    return;
+                }
+
+                const activeSlide = ticker.querySelector('.update-slide.active');
+                const fallbackIndex = Number(currentUpdateIndex) || 0;
+                const indexAttr = activeSlide ? Number(activeSlide.getAttribute('data-index')) : fallbackIndex;
+                const targetIndex = Number.isFinite(indexAttr) ? indexAttr : fallbackIndex;
+                showBroadcastPopup(targetIndex);
             });
         }
 
@@ -475,7 +683,7 @@
                     : '<div class="update-media update-media-placeholder">NEWS</div>';
 
                 return `
-                    <article class="update-slide ${index === 0 ? 'active' : ''}" data-index="${index}" onclick="showBroadcastPopup(${index})">
+                    <article class="update-slide ${index === 0 ? 'active' : ''}" data-index="${index}">
                         ${media}
                         <div class="update-content">
                             <h4>${title}</h4>
@@ -551,7 +759,7 @@
             showPopup('update-popup');
         }
 
-        function updateVIPStatus(isVIP) {
+        function updateVIPStatus(isVIP, vipExpiresAt = null) {
             const vipIndicator = document.getElementById('vipIndicator');
             const vipBadge = document.getElementById('vipBadge');
             const vipStatus = document.getElementById('vipStatus');
@@ -560,10 +768,15 @@
                 if (vipIndicator) vipIndicator.style.display = 'inline-flex';
                 if (vipBadge) vipBadge.textContent = 'VIP';
                 if (vipStatus) {
-                    vipStatus.textContent = 'Active';
+                    vipStatus.textContent = 'Active VIP';
                     vipStatus.style.display = 'inline';
                 }
+                startVipCounter(vipExpiresAt);
             } else {
+                if (vipCounterTimer) {
+                    clearInterval(vipCounterTimer);
+                    vipCounterTimer = null;
+                }
                 if (vipIndicator) vipIndicator.style.display = 'none';
                 if (vipStatus) {
                     vipStatus.textContent = '';
@@ -629,6 +842,7 @@
         loadPendingChatReplies();
         sendHeartbeat();
         loadBroadcasts();
+        bindUpdatesSwipe();
         observeThemeChanges();
 
         setInterval(sendHeartbeat, 60000);

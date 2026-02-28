@@ -193,6 +193,13 @@ body {
     margin-bottom: 25px;
 }
 
+.progress-hint {
+    margin-top: 16px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: calc(12px * var(--mobile-font-scale, 1));
+}
+
 /* Referral Input Section */
 .refer-input-section {
     display: flex;

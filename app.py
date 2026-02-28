@@ -351,15 +351,15 @@ html[data-theme="light"] .dashboard-card[onclick*="/referrals"] {
 html[data-theme="light"] #dash-m1-circle,
 html[data-theme="light"] #dash-m2-circle,
 html[data-theme="light"] #dash-m3-circle {
-    background: rgba(15, 23, 42, 0.06) !important;
-    border-color: var(--light-border) !important;
+    background: rgba(15, 23, 42, 0.06);
+    border-color: var(--light-border);
 }
 
 html[data-theme="light"] #dash-m1-label,
 html[data-theme="light"] #dash-m2-label,
 html[data-theme="light"] #dash-m3-label,
 html[data-theme="light"] #referralStreakHint {
-    color: var(--light-text-muted) !important;
+    color: var(--light-text-muted);
 }
 
 html[data-theme="light"] .dash-m-line {
@@ -1074,7 +1074,7 @@ def create_booking():
 @login_required
 def join_vip():
     """Store VIP request in Firestore as pending approval"""
-    data = request.get_json()
+    data = request.get_json() or {}
     user_id = session.get('user_id')
     user_email = session.get('email')
     user_name = session.get('user_name')
@@ -1082,6 +1082,26 @@ def join_vip():
     
     if db:
         try:
+            user_doc = db.collection('users').document(user_id).get()
+            if user_doc.exists:
+                user_data = user_doc.to_dict() or {}
+                already_vip = user_data.get('is_vip', False) or user_data.get('isVIP', False)
+                if already_vip:
+                    return {
+                        'success': False,
+                        'message': 'You are already an Active VIP.'
+                    }, 400
+
+            # Prevent duplicate pending VIP requests from the same user.
+            recent_requests = db.collection('approvals').where('user_id', '==', user_id).limit(100).get()
+            for req in recent_requests:
+                req_data = req.to_dict() or {}
+                if str(req_data.get('type', '')).lower() == 'vip' and str(req_data.get('status', '')).lower() == 'pending':
+                    return {
+                        'success': False,
+                        'message': 'You already have a pending VIP request.'
+                    }, 400
+
             # Add to approvals collection for admin to review
             approval_data = {
                 'user_id': user_id,
@@ -1172,26 +1192,53 @@ def reviews():
 @app.route('/api/reviews')
 def get_reviews():
     """Get all reviews"""
+    def enrich_reviews(review_docs):
+        review_list = []
+        user_photo_cache = {}
+
+        for doc in review_docs:
+            data = doc.to_dict() or {}
+            data['id'] = doc.id
+
+            # Prefer photo saved with the review record.
+            resolved_photo = resolve_user_photo(data)
+            user_id = str(data.get('user_id') or '').strip()
+
+            # Fallback to current user profile photo for older review records.
+            if not resolved_photo and user_id:
+                if user_id not in user_photo_cache:
+                    try:
+                        user_doc = db.collection('users').document(user_id).get()
+                        user_data = user_doc.to_dict() if user_doc.exists else {}
+                        user_photo_cache[user_id] = resolve_user_photo(user_data)
+                    except Exception:
+                        user_photo_cache[user_id] = ''
+                resolved_photo = user_photo_cache.get(user_id, '')
+
+            if resolved_photo:
+                data['photo_url'] = resolved_photo
+                data['avatar'] = resolved_photo
+            else:
+                data['photo_url'] = ''
+                if not isinstance(data.get('avatar'), str):
+                    data['avatar'] = ''
+
+            review_list.append(data)
+
+        return review_list
+
     if db:
         try:
             # Try with ordering first
             reviews_ref = db.collection('reviews').order_by('createdAt', direction=firestore.Query.DESCENDING).limit(20).get()
-            review_list = []
-            for doc in reviews_ref:
-                data = doc.to_dict()
-                data['id'] = doc.id
-                review_list.append(data)
+            review_list = enrich_reviews(reviews_ref)
             return {'success': True, 'data': review_list}
         except Exception as e:
             print(f"Error fetching reviews with order: {e}")
             # Fallback: get reviews without ordering
             try:
                 reviews_ref = db.collection('reviews').limit(20).get()
-                review_list = []
-                for doc in reviews_ref:
-                    data = doc.to_dict()
-                    data['id'] = doc.id
-                    review_list.append(data)
+                review_list = enrich_reviews(reviews_ref)
                 # Sort locally by createdAt
                 review_list.sort(key=lambda x: x.get('createdAt', 0), reverse=True)
                 return {'success': True, 'data': review_list}
@@ -1220,11 +1267,14 @@ def submit_review():
             user_data = user_doc.to_dict() if user_doc.exists else {}
             
             # Create review
+            review_photo = resolve_user_photo(user_data)
             review_data = {
                 'content': content,
                 'user_id': user_id,
                 'name': user_data.get('name', user_data.get('email', 'Anonymous').split('@')[0]),
                 'email': user_data.get('email', ''),
+                'photo_url': review_photo,
+                'avatar': review_photo,
                 'likes': 0,
                 'replies': 0,
                 'createdAt': firestore.SERVER_TIMESTAMP

@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="vip-container">
+    <div class="vip-container" id="vipContainer">
         <!-- Close Button -->
         <button class="close-btn" onclick="window.location.href='/clientdashboard'">✕</button>
         
@@ -75,7 +75,8 @@
         </div>
         
         <!-- Become VIP Button -->
-        <button class="become-vip-btn" onclick="submitVIP()">BECOME A VIP</button>
+        <button class="become-vip-btn" id="becomeVipBtn" type="button" onclick="submitVIP()">BECOME A VIP</button>
+        <div class="vip-lock-notice" id="vipLockNotice" style="display: none;"></div>
     </div>
     
     <!-- Success Overlay -->
@@ -181,9 +182,98 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadVipPrice);
+        function parseVipDate(value) {
+            if (!value) return null;
+            if (typeof value === 'string' || typeof value === 'number') {
+                const parsed = new Date(value);
+                return Number.isNaN(parsed.getTime()) ? null : parsed;
+            }
+            if (typeof value === 'object') {
+                if (typeof value.toDate === 'function') {
+                    const converted = value.toDate();
+                    return Number.isNaN(converted.getTime()) ? null : converted;
+                }
+                const seconds = value._seconds || value.seconds;
+                if (typeof seconds === 'number') {
+                    const converted = new Date(seconds * 1000);
+                    return Number.isNaN(converted.getTime()) ? null : converted;
+                }
+            }
+            return null;
+        }
+
+        function setVipLockedState(isLocked, message = '') {
+            const container = document.getElementById('vipContainer');
+            const btn = document.getElementById('becomeVipBtn');
+            const notice = document.getElementById('vipLockNotice');
+            const uploadSection = document.querySelector('.upload-section');
+
+            if (!btn || !notice || !container) return;
+
+            if (isLocked) {
+                btn.disabled = true;
+                btn.textContent = 'ALREADY ACTIVE VIP';
+                notice.textContent = message || 'You are already an Active VIP.';
+                notice.style.display = 'block';
+                container.classList.add('vip-locked');
+                if (uploadSection) uploadSection.style.display = 'none';
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'BECOME A VIP';
+                notice.textContent = '';
+                notice.style.display = 'none';
+                container.classList.remove('vip-locked');
+                if (uploadSection) uploadSection.style.display = '';
+            }
+        }
+
+        async function loadVipEligibility() {
+            try {
+                const response = await fetch('/api/user/profile');
+                const result = await response.json();
+                if (!(result.success && result.data)) {
+                    setVipLockedState(false);
+                    return;
+                }
+
+                const profile = result.data;
+                const isVIP = profile.is_vip === true || profile.isVIP === true;
+                if (!isVIP) {
+                    setVipLockedState(false);
+                    return;
+                }
+
+                const expiryValue = profile.vip_expires || profile.vipExpires || null;
+                const expiryDate = parseVipDate(expiryValue);
+                const today = new Date();
+
+                if (expiryDate && expiryDate.getTime() > today.getTime()) {
+                    const expiryLabel = expiryDate.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                    setVipLockedState(true, `You are already an Active VIP until ${expiryLabel}.`);
+                } else {
+                    setVipLockedState(true, 'You are already an Active VIP.');
+                }
+            } catch (error) {
+                console.error('Error loading VIP status:', error);
+                setVipLockedState(false);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Promise.all([loadVipPrice(), loadVipEligibility()]);
+        });
         
         function submitVIP() {
+            const vipButton = document.getElementById('becomeVipBtn');
+            if (vipButton && vipButton.disabled) {
+                alert('You are already an Active VIP.');
+                return;
+            }
+
             if (!receiptFile) {
                 alert('Please upload your payment receipt first!');
                 return;

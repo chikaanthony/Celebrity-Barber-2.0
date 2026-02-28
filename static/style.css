@@ -218,7 +218,7 @@ body {
     height: 100%;
     object-fit: cover;
     object-position: center 35%;
-    filter: brightness(0.46) contrast(0.9) saturate(0.86);
+    filter: brightness(0.68) contrast(0.95) saturate(0.95);
     z-index: -2;
 }
 
@@ -226,13 +226,13 @@ body {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 50% 20%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.65)),
+        radial-gradient(circle at 50% 20%, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.45)),
         linear-gradient(
             180deg,
-            rgba(0, 0, 0, 0.52) 0%,
-            rgba(0, 0, 0, 0.69) 48%,
-            rgba(0, 0, 0, 0.86) 76%,
-            rgba(0, 0, 0, 0.95) 100%
+            rgba(0, 0, 0, 0.34) 0%,
+            rgba(0, 0, 0, 0.50) 48%,
+            rgba(0, 0, 0, 0.66) 76%,
+            rgba(0, 0, 0, 0.78) 100%
         );
     z-index: -1;
 }
@@ -529,6 +529,101 @@ section {
     font-size: calc(14px * var(--mobile-font-scale, 1));
 }
 
+/* ==================== LIGHT THEME (LANDING/AUTH) ==================== */
+html[data-theme="light"] body {
+    background: #f4f7fb;
+    color: #0f172a;
+}
+
+html[data-theme="light"] .navbar {
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] .nav-links a {
+    color: #475569;
+}
+
+html[data-theme="light"] .nav-links a:hover {
+    color: #b88915;
+}
+
+html[data-theme="light"] .menu-icon span {
+    background: #0f172a;
+}
+
+html[data-theme="light"] .mobile-overlay {
+    background: rgba(255, 255, 255, 0.98);
+    border-left: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] .overlay-link,
+html[data-theme="light"] .close-btn {
+    color: #0f172a;
+}
+
+html[data-theme="light"] .overlay-link:hover {
+    color: #b88915;
+}
+
+html[data-theme="light"] .hero {
+    background: #e8eef8;
+}
+
+html[data-theme="light"] .hero-video {
+    filter: brightness(0.86) contrast(0.88) saturate(0.96);
+}
+
+html[data-theme="light"] .hero-overlay {
+    background:
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.20)),
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.12) 0%,
+            rgba(0, 0, 0, 0.22) 52%,
+            rgba(0, 0, 0, 0.34) 78%,
+            rgba(0, 0, 0, 0.44) 100%
+        );
+}
+
+html[data-theme="light"] .features {
+    background: #f8fafd;
+}
+
+html[data-theme="light"] .services {
+    background: #edf2f8;
+}
+
+html[data-theme="light"] .tweet-space {
+    background: #f8fafd;
+}
+
+html[data-theme="light"] .feature-card,
+html[data-theme="light"] .service-item,
+html[data-theme="light"] .tweet-card {
+    background: #ffffff;
+    border-color: rgba(15, 23, 42, 0.12);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme="light"] .feature-card p,
+html[data-theme="light"] .tweet-content {
+    color: #475569;
+}
+
+html[data-theme="light"] .service-item h3 {
+    color: #0f172a;
+}
+
+html[data-theme="light"] .footer {
+    background: #e9eef7;
+    border-top: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] .location {
+    color: #64748b;
+}
+
 /* ==================== MOBILE RESPONSIVE ==================== */
 
 @media (max-width: 900px) {
@@ -599,17 +694,45 @@ section {
         padding-right: 56px;
     }
 
-    .nav-auth {
+    #public-interface .navbar {
+        padding: 10px 12px 12px;
+        padding-right: 52px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    #public-interface .logo {
+        flex: 1 1 100%;
+    }
+
+    #public-interface .logo-text {
+        font-size: clamp(11px, calc(13px * var(--mobile-font-scale, 1)), 16px);
+    }
+
+    #public-interface .nav-auth {
         gap: 6px;
+        width: 100%;
+        flex: 1 1 100%;
+        justify-content: flex-start;
     }
     
-    .btn-login,
-    .btn-signup {
-        display: none;
+    #public-interface .btn-login,
+    #public-interface .btn-signup {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(10px, calc(11px * var(--mobile-font-scale, 1)), 13px);
+        padding: 6px 10px;
     }
 
     .menu-icon {
         right: 12px;
+    }
+
+    #public-interface .menu-icon {
+        top: 12px;
+        transform: none;
     }
     
     .btn-admin {

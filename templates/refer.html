@@ -51,6 +51,7 @@
                     <span class="milestone-label">FREE CUT</span>
                 </div>
             </div>
+            <p class="progress-hint" id="progressHint">Refer friends to unlock rewards!</p>
         </div>
         
         <!-- Referral Input Section -->
@@ -88,36 +89,74 @@
         
         async function fetchUserData() {
             try {
-                const response = await fetch('/api/user/profile');
-                const result = await response.json();
-                if (result.success) {
-                    const userData = result.data;
-                    referralCount = userData.referral_count || 0;
+                const [profileResponse, referralsResponse] = await Promise.all([
+                    fetch('/api/user/profile'),
+                    fetch('/api/user/referrals')
+                ]);
+                const profileResult = await profileResponse.json();
+                const referralsResult = await referralsResponse.json();
+                let profileReferralCount = 0;
+                let historyReferralCount = 0;
+                let referrals = [];
+
+                if (profileResult.success) {
+                    const userData = profileResult.data;
+                    const rawProfileCount =
+                        userData.referral_count ??
+                        userData.referrals_count ??
+                        userData.total_referrals ??
+                        userData.referral_streak ??
+                        0;
+                    profileReferralCount = Number(rawProfileCount) || 0;
                     userReferralCode = userData.referral_code || '';
                     
                     // Set referral code
                     if (userReferralCode) {
                         document.getElementById('referralCode').textContent = userReferralCode;
                     }
-                    
-                    // Update progress milestones based on actual count
-                    updateProgressFromCount(referralCount);
                 }
+
+                if (referralsResult.success && Array.isArray(referralsResult.data)) {
+                    referrals = referralsResult.data;
+                    historyReferralCount = referrals.length;
+                }
+
+                referralCount = Math.max(profileReferralCount, historyReferralCount, 0);
+                // Update progress milestones based on actual count
+                updateProgressFromCount(referralCount);
+                renderReferralHistory(referrals, referralCount);
             } catch (error) {
                 console.error('Error fetching user data:', error);
+                renderReferralHistory([], referralCount);
             }
         }
         
         // Update progress from fetched count
         function updateProgressFromCount(count) {
-            if (count >= 1) {
+            const total = Math.max(0, Number(count) || 0);
+            const cycleProgress = total % 3;
+            const completedCycles = Math.floor(total / 3);
+            const hint = document.getElementById('progressHint');
+
+            document.getElementById('milestone1').querySelector('.milestone-circle').classList.remove('active');
+            document.getElementById('milestone2').querySelector('.milestone-circle').classList.remove('active');
+            document.getElementById('milestone3').querySelector('.milestone-circle').classList.remove('active');
+
+            if (cycleProgress >= 1) {
                 document.getElementById('milestone1').querySelector('.milestone-circle').classList.add('active');
             }
-            if (count >= 2) {
+            if (cycleProgress >= 2) {
                 document.getElementById('milestone2').querySelector('.milestone-circle').classList.add('active');
             }
-            if (count >= 3) {
-                document.getElementById('milestone3').querySelector('.milestone-circle').classList.add('active');
+
+            if (hint) {
+                if (total > 0 && cycleProgress === 0) {
+                    hint.textContent = `${completedCycles} FREE CUT reward${completedCycles > 1 ? 's' : ''} unlocked. New cycle started.`;
+                } else if (cycleProgress >= 1) {
+                    hint.textContent = `${3 - cycleProgress} more referral(s) to unlock FREE CUT.`;
+                } else {
+                    hint.textContent = 'Refer friends to unlock rewards!';
+                }
             }
         }
         
@@ -133,45 +172,88 @@
         function submitReferral() {
             const friendName = document.getElementById('friendName').value.trim();
             
-            if (!friendName) {
-                showToast('Please enter your friend\'s name!');
+            if (!friendName && !userReferralCode) {
+                showToast('Referral code is not ready yet. Refresh and try again.');
                 return;
             }
-            
-            // Add to history
-            addToHistory(friendName);
-            
-            // Clear input
-            document.getElementById('friendName').value = '';
-            
-            // Update progress (local update for immediate feedback)
-            referralCount++;
-            updateProgressFromCount(referralCount);
-            
-            if (referralCount >= 3) {
-                showToast('🎉 Congratulations! You earned a FREE CUT!');
+
+            const code = (document.getElementById('referralCode').textContent || userReferralCode || '').trim();
+            const friendPrefix = friendName ? `Hi ${friendName}, ` : 'Hi, ';
+            const shareText = `${friendPrefix}use my Celebrity Barber referral code ${code} when signing up.`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Celebrity Barber Referral',
+                    text: shareText
+                }).then(() => {
+                    showToast('Referral message shared.');
+                }).catch(() => {
+                    // Ignore cancel errors from native share sheet.
+                });
             } else {
-                showToast('Referral sent successfully!');
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showToast('Referral message copied. Send it to your friend.');
+                }).catch(() => {
+                    showToast('Copy failed. Please try again.');
+                });
             }
+
+            document.getElementById('friendName').value = '';
         }
-        
-        // Add to history list
-        function addToHistory(name) {
+
+        function renderReferralHistory(referrals, totalCount) {
             const historyList = document.getElementById('historyList');
-            const emptyMsg = historyList.querySelector('.history-empty');
-            
-            if (emptyMsg) {
-                emptyMsg.remove();
+            if (!historyList) return;
+
+            if (Array.isArray(referrals) && referrals.length > 0) {
+                const rows = referrals
+                    .slice()
+                    .sort((a, b) => {
+                        const ta = Date.parse(a.referred_at || '') || 0;
+                        const tb = Date.parse(b.referred_at || '') || 0;
+                        return tb - ta;
+                    })
+                    .map((ref) => {
+                        const statusRaw = String(ref.status || 'pending').toLowerCase();
+                        const statusClass = statusRaw === 'successful' ? 'completed' : 'pending';
+                        const statusLabel = statusRaw === 'successful' ? 'Successful' : 'Pending';
+                        const name = escapeHtml(ref.name || ref.email || 'Referral');
+                        return `
+                            <div class="history-item">
+                                <span class="history-name">${name}</span>
+                                <span class="history-status ${statusClass}">${statusLabel}</span>
+                            </div>
+                        `;
+                    })
+                    .join('');
+                historyList.innerHTML = rows;
+                return;
             }
-            
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.innerHTML = `
-                <span class="history-name">${name}</span>
-                <span class="history-status pending">Pending</span>
+
+            if ((Number(totalCount) || 0) > 0) {
+                historyList.innerHTML = `
+                    <div class="history-item">
+                        <span class="history-name">${Number(totalCount)} referral(s) credited</span>
+                        <span class="history-status completed">Recorded</span>
+                    </div>
+                `;
+                return;
+            }
+
+            historyList.innerHTML = `
+                <div class="history-empty">
+                    <span>No referrals yet. Share your code to start earning rewards.</span>
+                </div>
             `;
-            
-            historyList.insertBefore(historyItem, historyList.firstChild);
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
         
         // Show toast notification

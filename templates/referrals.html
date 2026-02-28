@@ -326,7 +326,7 @@
                     <span class="milestone-label">FREE CUT</span>
                 </div>
             </div>
-            <p class="progress-hint">Refer friends to unlock rewards!</p>
+            <p class="progress-hint" id="referralProgressHint">Refer friends to unlock rewards!</p>
         </div>
         
         <div class="referral-stats">
@@ -357,29 +357,41 @@
         // Load user's referral data
         async function loadReferrals() {
             try {
+                let fallbackReferralCount = 0;
+                let historyReferralCount = 0;
+
                 // Get user profile for referral code
                 const profileRes = await fetch('/api/user/profile');
                 const profileData = await profileRes.json();
                 
                 if (profileData.success && profileData.data) {
                     document.getElementById('referralCode').textContent = profileData.data.referral_code || 'N/A';
-                    const referralCount = profileData.data.referral_count || 0;
-                    document.getElementById('totalReferrals').textContent = referralCount;
-                    
-                    // Update milestone progress
-                    updateMilestones(referralCount);
+                    const rawProfileCount =
+                        profileData.data.referral_count ??
+                        profileData.data.referrals_count ??
+                        profileData.data.total_referrals ??
+                        profileData.data.referral_streak ??
+                        0;
+                    fallbackReferralCount = Number(rawProfileCount) || 0;
                 }
                 
                 // Get user's referral history
                 const historyRes = await fetch('/api/user/referrals');
                 const historyData = await historyRes.json();
+                if (historyData.success && Array.isArray(historyData.data)) {
+                    historyReferralCount = historyData.data.length;
+                }
                 
                 const rewardsEarned = document.getElementById('rewardsEarned');
                 const listContainer = document.getElementById('referral-list');
+                const mergedReferralCount = Math.max(fallbackReferralCount, historyReferralCount, 0);
+                document.getElementById('totalReferrals').textContent = String(mergedReferralCount);
+                updateMilestones(mergedReferralCount);
                 
                 if (historyData.success && historyData.data && historyData.data.length > 0) {
                     const referrals = historyData.data;
                     const successful = referrals.filter(r => r.status === 'successful').length;
+
                     rewardsEarned.textContent = successful;
                     
                     listContainer.innerHTML = referrals.map(ref => `
@@ -409,24 +421,34 @@
         }
         
         function updateMilestones(count) {
-            // 1 referral = 30% off, 2 = 60% off, 3+ = free cut
+            // Milestones restart every 3 referrals.
             const m1 = document.getElementById('milestone1');
             const m2 = document.getElementById('milestone2');
             const m3 = document.getElementById('milestone3');
+            const hint = document.getElementById('referralProgressHint');
+            const total = Math.max(0, Number(count) || 0);
+            const cycleProgress = total % 3;
+            const completedCycles = Math.floor(total / 3);
             
             // Reset all
             m1.querySelector('.milestone-circle').classList.remove('active');
             m2.querySelector('.milestone-circle').classList.remove('active');
             m3.querySelector('.milestone-circle').classList.remove('active');
             
-            if (count >= 1) {
+            if (cycleProgress >= 1) {
                 m1.querySelector('.milestone-circle').classList.add('active');
             }
-            if (count >= 2) {
+            if (cycleProgress >= 2) {
                 m2.querySelector('.milestone-circle').classList.add('active');
             }
-            if (count >= 3) {
-                m3.querySelector('.milestone-circle').classList.add('active');
+            if (hint) {
+                if (total > 0 && cycleProgress === 0) {
+                    hint.textContent = `${completedCycles} FREE CUT reward${completedCycles > 1 ? 's' : ''} unlocked. New cycle started.`;
+                } else if (cycleProgress >= 1) {
+                    hint.textContent = `${3 - cycleProgress} more referral(s) to unlock FREE CUT.`;
+                } else {
+                    hint.textContent = 'Refer friends to unlock rewards!';
+                }
             }
         }
         

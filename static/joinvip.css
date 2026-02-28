@@ -160,6 +160,23 @@ body {
     color: #d4af37;
 }
 
+html[data-theme="light"] .privilege-section {
+    background: #fffaf0;
+    border-color: rgba(184, 137, 21, 0.24);
+}
+
+html[data-theme="light"] .privilege-title {
+    color: #8f6b0f;
+}
+
+html[data-theme="light"] .privilege-text {
+    color: #1e293b;
+}
+
+html[data-theme="light"] .privilege-text strong {
+    color: #8f6b0f;
+}
+
 /* Payment Details */
 .payment-details-section {
     margin-bottom: 28px;
@@ -347,6 +364,38 @@ body {
 
 .become-vip-btn:active {
     transform: translateY(0);
+}
+
+.become-vip-btn:disabled {
+    background: linear-gradient(135deg, #4a4a4a 0%, #5a5a5a 100%);
+    color: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    opacity: 0.92;
+}
+
+.become-vip-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.vip-lock-notice {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.1);
+    color: #f8e08a;
+    font-size: calc(13px * var(--mobile-font-scale, 1));
+    line-height: 1.5;
+    text-align: center;
+}
+
+html[data-theme="light"] .vip-lock-notice {
+    background: rgba(212, 175, 55, 0.16);
+    border-color: rgba(184, 137, 21, 0.4);
+    color: #7a5c0d;
 }
 
 /* Success Overlay */

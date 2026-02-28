@@ -79,7 +79,28 @@
         }
         
         .profile-avatar {
-            font-size: calc(32px * var(--mobile-font-scale, 1));
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .profile-avatar .avatar-emoji {
+            font-size: calc(25px * var(--mobile-font-scale, 1));
+            line-height: 1;
         }
         
         .user-name {
@@ -239,6 +260,68 @@
     </div>
 
     <script>
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function isImageSource(value) {
+            const input = String(value || '').trim();
+            return (
+                input.startsWith('data:image/')
+                || input.startsWith('http://')
+                || input.startsWith('https://')
+                || input.startsWith('/')
+            );
+        }
+
+        function formatReviewDate(value) {
+            if (!value) return 'Recent';
+            if (typeof value === 'number') {
+                const date = value > 10_000_000_000 ? new Date(value) : new Date(value * 1000);
+                return Number.isNaN(date.getTime()) ? 'Recent' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            if (typeof value === 'string') {
+                const date = new Date(value);
+                return Number.isNaN(date.getTime()) ? 'Recent' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            if (typeof value === 'object') {
+                if (typeof value.toDate === 'function') {
+                    const date = value.toDate();
+                    return Number.isNaN(date.getTime()) ? 'Recent' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+                const seconds = value._seconds || value.seconds;
+                if (typeof seconds === 'number') {
+                    const date = new Date(seconds * 1000);
+                    return Number.isNaN(date.getTime()) ? 'Recent' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+            }
+            return 'Recent';
+        }
+
+        function buildAvatarMarkup(review, name) {
+            const photoCandidate =
+                review.photo_url ||
+                review.profile_photo ||
+                review.profilePhoto ||
+                '';
+
+            if (isImageSource(photoCandidate)) {
+                const safeUrl = escapeHtml(photoCandidate);
+                const safeName = escapeHtml(name || 'Reviewer');
+                return `<img src="${safeUrl}" alt="${safeName} profile photo">`;
+            }
+
+            const avatarText = (typeof review.avatar === 'string' && !isImageSource(review.avatar) && review.avatar.trim())
+                ? review.avatar
+                : '👨🏿';
+            return `<span class="avatar-emoji">${escapeHtml(avatarText)}</span>`;
+        }
+
         // Load reviews from API
         async function loadReviews() {
             try {
@@ -249,18 +332,10 @@
                 
                 if (result.success && result.data && result.data.length > 0) {
                     feed.innerHTML = result.data.map(review => {
-                        let dateStr = 'Recent';
-                        if (review.createdAt) {
-                            let timestamp = review.createdAt;
-                            if (typeof timestamp === 'number') {
-                                const date = timestamp > 10000000000 ? new Date(timestamp) : new Date(timestamp * 1000);
-                                dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                            }
-                        }
-                        
-                        const avatar = review.avatar || '👨🏿';
+                        const dateStr = formatReviewDate(review.createdAt);
                         const name = review.name || 'Anonymous';
                         const content = review.content || review.text || 'Great service!';
+                        const avatarMarkup = buildAvatarMarkup(review, name);
                         const likes = review.likes || 0;
                         const replies = review.replies || 0;
                         
@@ -268,13 +343,13 @@
                             <div class="review-box">
                                 <div class="review-header">
                                     <div class="user-profile">
-                                        <div class="profile-avatar">${avatar}</div>
-                                        <span class="user-name">${name}</span>
+                                        <div class="profile-avatar">${avatarMarkup}</div>
+                                        <span class="user-name">${escapeHtml(name)}</span>
                                     </div>
                                     <span class="review-date">${dateStr}</span>
                                 </div>
                                 <div class="review-content">
-                                    <p>${content}</p>
+                                    <p>${escapeHtml(content)}</p>
                                 </div>
                                 <div class="review-actions">
                                     <button class="action-btn like-btn" onclick="toggleLike(this)">
