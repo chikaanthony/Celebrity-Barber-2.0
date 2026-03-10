@@ -1442,6 +1442,88 @@ def send_chat_message():
     return {'success': False, 'message': 'Database not available'}, 500
 
 
+# Chat API - User sends voice note
+@app.route('/api/chat/voice', methods=['POST'])
+@login_required
+def send_voice_note():
+    """User sends a voice note"""
+    if 'audio' not in request.files:
+        return {'success': False, 'message': 'No audio file provided'}, 400
+    
+    audio_file = request.files['audio']
+    user_id = session.get('user_id')
+    user_email = session.get('email', '')
+    
+    print(f"Voice note - user_id: {user_id}, email: {user_email}")
+    
+    if db:
+        try:
+            # Check if user is blocked
+            try:
+                blocked_doc = db.collection('blocked_users').document(user_id).get()
+                if blocked_doc.exists:
+                    return {'success': False, 'message': 'You have been blocked from messaging. Contact support.'}, 403
+            except:
+                pass
+            
+            # Get user name
+            user_name = user_email.split('@')[0] if user_email else 'User'
+            try:
+                user_doc = db.collection('users').document(user_id).get()
+                if user_doc.exists:
+                    user_data = user_doc.to_dict()
+                    user_name = user_data.get('full_name', user_name)
+            except Exception as e:
+                print(f"Error getting user doc: {e}")
+            
+            # Read audio data
+            audio_data = audio_file.read()
+            
+            # Upload audio to Firebase Storage
+            import uuid
+            audio_filename = f"voice_notes/{user_id}_{uuid.uuid4()}.webm"
+            bucket = storage.bucket() if storage else None
+            
+            audio_url = ''
+            if bucket:
+                try:
+                    blob = bucket.blob(audio_filename)
+                    blob.upload_from_string(audio_data, content_type='audio/webm')
+                    # Make the blob publicly accessible
+                    blob.make_public()
+                    audio_url = blob.public_url
+                except Exception as e:
+                    print(f"Error uploading audio: {e}")
+                    # Store as base64 as fallback
+                    import base64
+                    audio_url = f"data:audio/webm;base64,{base64.b64encode(audio_data).decode('utf-8')}"
+            else:
+                # Store as base64 if no storage available
+                import base64
+                audio_url = f"data:audio/webm;base64,{base64.b64encode(audio_data).decode('utf-8')}"
+            
+            # Save message to Firestore
+            chat_message = {
+                'user_id': user_id,
+                'user_name': user_name,
+                'user_email': user_email,
+                'message': '🎤 Voice note',
+                'audio_url': audio_url,
+                'sender': 'user',
+                'status': 'unread',
+                'message_type': 'voice',
+                'created_at': firestore.SERVER_TIMESTAMP
+            }
+            db.collection('chats').add(chat_message)
+            
+            return {'success': True}
+        except Exception as e:
+            print(f"Error sending voice note: {e}")
+            return {'success': False, 'message': str(e)}, 500
+    
+    return {'success': False, 'message': 'Database not available'}, 500
+
+
 # Chat API - Get user's chat messages
 @app.route('/api/chat/messages')
 @login_required
@@ -1793,6 +1875,72 @@ def admin_reply_chat():
             return {'success': True}
         except Exception as e:
             print(f"Error sending admin reply: {e}")
+            return {'success': False, 'message': str(e)}, 500
+    
+    return {'success': False, 'message': 'Database not available'}, 500
+
+
+# Admin API - Send voice reply to chat
+@app.route('/api/admin/chat/voice-reply', methods=['POST'])
+@login_required
+def admin_voice_reply_chat():
+    """Admin sends a voice reply to a chat message"""
+    if not session.get('is_admin'):
+        return {'success': False, 'message': 'Access denied'}, 403
+    
+    if 'audio' not in request.files:
+        return {'success': False, 'message': 'No audio file provided'}, 400
+    
+    audio_file = request.files['audio']
+    user_id = request.form.get('user_id')
+    
+    if not user_id:
+        return {'success': False, 'message': 'User ID required'}, 400
+    
+    if db:
+        try:
+            admin_email = session.get('email', 'admin')
+            
+            # Read audio data
+            audio_data = audio_file.read()
+            
+            # Upload audio to Firebase Storage
+            import uuid
+            audio_filename = f"voice_notes/admin_{user_id}_{uuid.uuid4()}.webm"
+            bucket = storage.bucket() if storage else None
+            
+            audio_url = ''
+            if bucket:
+                try:
+                    blob = bucket.blob(audio_filename)
+                    blob.upload_from_string(audio_data, content_type='audio/webm')
+                    blob.make_public()
+                    audio_url = blob.public_url
+                except Exception as e:
+                    print(f"Error uploading audio: {e}")
+                    import base64
+                    audio_url = f"data:audio/webm;base64,{base64.b64encode(audio_data).decode('utf-8')}"
+            else:
+                import base64
+                audio_url = f"data:audio/webm;base64,{base64.b64encode(audio_data).decode('utf-8')}"
+            
+            # Save admin voice reply
+            chat_message = {
+                'user_id': user_id,
+                'user_name': 'Admin',
+                'user_email': admin_email,
+                'message': '🎤 Voice note',
+                'audio_url': audio_url,
+                'sender': 'admin',
+                'status': 'read',
+                'message_type': 'voice',
+                'created_at': firestore.SERVER_TIMESTAMP
+            }
+            db.collection('chats').add(chat_message)
+            
+            return {'success': True}
+        except Exception as e:
+            print(f"Error sending admin voice reply: {e}")
             return {'success': False, 'message': str(e)}, 500
     
     return {'success': False, 'message': 'Database not available'}, 500
