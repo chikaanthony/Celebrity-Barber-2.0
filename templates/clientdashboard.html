@@ -863,8 +863,9 @@
             document.body.style.overflow = 'auto';
         }
 
-        loadSpendingSettings();
-        loadUserSpending();
+        loadSpendingSettings().then(() => {
+            loadUserSpending();
+        });
         loadUserProfile();
         loadNotificationCount();
         loadPendingChatReplies();

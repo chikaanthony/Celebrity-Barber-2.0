@@ -848,6 +848,20 @@ def login():
                 session['email'] = email
                 session['user_name'] = 'Admin User'
                 session['is_admin'] = True
+                # Update admin last_active for presence tracking
+                import time
+                if db:
+                    try:
+                        # Try to update existing admin user or create new one
+                        admins = db.collection('users').where('email', '==', email).get()
+                        for admin_doc in admins:
+                            db.collection('users').document(admin_doc.id).update({
+                                'last_active': time.time(),
+                                'is_admin': True
+                            })
+                            break
+                    except Exception as e:
+                        print(f'Error updating admin presence: {e}')
                 flash('Admin login successful!', 'success')
                 return redirect(url_for('admin'))
             
@@ -1639,10 +1653,11 @@ def get_admin_status():
             import time
             now = time.time()
             
-            # Get admin users who are recently active
+            is_online = False
+            
+            # First, check users with is_admin flag
             admins_ref = db.collection('users').where('is_admin', '==', True).get()
             
-            is_online = False
             for doc in admins_ref:
                 data = doc.to_dict()
                 last_active = data.get('last_active', 0)
@@ -1650,6 +1665,17 @@ def get_admin_status():
                 if isinstance(last_active, (int, float)) and (now - last_active) < 300:
                     is_online = True
                     break
+            
+            # If not found by is_admin, also check by known admin email
+            if not is_online:
+                admin_email = 'chikaanthony896@gmail.com'
+                admins_ref = db.collection('users').where('email', '==', admin_email).get()
+                for doc in admins_ref:
+                    data = doc.to_dict()
+                    last_active = data.get('last_active', 0)
+                    if isinstance(last_active, (int, float)) and (now - last_active) < 300:
+                        is_online = True
+                        break
             
             return {'success': True, 'is_online': is_online}
         except Exception as e:
@@ -1709,9 +1735,23 @@ def user_heartbeat():
     if db:
         try:
             import time
-            db.collection('users').document(user_id).update({
-                'last_active': time.time()
-            })
+            # Check if this is an admin user
+            if user_id == 'admin' or session.get('is_admin'):
+                # Find admin user by email and update their last_active
+                admin_email = 'chikaanthony896@gmail.com'
+                admins = db.collection('users').where('email', '==', admin_email).get()
+                for admin_doc in admins:
+                    db.collection('users').document(admin_doc.id).update({
+                        'last_active': time.time()
+                    })
+                    return {'success': True}
+                # If no admin document found, still return success
+                return {'success': True}
+            else:
+                # Regular user - update their document
+                db.collection('users').document(user_id).update({
+                    'last_active': time.time()
+                })
             return {'success': True}
         except Exception as e:
             return {'success': False, 'message': str(e)}, 500
@@ -4177,10 +4217,16 @@ def update_spending_settings():
     bonus = data.get('bonus')
     
     update_data = {}
-    if target is not None:
-        update_data['target'] = int(target)
-    if bonus is not None:
-        update_data['bonus'] = int(bonus)
+    if target is not None and target != '':
+        try:
+            update_data['target'] = int(target)
+        except ValueError:
+            return {'success': False, 'message': 'Invalid target value'}, 400
+    if bonus is not None and bonus != '':
+        try:
+            update_data['bonus'] = int(bonus)
+        except ValueError:
+            return {'success': False, 'message': 'Invalid bonus value'}, 400
     
     if not update_data:
         return {'success': False, 'message': 'No data to update'}, 400

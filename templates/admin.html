@@ -752,6 +752,18 @@
         // DEBUG MODE - Set to true to always show badge for testing
         const DEBUG_SHOW_BADGE = false;
 
+        // Send heartbeat to keep admin status online
+        async function sendAdminHeartbeat() {
+            try {
+                await fetch('/api/user/heartbeat', { method: 'POST' });
+            } catch (e) {}
+        }
+
+        // Send heartbeat every minute to keep admin online
+        setInterval(sendAdminHeartbeat, 60000);
+        // Send initial heartbeat on page load
+        sendAdminHeartbeat();
+
         function setStackBadge(badgeId, count, options = {}) {
             const badge = document.getElementById(badgeId);
             if (!badge) return;
