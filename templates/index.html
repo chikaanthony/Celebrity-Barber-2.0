@@ -16,8 +16,7 @@
         <!-- Navigation -->
         <nav class="navbar">
             <div class="logo">
-                <span class="logo-icon">✂️</span>
-                <span class="logo-text">CELEBRITY BARBER</span>
+                <img src="{{ url_for('static', filename='logo.svg') }}" alt="CELEBRITY BARBERS" class="logo-img" style="height: 50px;">
             </div>
             
             <div class="nav-links desktop-only">
@@ -57,7 +56,7 @@
             </video>
             <div class="hero-overlay" aria-hidden="true"></div>
             <div class="hero-content">
-                <h1 class="brand-name">CELEBRITY BARBER</h1>
+                <h1 class="brand-name"><img src="{{ url_for('static', filename='logo.svg') }}" alt="CELEBRITY BARBERS" style="max-width: 300px; height: auto;"></h1>
                 <p class="tagline">FRESHNESS DELIVERED</p>
                 <button class="btn-cta" onclick="window.location.href='/login'">CLAIM YOUR IDENTITY</button>
                 <div class="center-admin">
@@ -110,7 +109,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>CELEBRITY BARBER</p>
+            <p><img src="{{ url_for('static', filename='logo.svg') }}" alt="CELEBRITY BARBERS" style="max-width: 200px; height: auto;"></p>
             <p class="location">Freshness Delivered - UNIUYO, Nigeria</p>
         </footer>
     </div>

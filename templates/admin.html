@@ -645,8 +645,7 @@
         <!-- Admin Header -->
         <nav class="admin-nav">
             <div class="logo">
-                <span class="logo-icon">✂️</span>
-                <span class="logo-text">CELEBRITY BARBER</span>
+                <img src="{{ url_for('static', filename='logo.svg') }}" alt="CELEBRITY BARBERS" class="logo-img" style="height: 40px;">
             </div>
             <div class="admin-user">
                 <span class="admin-name">Admin User</span>
@@ -748,7 +747,8 @@
         
         <!-- Section Content - Removed - Will be separate pages -->
         </div>
-    </div>    <script>
+    </div>
+    <script>
         // DEBUG MODE - Set to true to always show badge for testing
         const DEBUG_SHOW_BADGE = false;
 
