@@ -1,16 +1,19 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" fill="#000000"/>
-
-  <g transform="translate(1, 1) scale(0.9)">
-    <path d="M0 15 L8 15" stroke="#EAB308" stroke-width="1.5" stroke-linecap="round"/>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#000000"/>
+  <text x="50%" y="120" dominant-baseline="middle" text-anchor="middle" font-family="serif" font-size="52" font-weight="bold" fill="#EAB308" style="letter-spacing: 2px;">CELEBRITY</text>
+  
+  <g transform="translate(110, 145)">
+    <path d="M0 15 L70 15" stroke="#EAB308" stroke-width="2" stroke-linecap="round"/>
     
-    <g transform="translate(10, 0) scale(0.4)">
-        <path d="M10 25C10 19.4772 14.4772 15 20 15C25.5228 15 30 19.4772 30 25C30 30.5228 25.5228 35 20 35C14.4772 35 10 30.5228 10 25ZM20 18C16.134 18 13 21.134 13 25C13 28.866 16.134 32 20 32C23.866 32 27 28.866 27 25C27 21.134 23.866 18 20 18Z" fill="#EAB308"/>
-        <path d="M50 25C50 19.4772 54.4772 15 60 15C65.5228 15 70 19.4772 70 25C70 30.5228 65.5228 35 60 35C54.4772 35 50 30.5228 50 25ZM60 18C56.134 18 53 21.134 53 25C53 28.866 56.134 32 60 32C63.866 32 67 28.866 67 25C67 21.134 63.866 18 60 18Z" fill="#EAB308"/>
-        <rect x="35" y="5" width="2.5" height="45" transform="rotate(-45 35 5)" fill="#EAB308"/>
-        <rect x="45" y="5" width="2.5" height="45" transform="rotate(45 45 5)" fill="#EAB308"/>
+    <g transform="translate(75, 0) scale(0.6)">
+        <circle cx="20" cy="25" r="7" stroke="#EAB308" stroke-width="3" fill="none"/>
+        <circle cx="60" cy="25" r="7" stroke="#EAB308" stroke-width="3" fill="none"/>
+        <rect x="35" y="5" width="3" height="45" transform="rotate(-45 35 5)" fill="#EAB308"/>
+        <rect x="45" y="5" width="3" height="45" transform="rotate(45 45 5)" fill="#EAB308"/>
     </g>
 
-    <path d="M22 15 L30 15" stroke="#EAB308" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M135 15 L205 15" stroke="#EAB308" stroke-width="2" stroke-linecap="round"/>
   </g>
+
+  <text x="50%" y="250" dominant-baseline="middle" text-anchor="middle" font-family="serif" font-size="64" font-weight="bold" fill="#EAB308" style="letter-spacing: 4px;">BARBERS</text>
 </svg>
