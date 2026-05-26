@@ -2474,94 +2474,57 @@ def get_user_notifications():
             notifications = []
             seen_notifications = session.get('seen_notifications', [])
             
-            # Get user's bookings for notification data (without ordering to avoid index issues)
-            bookings = db.collection('bookings').where('user_id', '==', user_id).limit(20).get()
-            
-            # Convert to list and sort by created_at locally
-            bookings_list = [doc.to_dict() | {'id': doc.id} for doc in bookings]
-            bookings_list.sort(key=lambda x: x.get('created_at', ''), reverse=True)
-            
-            for data in bookings_list[:10]:
-                status = data.get('status', 'pending')
-                service = data.get('service', 'Haircut Service')
-                price = data.get('price', data.get('amount', 0))
-                created_at = data.get('created_at')
-                doc_id = data.get('id', '')
+            # Read from notifications collection only
+            try:
+                notifications_ref = db.collection('notifications')
+                all_notifications = notifications_ref.limit(50).get()
                 
-                # Check if this notification has been seen
-                is_seen = doc_id in seen_notifications
-                
-                # Convert timestamp to readable format
-                time_ago = 'recently'
-                if created_at:
-                    try:
-                        from datetime import datetime
-                        import time
-                        if hasattr(created_at, 'timestamp'):
-                            diff = time.time() - created_at.timestamp()
-                            if diff < 60:
-                                time_ago = 'just now'
-                            elif diff < 3600:
-                                time_ago = f'{int(diff/60)}m ago'
-                            elif diff < 86400:
-                                time_ago = f'{int(diff/3600)}h ago'
-                            else:
-                                time_ago = f'{int(diff/86400)}d ago'
-                    except:
-                        pass
-                
-                if status == 'pending':
+                for doc in all_notifications:
+                    data = doc.to_dict() or {}
+                    
+                    # Only include notifications for this user
+                    if data.get('user_id') != user_id:
+                        continue
+                    
+                    # Convert timestamp to readable format
+                    created_at = data.get('created_at')
+                    time_ago = 'recently'
+                    if created_at:
+                        try:
+                            import time
+                            if hasattr(created_at, 'timestamp'):
+                                diff = time.time() - created_at.timestamp()
+                                if diff < 60:
+                                    time_ago = 'just now'
+                                elif diff < 3600:
+                                    time_ago = f'{int(diff/60)}m ago'
+                                elif diff < 86400:
+                                    time_ago = f'{int(diff/3600)}h ago'
+                                else:
+                                    time_ago = f'{int(diff/86400)}d ago'
+                        except:
+                            pass
+                    
+                    # Get the icon based on type
+                    notif_type = data.get('type', 'default')
+                    icon, icon_type = get_notification_icon(notif_type)
+                    
                     notifications.append({
-                        'id': doc_id,
-                        'type': 'booking',
-                        'icon': 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦',
-                        'icon_type': 'booking',
-                        'title': 'Booking Pending',
-                        'message': f'Your appointment for {service} is awaiting confirmation.',
+                        'id': doc.id,
+                        'type': notif_type,
+                        'icon': data.get('icon', icon),
+                        'icon_type': data.get('icon_type', icon_type),
+                        'title': data.get('title', 'Notification'),
+                        'message': data.get('message', ''),
                         'time': time_ago,
-                        'unread': not is_seen
+                        'unread': not data.get('read', False)
                     })
-                elif status == 'approved':
-                    notifications.append({
-                        'id': doc_id,
-                        'type': 'booking',
-                        'icon': 'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦',
-                        'icon_type': 'success',
-                        'title': 'Booking Approved',
-                        'message': f'Your appointment for {service} has been approved!',
-                        'time': time_ago,
-                        'unread': not is_seen
-                    })
-                elif status == 'confirmed':
-                    notifications.append({
-                        'id': doc_id,
-                        'type': 'booking',
-                        'icon': 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦',
-                        'icon_type': 'booking',
-                        'title': 'Booking Confirmed',
-                        'message': f'Your appointment for {service} has been confirmed.',
-                        'time': time_ago,
-                        'unread': False
-                    })
+            except Exception as e:
+                print(f"Error fetching notifications: {e}")
+                notifications = []
             
-            # Get user profile for VIP status
-            user_doc = db.collection('users').document(user_id).get()
-            if user_doc.exists:
-                user_data = user_doc.to_dict() or {}
-                is_vip = user_data.get('is_vip', False) or user_data.get('isVIP', False)
-                
-                if is_vip:
-                    notifications.append({
-                        'id': 'vip_status',
-                        'type': 'vip',
-                        'icon': 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“',
-                        'icon_type': 'vip',
-                        'title': 'VIP Status Active',
-                        'message': 'You are a VIP member! Enjoy priority cutting and exclusive benefits.',
-                        'time': 'active',
-                        'unread': False
-                    })
-            
+            # Sort notifications by created_at descending
+            notifications.sort(key=lambda x: x.get('created_at', ''), reverse=True)
             return {'success': True, 'data': notifications}
         except Exception as e:
             print(f"Error fetching notifications: {e}")

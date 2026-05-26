@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+`1234<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -71,15 +71,33 @@
             // Sort: unread first, then read
             notifications.sort((a, b) => (b.unread === true) - (a.unread === true));
             
+            // Remove duplicates based on id
+            const seen = new Set();
+            notifications = notifications.filter(n => {
+                if (seen.has(n.id)) return false;
+                seen.add(n.id);
+                return true;
+            });
+            
+            // Helper function to decode HTML entities
+            function decodeHtml(html) {
+                const txt = document.createElement('textarea');
+                txt.innerHTML = html;
+                return txt.value;
+            }
+            
             notifications.forEach(notif => {
                 const item = document.createElement('div');
                 item.className = `notification-item ${notif.unread ? 'unread' : ''}`;
                 item.setAttribute('data-id', notif.id);
                 item.onclick = () => openNotification(notif.id);
                 
+                // Decode HTML entities in icon
+                const icon = decodeHtml(notif.icon || '📅');
+                
                 item.innerHTML = `
                     <div class="notif-icon-box ${notif.icon_type || 'booking'}">
-                        <span>${notif.icon || '📅'}</span>
+                        <span>${icon}</span>
                     </div>
                     <div class="notif-content">
                         <div class="notif-top">
